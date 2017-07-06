@@ -1,0 +1,48 @@
+package digital.container.service.databasefile;
+
+import digital.container.storage.domain.model.DatabaseFile;
+import digital.container.storage.domain.model.DatabaseFilePart;
+import digital.container.repository.DatabaseFilePartRepository;
+import io.gumga.application.GumgaService;
+import io.gumga.domain.repository.GumgaCrudRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+@Service
+public class DatabaseFilePartService extends GumgaService<DatabaseFilePart, Long> {
+
+    @Autowired
+    private DatabaseFilePartRepository databaseFilePartRepository;
+
+    @Autowired
+    public DatabaseFilePartService(GumgaCrudRepository<DatabaseFilePart, Long> repository) {
+        super(repository);
+    }
+
+    @Transactional
+    public void saveFile(DatabaseFile databaseFile, MultipartFile multipartFile) {
+        try(InputStream inputStream = multipartFile.getInputStream()) {
+
+            while (inputStream.available() > 0) {
+                DatabaseFilePart newDatabaseFilePart = new DatabaseFilePart();
+                newDatabaseFilePart.setDatabaseFile(databaseFile);
+
+                byte buffer[] = new byte[inputStream.available() > DatabaseFilePart.PART_SIZE ? DatabaseFilePart.PART_SIZE : inputStream.available()];
+                newDatabaseFilePart.setRawBytes(buffer);
+                inputStream.read(buffer);
+
+                DatabaseFilePart databaseFilePartSaved = this.databaseFilePartRepository.saveAndFlush(newDatabaseFilePart);
+
+                databaseFile.addDatabaseFilePart(databaseFilePartSaved);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}

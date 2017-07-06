@@ -1,0 +1,37 @@
+{
+  "name": "gumga-alert-ng",
+  "version": "1.0.4",
+  "description": "Gumga Alert",
+  "main": "./src/rest.js",
+  "authors": [
+    "Gumga Tecnologia da Informação S/A"
+  ],
+  "license": "LGPL-3.0",
+  "keywords": [
+    "gumga",
+    "rest"
+  ],
+  "homepage": "https://github.com/GUMGA/gumga-alert-ng",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.8"
+  },
+  "devDependencies": {
+    "remarkable-bootstrap-notify": "^3.1.3"
+  },
+  "_release": "1.0.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.4",
+    "commit": "aa3b72d97afece0a971cdd80c7af4df058298c93"
+  },
+  "_source": "https://github.com/GUMGA/gumga-alert-ng.git",
+  "_target": "*",
+  "_originalSource": "gumga-alert-ng"
+}

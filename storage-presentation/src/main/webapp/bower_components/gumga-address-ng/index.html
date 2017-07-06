@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="app">
+
+<head>
+  <title></title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+    <!--<link rel="stylesheet" href="gumga.css">-->
+</head>
+
+<body data-ng-controller="ctrl">
+
+  <div class="container">
+    <h1>Gumga Address</h1>
+    <div class="row">
+      <div class="col-md-7 col-md-offset-2">
+      <gumga-address   state-code="true"
+                       value="address"
+                       name="endereco"
+                       title="Preencha um endereço"
+                       state-city="false"
+                       state-city-ibge="true"
+                       cep="false"
+                       neighbourhood="true"
+                       street="false"
+                       lat-lng="true"
+                       street-number="true"
+                       coords-by-number="true"
+                       complement="true"
+                       on-search-cep-start="start()"
+                       on-search-cep-success="success()"
+                       on-search-cep-error="error()">
+        </gumga-address>
+  <pre>
+  {{address | json}}
+  </pre>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="node_modules/angular/angular.min.js"></script>
+  <script src="node_modules/gumga-mask-ng/dist/gumga-mask.min.js"></script>
+  <script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+  <script src="dist/gumga-address.min.js"></script>
+  <script>
+    angular
+      .module('app', ['ui.bootstrap','gumga.address', 'gumga.mask'])
+      .config(function ($httpProvider) {
+      })
+      .controller('ctrl', ['$scope', function ($scope) {
+
+        $scope.address =   {
+          "zipCode": "86890000",
+          "premisseType": "AVENIDA",
+          "premisse": "Brasil",
+          "number": null,
+          "information": null,
+          "neighbourhood": "jardim pérola",
+          "localization": "cambira",
+          "state": "PR",
+          "country": "Brasil",
+          "formalCode": "4118402"
+        };
+
+      }])
+  </script>
+</body>
+
+</html>

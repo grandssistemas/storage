@@ -1,0 +1,36 @@
+{
+  "name": "gumga-breadcrumb",
+  "description": "Gumga Breadcrumb (Angular 1.x)",
+  "main": "./src/breadcrumb.js",
+  "authors": [
+    "Gumga Tecnologia da Informação S/A"
+  ],
+  "license": "LGPL-3.0",
+  "keywords": [
+    "Gumga",
+    "Breadcrumb",
+    "Angular",
+    "1.x"
+  ],
+  "homepage": "https://github.com/guiseek/gumga-breadcrumb",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.8",
+    "angular-bootstrap": "2.3.2"
+  },
+  "_release": "900d995412",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "900d995412bc8990d30fe962f47958c5c7bb7961"
+  },
+  "_source": "https://github.com/GUMGA/gumga-breadcrumb.git",
+  "_target": "*",
+  "_originalSource": "gumga-breadcrumb"
+}

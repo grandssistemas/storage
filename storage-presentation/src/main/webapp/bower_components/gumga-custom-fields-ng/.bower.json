@@ -1,0 +1,37 @@
+{
+  "name": "gumga-custom-fields-ng",
+  "description": "Gumga Custom Fields (Angular 1.x)",
+  "main": "./src/custom-fields.js",
+  "version": "1.0.2",
+  "authors": [
+    "Gumga Tecnologia da Informação S/A"
+  ],
+  "license": "LGPL-3.0",
+  "keywords": [
+    "gumga",
+    "custom",
+    "fields",
+    "angular",
+    "1.x"
+  ],
+  "homepage": "https://github.com/GUMGA/gumga-custom-fields-ng",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.8"
+  },
+  "_release": "1.0.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.2",
+    "commit": "7c27bd6c41b7b1e02266d9872c7b8f294fa9f670"
+  },
+  "_source": "https://github.com/GUMGA/gumga-custom-fields-ng.git",
+  "_target": "*",
+  "_originalSource": "gumga-custom-fields-ng"
+}

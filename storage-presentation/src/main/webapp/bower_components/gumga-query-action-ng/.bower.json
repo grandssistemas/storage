@@ -1,0 +1,35 @@
+{
+  "name": "gumga-query-action-ng",
+  "description": "Gumga Query Action",
+  "main": "./src/query-action.js",
+  "authors": [
+    "Gumga Tecnologia da Informação S/A"
+  ],
+  "license": "LGPL-3.0",
+  "keywords": [
+    "gumga",
+    "query action",
+    "angular 1.x"
+  ],
+  "homepage": "https://github.com/GUMGA/gumga-query-action-ng",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.8",
+    "angular-bootstrap": "2.3.2"
+  },
+  "_release": "eb3830e919",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "eb3830e91971c321cb7e21963f12b24f196add91"
+  },
+  "_source": "https://github.com/GUMGA/gumga-query-action-ng.git",
+  "_target": "*",
+  "_originalSource": "gumga-query-action-ng"
+}

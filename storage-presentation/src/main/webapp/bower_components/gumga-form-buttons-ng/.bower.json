@@ -1,0 +1,38 @@
+{
+  "name": "gumga-form-buttons-ng",
+  "version": "1.1.0",
+  "description": "Gumga Form Buttons",
+  "main": "./src/index.js",
+  "authors": [
+    "Gumga Tecnologia da Informação S/A"
+  ],
+  "license": "GPL-3.0",
+  "keywords": [
+    "gumga",
+    "form",
+    "buttons",
+    "angular 1.x"
+  ],
+  "homepage": "https://github.com/GUMGA/gumga-form-buttons-ng",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.8",
+    "angular-bootstrap": "2.3.2",
+    "angular-ui-router": "0.2.15"
+  },
+  "_release": "1.1.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.1.0",
+    "commit": "446a0935d70fb5f085f73e421a9848d919898ff6"
+  },
+  "_source": "https://github.com/GUMGA/gumga-form-buttons-ng.git",
+  "_target": "*",
+  "_originalSource": "gumga-form-buttons-ng"
+}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="yourApp">
+
+<head>
+  <title>Gumga List</title>
+  <meta charset="UTF-8">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+  <meta name="viewport" content="width=device-width">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://gumga.github.io/layout/gumga-layout/gumga-layout.css"/>
+
+</head>
+
+<body ng-controller="manyToOneCtrl" >
+  <div class="gumga-layout">
+    <form name="Example">
+      <br>
+      <br>
+      <br>
+
+      <!-- {{mateus}} -->
+      <div class="col-md-12">
+        <div class="col-md-12">
+          <gumga-list data="pessoa.data"
+                      selected-values="mateus"
+                      name="pessoa"
+                      configuration="tableConfig"
+                      page-size="pessoa.pageSize"
+                      page-position="bottom"
+                      page-align="flex-end"
+                      count="pessoa.count"
+                      page-model="page"
+                      on-row-change="update(row)"
+                      on-page-change="pessoa.methods.get(page, pageSize)"
+            ></gumga-list>
+
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <style media="screen">
+    body{
+      background: #f5f5f5;
+    }
+    .disponivel{
+      color: red !important;
+    }
+    .nao-disponivel:hover{
+      color: red !important;
+    }
+    html {
+      touch-action: manipulation;
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="node_modules/angular/angular.min.js"></script>
+  <script src="node_modules/gumga-rest-ng/dist/gumga-rest.min.js"></script>
+  <script src="node_modules/gumga-controller-ng/dist/gumga-controller.min.js"></script>
+  <script src="dist/gumga-list.js"></script>
+
+  <script>
+    angular.module('yourApp', ['gumga.rest','gumga.controller','gumga.list'])
+      .config(function ($httpProvider) {
+        $httpProvider.defaults.headers.common['gumgaToken'] = 'eterno'
+        // $httpProvider.defaults.headers.common['gumgaToken'] = 'homologacaokids'
+        // $httpProvider.defaults.headers.common['gumgaToken'] = 'batistakids'
+      })
+      .controller('manyToOneCtrl', ['GumgaRest','gumgaController','$scope', '$http',
+        function (GumgaRest,gumgaController,$scope, $http) {
+          var PessoaService = new GumgaRest('https://gumga.io/security-api/api/user');
+          // var PessoaService = new GumgaRest('http://192.168.25.250/gileadeweb-api/api/pessoacadastro');
+
+        gumgaController.createRestMethods($scope, PessoaService, 'pessoa');
+
+        $scope.pessoa.methods.getLatestOperation();
+
+        $scope.update = function(){}
+
+        $scope.tableConfig = {
+          columns: 'id, name, login',
+          itemsPerPage: [5, 10],
+          checkbox: true,
+          // title: 'Listagem de usuários',
+          disabledRow: function(row){
+            return row.id == 3 || row.id == 7 || row.id == 16 || row.name == 'GumgaAdmin'
+          },
+          actions: [{
+            icon: '<button class="btn btn gmd" aria-hidden="true">Apenas os lindos</button>',
+            onClick: function(p1, p2){
+              $scope.pessoa.methods.search('name', 'Mateus');
+            }
+          }],
+          materialTheme: true,
+          // checkboxColor: 'red',
+          // activeLineColor: 'red',
+          // hoverLineColor: 'red',
+          ordination: true,
+          resizable: true,
+          fixed: {
+              head: true,
+              left: 2
+          },
+          selection: "multi",
+          columnsConfig: [
+            {
+              name: 'id',
+              title: 'Codigo',
+              content: '{{$value.id}}',
+              sortField: 'id'
+            },
+            {
+              name: 'name',
+              editable: true,
+              title: 'Nome completo',
+              content: '{{$value.name}}',
+              sortField: 'name'
+            },
+            {
+              name: 'login',
+              title: 'E-mail',
+              content: '{{$value.login}}',
+              sortField: 'login'
+            },
+            {
+              name: 'view',
+              title: 'Ações',
+              content: ' <span class="pull-right"><a uib-tooltip="View" class="btn btn-primary btn-sm" ui-sref="gumgaController.view({id: $value.id })"><i class="glyphicon glyphicon-eye-open"></i></a></span>'
+            }
+          ]
+        }
+
+      }
+      ])
+  </script>
+</body>
+</html>

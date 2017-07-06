@@ -1,0 +1,27 @@
+{
+  "name": "gumga-many-to-one-ng",
+  "description": "Gumga Many To One",
+  "version": "1.1.8",
+  "main": "./src/many-to-one.js",
+  "authors": [
+    "Gumga Tecnologia da Informação S/A"
+  ],
+  "license": "LGPL-3.0",
+  "keywords": [
+    "gumga",
+    "many to one",
+    "angular 1.x"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.8",
+    "angular-bootstrap": "2.3.2"
+  }
+}

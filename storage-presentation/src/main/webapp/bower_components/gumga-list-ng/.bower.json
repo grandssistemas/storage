@@ -1,0 +1,35 @@
+{
+  "name": "gumga-list-ng",
+  "version": "1.2.3",
+  "description": "Gumga List",
+  "main": "./src/list.js",
+  "authors": [
+    "Gumga Tecnologia da Informação S/A"
+  ],
+  "license": "LGPL-3.0",
+  "keywords": [
+    "gumga",
+    "controller",
+    "angular 1.x"
+  ],
+  "homepage": "https://github.com/GUMGA/gumga-list-ng",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.8"
+  },
+  "_release": "1.2.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.2.3",
+    "commit": "534f22f4cb5e8f9a389f938b9a64ac0b655f8f32"
+  },
+  "_source": "https://github.com/GUMGA/gumga-list-ng.git",
+  "_target": "*",
+  "_originalSource": "gumga-list-ng"
+}

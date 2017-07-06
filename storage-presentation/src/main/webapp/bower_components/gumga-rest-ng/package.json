@@ -1,0 +1,62 @@
+{
+  "name": "gumga-rest-ng",
+  "version": "1.1.5",
+  "description": "Gumga Rest",
+  "main": "./src/rest.js",
+  "directories": {
+    "example": "example"
+  },
+  "dependencies": {
+    "angular": "1.5.8"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
+  "devDependencies": {
+    "angular": "^1.6.4",
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.8",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "babel-preset-stage-0": "^6.16.0",
+    "css-loader": "^0.28.2",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "file-loader": "^0.11.1",
+    "gumga-controller-ng": "^1.1.3",
+    "gumga-list-ng": "^1.2.1",
+    "chai": "^4.0.2",
+    "istanbul-instrumenter-loader": "^2.0.0",
+    "karma": "^1.7.0",
+    "karma-babel-preprocessor": "^6.0.1",
+    "karma-chrome-launcher": "^2.1.1",
+    "karma-coverage": "^1.1.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-jshint-preprocessor": "0.0.6",
+    "karma-mocha": "^1.3.0",
+    "karma-mocha-reporter": "^2.2.3",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-spec-reporter": "0.0.31",
+    "karma-webpack": "^2.0.3",
+    "mocha": "^3.4.2",
+    "script-loader": "^0.7.0",
+    "uglifyjs-webpack-plugin": "^0.4.3",
+    "unminified-webpack-plugin": "^1.1.1",
+    "webpack": "^2.6.0",
+    "webpack-dev-server": "^1.16.2",
+    "webpack-stream": "^3.2.0"
+  },
+  "scripts": {
+    "dev": "webpack-dev-server --config ./webpack.dev.config.js",
+    "prod": "NODE_ENV=production webpack --config ./webpack.production.config.js && webpack --config ./webpack.production.bundle.config",
+    "doc": "node ./docs/create-doc.js",
+    "test": "karma start ./webpack.karma.config.js"
+  },
+  "keywords": [
+    "gumga",
+    "rest"
+  ],
+  "author": "Gumga Tecnologia da Informação S/A",
+  "license": "LGPL-3.0"
+}

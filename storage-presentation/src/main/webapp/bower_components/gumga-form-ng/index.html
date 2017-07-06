@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html ng-app="yourApp">
+  <head>
+    <meta charset="utf-8">
+    <title>Gumga Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+
+  </head>
+  <body ng-controller="filterCtrl">
+
+    <br><br><br>
+  <div class="container">
+
+    <form name="myForm" gumga-form>
+      <button type="button" class="btn" ng-click="juridico = !juridico">{{juridico ? 'Fisico': 'Juridico'}}</button> <br>
+      <div class="row">
+        <div class="col-md-6" ng-if="!juridico">
+          <label>CPF</label>
+          <input type="number" name="CPF" class="form-control" gumga-required ng-model="CPF">
+        </div>
+        <div class="col-md-6" ng-if="juridico">
+          <label>CNPJ</label>
+          <input type="number" name="CNPJ" class="form-control" gumga-required ng-model="CNPJ">
+        </div>
+      </div>
+      <br>
+      <label>Cliente</label>
+      <gumga-many-to-one
+        value="selecionado"
+        gumga-model-error="configManyToOne"
+        ng-if="!juridico"
+        search-method="pessoas.methods.asyncSearch('nome', param)"
+        editable="false"
+        field="nome"
+        authorize-add="false"
+        async="true"
+        display-info="false">
+      <match>
+        <div>{{match.model.nome}}</div>
+      </match>
+      </gumga-many-to-one>
+
+      <br>
+      <label>Valor</label>
+      <input type="number" name="minNumber" ng-model="minNumber" gumga-min-number="20" class="form-control">
+      <br/>
+      <label>Email</label>
+      <input type="email" name="email" ng-init="email='user@host.com';" ng-model="email" class="form-control" gumga-validate-type />
+      <br>
+      <gumga-errors placement="right" icon="glyphicon glyphicon-info-sign" label="Campos inválidos" title="Campos inválidos"></gumga-errors>
+    </form>
+
+    <br>
+
+    <div class="row">
+      <div class="col-sm-6">
+<pre>
+Arrar exemplo: $scope.items = []
+{
+  ngModel : 'items', //NOME DA VARIAVEL NO SCOPE
+  options : {
+    type: 'array', //ng model deve ser um array
+    message: 'Não é um array',
+    empty: {
+      value: false, //NAO PODE SER VAZIO
+      message: 'Está vazio' //MENSAGEM SE ESTIVER VAZIO
+    },
+    min: {
+      value: 2, //DEVE TER NO MINIMO 2 OCORENCIAS NO ARRAY
+      message: 'Não tem duas ocorrencias no array'
+    },
+    max: {
+      value: 4, //DEVE TER NO MAXIMO 4 OCORENCIAS NO ARRAY
+      message: 'tem mais que 4 ocorrencias no array'
+    }
+  }
+}
+</pre>
+      </div>
+      <div class="col-sm-6">
+<pre>
+Object exemplo: $scope.item = {}
+{
+  ngModel : 'item', //NOME DA VARIAVEL NO SCOPE
+  options : {
+    type: 'object', //ng model deve ser um array
+    message: 'Não é um Object',
+    empty: {
+      value: false, //NAO PODE SER VAZIO
+      message: 'Está vazio' //MENSAGEM SE ESTIVER VAZIO
+    },
+    fields: [
+      {
+        name: 'nome', //NOME DO ATRIBUTO A SER VALIDADO NO OBJETO
+        equal: { // EMPTY, EQUAL, CONTAINS, MAX, MIN
+          value: 'MATEUS MIRANDA',
+          message: 'CASO NÃO OBDECER '
+        }
+      }
+    ]
+  }
+}
+</pre>
+      </div>
+    </div>
+
+  </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="node_modules/angular/angular.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js"></script>
+    <script src="node_modules/gumga-many-to-one-ng/dist/gumga-many-to-one.min.js"></script>
+    <script src="node_modules/gumga-rest-ng/dist/gumga-rest.min.js"></script>
+    <script src="node_modules/gumga-controller-ng/dist/gumga-controller.min.js"></script>
+    <script src="dist/gumga-form.js"></script>
+
+    <script>
+    angular.module('yourApp', ['gumga.form','gumga.manytoone','gumga.controller','gumga.rest', 'ui.bootstrap'])
+      .config(function ($httpProvider) {
+        $httpProvider.defaults.headers.common['gumgaToken'] = 'tokenkids'
+      })
+      .controller('filterCtrl', ['gumgaController', 'GumgaRest','$scope',
+        function (gumgaController, GumgaRest, $scope) {
+          var PessoaService = new GumgaRest('http://192.168.25.250/gileadeweb-api/api/pessoacadastro');
+          gumgaController.createRestMethods($scope, PessoaService, 'pessoas');
+          $scope.pessoas.methods.get();
+
+          $scope.idade = 0
+
+          $scope.selecionados = [
+          ]
+
+          //IGUAL
+          //DIFERENTE
+          //CONTEM
+          //MINIMO
+          //MAXIMO
+
+          $scope.configManyToOne = {
+            ngModel : 'selecionados',
+            options : {
+              type: 'array',
+              empty: {
+                value: false,
+                message: 'Está vazio'
+              },
+              fields: [
+                // {
+                //   name: 'nome',
+                //   regex: {
+                //     value: 'WILLIAN',
+                //     message: 'Regex teste'
+                //   }
+                // }
+              ]
+            }
+          }
+
+
+          $scope.getSearch = function(param){
+              return $q(function(resolve){
+                  var arr = $scope.produtos.filter(function(produto){
+                    return produto.nome.indexOf(param) != -1;
+                  })
+                  resolve(arr);
+              })
+          }
+
+        }
+      ]);
+  </script>
+
+  </body>
+</html>

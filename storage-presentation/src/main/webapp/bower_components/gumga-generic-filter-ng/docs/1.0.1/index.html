@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html ng-app="app">
+  <head>
+    <meta charset="utf-8">
+    <title>gumga-generic-filter-ng</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://gumga.github.io/components/style.css">
+
+  </head>
+  <body >
+
+    <nav class="navbar navbar-inverse" ng-controller="VersionController as ctrl">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">gumga-generic-filter-ng</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#"
+                 class="dropdown-toggle"
+                 data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ctrl.version}} <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li ng-repeat="version in ctrl.versions"><a href="../{{version}}">{{version}}</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container" ng-controller="Ctrl as ctrl">
+      <div class="row">
+        <div class="col-xs-6">
+          <h2>Descrição</h2>
+          <p>O componente gumga-generic-filter-ng é um filtro genérico que até agora permite aplicar filtros para datas no formato pt-br, em CPF e CNPJ.</p>
+        </div>
+        <div class="col-xs-6">
+          <h3>Instalação</h3>
+          <pre><code class="prettyprint">// npm
+npm i gumga-generic-filter-ng --save
+
+// bower
+bower install gumga-generic-filter-ng --save</code></pre>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Usando
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-xs-6">
+              <div class="row">
+                <div class="col-xs-6">
+                  <h4>HTML filter:</h4>
+                  <p>Data: {{ctrl.html.date | gumgaGenericFilter:'date'}}</p>
+                  <p>CPF: {{ctrl.html.cpf | gumgaGenericFilter:'cpf'}}</p>
+                  <p>CNPJ: {{ctrl.html.cnpj | gumgaGenericFilter:'cnpj'}}</p>
+                </div>
+                <div class="col-xs-6">
+                  <h4>JS filter:</h4>
+                  <p>Data: {{ctrl.js.date}}</p>
+                  <p>CPF: {{ctrl.js.cpf}}</p>
+                  <p>CNPJ: {{ctrl.js.cnpj}}</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-6">
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#html" aria-controls="html" role="tab" data-toggle="tab">HTML</a></li>
+                <li role="presentation"><a href="#js" aria-controls="js" role="tab" data-toggle="tab">JavaScript</a></li>
+              </ul>
+              <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="html">
+                  <pre><code  class="prettyprint" ng-non-bindable>&lt;p>Data: &lcub;&lcub;ctrl.js.date&rcub;&rcub;&lt;/p>
+&lt;p>CPF: &lcub;&lcub;ctrl.js.cpf&rcub;&rcub; &lt;/p>
+&lt;p>CNPJ: &lcub;&lcub;ctrl.js.cnpj&rcub;&rcub;&lt;/p>
+&lt;p>Data: &lcub;&lcub;ctrl.html.date | gumgaGenericFilter:'date'&rcub;&rcub;&lt;/p>
+&lt;p>CPF: &lcub;&lcub;ctrl.html.cpf | gumgaGenericFilter:'cpf'&rcub;&rcub; &lt;/p>
+&lt;p>CNPJ: &lcub;&lcub;ctrl.html.cnpj | gumgaGenericFilter:'cnpj'&rcub;&rcub;&lt;/p>
+</code></pre>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="js">
+                  <pre><code class="prettyprint">angular.module('app', ['gumga.genericfilter'])
+  .controller('Ctrl', function ($filter) {
+    var ctrl = this;
+    ctrl.html = {
+      date: '29121986',
+      cpf: '32165498700',
+      cnpj: '11131821000183'
+    }
+    ctrl.js = {
+      date: $filter('gumgaGenericFilter')('29121986', 'date'),
+      cpf: $filter('gumgaGenericFilter')('32165498700', 'cpf'),
+      cnpj: $filter('gumgaGenericFilter')('11131821000183', 'cnpj')
+    }
+  })</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    <script src="dist/gumga-generic-filter.min.js"></script>
+
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="https://gumga.github.io/components/app.js"></script>
+
+  </body>
+</html>

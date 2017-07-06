@@ -1,0 +1,35 @@
+{
+  "name": "gumga-form-ng",
+  "version": "1.0.4",
+  "description": "Gumga Form",
+  "main": "./src/index.js",
+  "authors": [
+    "Gumga Tecnologia da Informação S/A"
+  ],
+  "license": "LGPL-3.0",
+  "keywords": [
+    "gumga",
+    "form",
+    "angular 1.x"
+  ],
+  "homepage": "https://github.com/guiseek/gumga-form-ng",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.8"
+  },
+  "_release": "1.0.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.4",
+    "commit": "8316608cd3a4dbe778c5f619bb3629661ca96a59"
+  },
+  "_source": "https://github.com/GUMGA/gumga-form-ng.git",
+  "_target": "*",
+  "_originalSource": "gumga-form-ng"
+}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html ng-app="app">
+  <head>
+    <meta charset="utf-8">
+    <title>gumga-counter-ng</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://gumga.github.io/components/style.css">
+
+  </head>
+  <body >
+
+    <nav class="navbar navbar-inverse" ng-controller="VersionController as ctrl">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">gumga-counter-ng</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#"
+                 class="dropdown-toggle"
+                 data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ctrl.version}} <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li ng-repeat="version in ctrl.versions"><a href="../{{version}}">{{version}}</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container" ng-controller="Ctrl as ctrl">
+      <div class="row">
+        <div class="col-xs-4">
+          <h2>Descrição</h2>
+          <p>O componente gumgaCounter permite escolher um tamanho máximo permitido no campo e também cria um contador de que indica se o número de caracteres do que está no input. Caso seja passado um valor para a directive ou ela seja utilizada em conjunto com a directive gumgaMaxLength, o contador indicará o máximo de caracteres possíveis também. </p>
+        </div>
+        <div class="col-xs-8">
+          <h3>Instalação</h3>
+          <pre ><code class="prettyprint">// npm
+npm install gumga-counter-ng --save
+
+// bower
+bower install gumga-counter-ng --save
+
+//Injeção do modulo
+angular.module('yourApp', ['gumga.counter']);
+
+&lt;script src="node_modules/gumga-counter-ng/dist/gumga-counter.min.js"&gt;&lt;/script&gt;
+&lt;script src="bower_components/gumga-counter-ng/dist/gumga-counter.min.js"&gt;&lt;/script&gt;
+</code></pre>
+
+
+
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Usando
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-xs-6">
+              <form name="Example">
+                <label>Exemplo:</label>
+                <input  type="text"
+                        gumga-counter
+                        gumga-max-length-text="10"
+                        ng-model="entity.name"
+                        class="form-control"/>
+              </form>
+            </div>
+            <div class="col-xs-6">
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#html" aria-controls="home" role="tab" data-toggle="tab">HTML</a></li>
+                <!-- <li role="presentation"><a href="#js" aria-controls="profile" role="tab" data-toggle="tab">JavaScript</a></li> -->
+              </ul>
+              <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active">
+                  <pre><code  class="prettyprint" ng-non-bindable>&lt;form name="Example"&gt;
+  &lt;label>Exemplo: {{entity.name}}&lt;/label&gt;
+  &lt;input  type="text"
+          gumga-counter
+          gumga-max-length-text="10"
+          ng-model="entity.name"
+          class="form-control"/&gt;
+&lt;/form&gt;
+</code></pre>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Atributos
+        </div>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Parâmetro</th>
+              <th>Tipo</th>
+              <th>Requerido</th>
+              <th>Descrição</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>gumga-max-length-text</strong></td>
+              <td><code>Number</code></td>
+              <td>Não</td>
+              <td>Quantidade máxima de caracteres permitidos.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+
+    <script src="dist/gumga-counter.min.js"></script>
+
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="https://gumga.github.io/components/app.js"></script>
+
+  </body>
+</html>

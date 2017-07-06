@@ -1,0 +1,33 @@
+{
+  "name": "gumga-counter-ng",
+  "description": "Gumga Counter",
+  "main": "./src/counter.js",
+  "authors": [
+    "Gumga Tecnologia da Informação S/A"
+  ],
+  "license": "LGPL-3.0",
+  "keywords": [
+    "Gumga",
+    "Counter"
+  ],
+  "homepage": "https://github.com/GUMGA/gumga-counter",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.8"
+  },
+  "_release": "4e91999500",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "4e91999500b706224f5aac61f63758d0fef63944"
+  },
+  "_source": "https://github.com/GUMGA/gumga-counter.git",
+  "_target": "*",
+  "_originalSource": "gumga-counter"
+}

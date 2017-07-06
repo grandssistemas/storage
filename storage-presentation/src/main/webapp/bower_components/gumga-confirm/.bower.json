@@ -1,0 +1,34 @@
+{
+  "name": "gumga-confirm",
+  "description": "Gumga Confirm",
+  "main": "./src/confirm.js",
+  "authors": [
+    "Gumga Tecnologia da Informação S/A"
+  ],
+  "license": "GPL-3.0",
+  "keywords": [
+    "gumga",
+    "confirm"
+  ],
+  "homepage": "https://github.com/GUMGA/gumga-confirm",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.8",
+    "angular-bootstrap": "2.3.2"
+  },
+  "_release": "672ccc214b",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "672ccc214b3ab2baf81b20a1e84f44c58b86d5c8"
+  },
+  "_source": "https://github.com/GUMGA/gumga-confirm.git",
+  "_target": "*",
+  "_originalSource": "gumga-confirm"
+}
