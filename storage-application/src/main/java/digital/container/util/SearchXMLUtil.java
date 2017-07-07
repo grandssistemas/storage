@@ -23,16 +23,22 @@ public class SearchXMLUtil {
                 .orElse(EMPTY);
     }
 
+    public static String getIdeDhEmi(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<ide>.*<dhEmi>(.*)<\\/dhEmi>.*<\\/ide>"))
+                .orElse(getIdeDEmi(xml));
+    }
 
-    private static String searchGroup1(String xml, String regex) {
-        String result = null;
-        Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(xml);
-        while (matcher.find()) {
-            if(matcher.groupCount() > 0) {
-                result = matcher.group(1);
-            }
-        }
-        return result;
+    private static String getIdeDEmi(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<ide>.*<dEmi>(.*)<\\/dEmi>.*<\\/ide>"))
+                .orElse(EMPTY);
+    }
+
+    public static String getIdeTpNF(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<ide>.*<tpNF>(.*)<\\/tpNF>.*<\\/ide>"))
+                .orElse(EMPTY);
     }
 
     public static String getIdeMod(String xml) {
@@ -40,4 +46,16 @@ public class SearchXMLUtil {
                 .ofNullable(searchGroup1(xml, "<ide>.*<mod>(.*)<\\/mod>.*<\\/ide>"))
                 .orElse(EMPTY);
     }
-}
+
+
+    private static String searchGroup1(String xml, String regex) {
+            String result = null;
+            Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(xml);
+            while (matcher.find()) {
+                if(matcher.groupCount() > 0) {
+                    result = matcher.group(1);
+                }
+            }
+            return result;
+        }
+    }

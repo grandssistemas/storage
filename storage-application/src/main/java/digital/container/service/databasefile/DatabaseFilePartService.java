@@ -1,7 +1,7 @@
 package digital.container.service.databasefile;
 
-import digital.container.storage.domain.model.DatabaseFile;
-import digital.container.storage.domain.model.DatabaseFilePart;
+import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.DatabaseFilePart;
 import digital.container.repository.DatabaseFilePartRepository;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;

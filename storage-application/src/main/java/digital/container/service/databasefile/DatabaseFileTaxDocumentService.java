@@ -1,8 +1,10 @@
 package digital.container.service.databasefile;
 
-import digital.container.storage.domain.model.*;
 import digital.container.repository.DatabaseFileRepository;
-import digital.container.storage.domain.model.vo.FileProcessed;
+import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.DatabaseFilePart;
+import digital.container.storage.domain.model.file.FileStatus;
+import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.GenerateHash;
 import digital.container.util.ValidateNfXML;
 import digital.container.vo.TaxDocumentModel;

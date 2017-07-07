@@ -2,11 +2,8 @@ package digital.container.storage.api;
 
 import digital.container.repository.DatabaseFileRepository;
 import digital.container.repository.LocalFileRepository;
-import digital.container.service.databasefile.DatabaseFileService;
-import digital.container.service.localfile.LocalFileService;
-import digital.container.storage.domain.model.AbstractFile;
-import digital.container.storage.domain.model.DatabaseFile;
-import digital.container.storage.domain.model.LocalFile;
+import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
 import org.springframework.beans.factory.annotation.Autowired;

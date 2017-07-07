@@ -1,9 +1,10 @@
 package digital.container.service.localfile;
 
-import digital.container.storage.domain.model.FileStatus;
-import digital.container.storage.domain.model.FileType;
-import digital.container.storage.domain.model.LocalFile;
-import digital.container.storage.domain.model.vo.FileProcessed;
+import digital.container.service.container.PermissionContainerService;
+import digital.container.storage.domain.model.file.FileStatus;
+import digital.container.storage.domain.model.file.FileType;
+import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.repository.LocalFileRepository;
 import digital.container.util.GenerateHash;
 import digital.container.util.LocalFileUtil;
@@ -28,6 +29,8 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
 
     @Autowired
     private LocalFileRepository localFileRepository;
+    @Autowired
+    private PermissionContainerService permissionContainerService;
 
     @Autowired
     public LocalFileService(GumgaCrudRepository<LocalFile, Long> repository) {
@@ -38,6 +41,11 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
     public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared) {
         LocalFile localFile = new LocalFile();
         localFile.setName(multipartFile.getOriginalFilename());
+
+        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+            return new FileProcessed(localFile, Arrays.asList("You are not allowed to use the container:"+containerKey));
+        }
+
         localFile.setFileStatus(FileStatus.DO_NOT_SYNC);
         localFile.setFileType(FileType.ANYTHING);
         localFile.setFilePublic(shared);

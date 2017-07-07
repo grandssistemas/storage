@@ -1,8 +1,8 @@
 package digital.container.storage.api.localfile;
 
-import digital.container.storage.domain.model.LocalFile;
+import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
-import digital.container.storage.domain.model.vo.FileProcessed;
+import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.service.localfile.LocalFileTaxDocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

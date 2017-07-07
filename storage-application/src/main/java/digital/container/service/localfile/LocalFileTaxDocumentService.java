@@ -1,8 +1,9 @@
 package digital.container.service.localfile;
 
-import digital.container.storage.domain.model.FileStatus;
-import digital.container.storage.domain.model.LocalFile;
-import digital.container.storage.domain.model.vo.FileProcessed;
+import digital.container.service.container.PermissionContainerService;
+import digital.container.storage.domain.model.file.FileStatus;
+import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.repository.LocalFileRepository;
 import digital.container.util.GenerateHash;
 import digital.container.util.LocalFileUtil;
@@ -21,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -30,6 +33,8 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
 
     @Autowired
     private LocalFileRepository localFileRepository;
+    @Autowired
+    private PermissionContainerService permissionContainerService;
 
     @Autowired
     public LocalFileTaxDocumentService(GumgaCrudRepository<LocalFile, Long> repository) {
@@ -40,6 +45,11 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
     public FileProcessed upload(String containerKey, MultipartFile multipartFile) {
         LocalFile localFile = new LocalFile();
         localFile.setName(multipartFile.getOriginalFilename());
+
+        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+            return new FileProcessed(localFile, Arrays.asList("You are not allowed to use the container:"+containerKey));
+        }
+
         localFile.setFileStatus(FileStatus.NOT_SYNC);
 
         TaxDocumentModel taxDocumentModel = new TaxDocumentModel();
@@ -48,14 +58,25 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
             return errors;
         }
 
-        File folder = new File(LocalFileUtil.DIRECTORY_PATH + '/' + LocalFileUtil.getRelativePathFileANYTHING(containerKey));
+        localFile.setFileType(taxDocumentModel.getFileType());
+
+        Date date = ValidateNfXML.stringToDate(localFile.getDetailTwo());
+        LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENT(containerKey,
+                        ld.getYear(),
+                        ld.getMonth().toString(),
+                        localFile.getFileType(),
+                        localFile.getDetailThree());
+
+        File folder = new File(LocalFileUtil.DIRECTORY_PATH + '/' + path);
+
         folder.mkdirs();
 
-        localFile.setRelativePath(LocalFileUtil.getRelativePathFileANYTHING(containerKey) + '/' + localFile.getName());
+        localFile.setRelativePath(path + '/' + localFile.getName());
 
         localFile.setContainerKey(containerKey);
         localFile.setCreateDate(Calendar.getInstance());
-        localFile.setFileType(taxDocumentModel.getFileType());
         localFile.setHash(GenerateHash.generate());
 
         localFile.setContentType(multipartFile.getContentType());

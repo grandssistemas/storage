@@ -1,9 +1,9 @@
 package digital.container.storage.api.databasefile;
 
-import digital.container.storage.domain.model.DatabaseFile;
+import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.service.databasefile.DatabaseFileTaxDocumentService;
-import digital.container.storage.domain.model.vo.FileProcessed;
+import digital.container.storage.domain.model.file.vo.FileProcessed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

@@ -1,7 +1,7 @@
 package digital.container.vo;
 
 
-import digital.container.storage.domain.model.FileType;
+import digital.container.storage.domain.model.file.FileType;
 
 public class TaxDocumentModel {
 

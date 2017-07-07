@@ -1,4 +1,4 @@
-package digital.container.storage.domain.model;
+package digital.container.storage.domain.model.file;
 
 import io.gumga.domain.GumgaMultitenancy;
 import io.gumga.domain.shared.GumgaSharedModel;

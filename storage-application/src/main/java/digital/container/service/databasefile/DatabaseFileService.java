@@ -1,10 +1,10 @@
 package digital.container.service.databasefile;
 
-import digital.container.storage.domain.model.DatabaseFile;
-import digital.container.storage.domain.model.DatabaseFilePart;
-import digital.container.storage.domain.model.FileStatus;
-import digital.container.storage.domain.model.FileType;
-import digital.container.storage.domain.model.vo.FileProcessed;
+import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.DatabaseFilePart;
+import digital.container.storage.domain.model.file.FileStatus;
+import digital.container.storage.domain.model.file.FileType;
+import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.repository.DatabaseFileRepository;
 import digital.container.util.GenerateHash;
 import io.gumga.application.GumgaService;

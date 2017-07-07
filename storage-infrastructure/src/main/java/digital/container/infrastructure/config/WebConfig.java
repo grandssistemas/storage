@@ -36,7 +36,7 @@ import io.gumga.security_v2.GumgaRequestFilterV2;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = {"digital.container.presentation.web", "io.gumga"})
+@ComponentScan(basePackages = {"digital.container", "io.gumga"})
 @Import(Application.class)
 public class WebConfig extends WebMvcConfigurerAdapter implements WebApplicationInitializer {
 

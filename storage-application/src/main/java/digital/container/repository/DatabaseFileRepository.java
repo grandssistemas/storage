@@ -1,6 +1,6 @@
 package digital.container.repository;
 
-import digital.container.storage.domain.model.DatabaseFile;
+import digital.container.storage.domain.model.file.DatabaseFile;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

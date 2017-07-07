@@ -1,7 +1,7 @@
-package digital.container.storage.domain.model.vo;
+package digital.container.storage.domain.model.file.vo;
 
 
-import digital.container.storage.domain.model.AbstractFile;
+import digital.container.storage.domain.model.file.AbstractFile;
 
 import java.io.Serializable;
 import java.util.List;

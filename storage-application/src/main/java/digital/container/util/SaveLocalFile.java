@@ -1,6 +1,6 @@
 package digital.container.util;
 
-import digital.container.storage.domain.model.LocalFile;
+import digital.container.storage.domain.model.file.LocalFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
