@@ -13,12 +13,16 @@ import io.gumga.domain.GumgaQueryParserProvider;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.apache.activemq.spring.ActiveMQConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jms.annotation.EnableJms;
+import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -32,7 +36,12 @@ import com.zaxxer.hikari.HikariDataSource;
 @ComponentScan(basePackages = {"digital.container", "io.gumga"})
 @EnableJpaRepositories(repositoryFactoryBeanClass = GumgaRepositoryFactoryBean.class, basePackages = {"digital.container", "io.gumga"})
 @EnableTransactionManagement(proxyTargetClass = true)
+@EnableJms
 public class Application {
+
+    private static final String DEFAULT_BROKER_URL = "tcp://localhost:61616";
+    private static final String ORDER_QUEUE = "tax.document.queue";
+
 
     private Properties properties;
 
@@ -122,6 +131,31 @@ public class Application {
     @Autowired
     public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
         return new JpaTransactionManager(emf);
+    }
+
+    @Bean
+    public ActiveMQConnectionFactory connectionFactory() {
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+        connectionFactory.setBrokerURL(DEFAULT_BROKER_URL);
+
+//        connectionFactory.setTrustedPackages(Arrays.asList("com.websystique.spring","java.util"));
+        return connectionFactory;
+    }
+
+    @Bean
+    public JmsTemplate jmsTemplate(){
+        JmsTemplate template = new JmsTemplate();
+        template.setConnectionFactory(connectionFactory());
+        template.setDefaultDestinationName(ORDER_QUEUE);
+        return template;
+    }
+
+    @Bean
+    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
+        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory());
+        factory.setConcurrency("1-1");
+        return factory;
     }
 
 }

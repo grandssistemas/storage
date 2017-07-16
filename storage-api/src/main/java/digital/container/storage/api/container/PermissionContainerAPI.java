@@ -19,6 +19,7 @@ public class PermissionContainerAPI {
         if(!this.permissionContainerService.containerKeyValid(permissionContainer.getContainerKey())) {
             return ResponseEntity.status(HttpStatus.CREATED).body(this.permissionContainerService.save(permissionContainer));
         }
+
         return ResponseEntity.badRequest().body(new String("You already have access to container:"+permissionContainer.getContainerKey()));
     }
 }

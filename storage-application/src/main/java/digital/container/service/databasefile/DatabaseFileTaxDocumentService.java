@@ -50,7 +50,7 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
         databaseFile.setContainerKey(containerKey);
         databaseFile.setCreateDate(Calendar.getInstance());
         databaseFile.setFileType(taxDocumentModel.getFileType());
-        databaseFile.setHash(GenerateHash.generate());
+        databaseFile.setHash(GenerateHash.generateDatabaseFile());
 
         databaseFile.setContentType(multipartFile.getContentType());
         databaseFile.setSize(multipartFile.getSize());

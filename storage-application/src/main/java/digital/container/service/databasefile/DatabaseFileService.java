@@ -43,7 +43,7 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
         databaseFile.setName(multipartFile.getOriginalFilename());
         databaseFile.setContainerKey(containerKey);
         databaseFile.setCreateDate(Calendar.getInstance());
-        databaseFile.setHash(GenerateHash.generate());
+        databaseFile.setHash(GenerateHash.generateDatabaseFile());
         databaseFile.setContentType(multipartFile.getContentType());
         databaseFile.setSize(multipartFile.getSize());
         DatabaseFile newDatabaseFile = this.databaseFileRepository.saveAndFlush(databaseFile);

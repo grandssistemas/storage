@@ -57,7 +57,7 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
 
         localFile.setContainerKey(containerKey);
         localFile.setCreateDate(Calendar.getInstance());
-        localFile.setHash(GenerateHash.generate());
+        localFile.setHash(GenerateHash.generateLocalFile());
 
         localFile.setContentType(multipartFile.getContentType());
         localFile.setSize(multipartFile.getSize());

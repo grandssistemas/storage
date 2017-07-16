@@ -7,7 +7,9 @@ import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,11 +17,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/file-hash")
 public class HashAPI {
+
+    @Autowired
+    JmsTemplate jmsTemplate;
 
     @Autowired
     private DatabaseFileRepository databaseFileRepository;
@@ -61,6 +68,14 @@ public class HashAPI {
                 SendDataLocalFileHttpServlet.send(lf.get(), httpServletResponse);
             }
         }
+    }
+
+    @RequestMapping
+    public void teste() {
+        Map map = new HashMap<>();
+        map.put("model", "55");
+        map.put("hash", "1500213312d3c3fac497df4521a7cf9f454e05db02DF");
+        this.jmsTemplate.convertAndSend(map);
     }
 
 }

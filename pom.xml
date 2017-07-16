@@ -231,6 +231,18 @@
                 <artifactId>commons-io</artifactId>
                 <version>2.4</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-spring</artifactId>
+                <version>5.14.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jms</artifactId>
+                <version>4.2.6.RELEASE</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
     <build>

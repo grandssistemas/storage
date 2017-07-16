@@ -17,6 +17,11 @@ public class SendDataDatabaseFileHttpServlet {
 
     public static void send(DatabaseFile databaseFile, HttpServletResponse httpServletResponse) {
         httpServletResponse.reset();
+
+        if(databaseFile.getContentType().contains("pdf")) {
+            httpServletResponse.setHeader("Content-disposition","attachment;filename="+databaseFile.getName());
+        }
+
         httpServletResponse.setContentType(MediaType.parseMediaType(databaseFile.getContentType()).getType());
         httpServletResponse.setContentLength(Integer.parseInt(databaseFile.getSize().toString()));
 
