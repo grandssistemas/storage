@@ -36,6 +36,7 @@ public class ValidateNfXML {
             String chNFe = SearchXMLUtil.getInfProtChNFe(xml);
             String dhEmi = SearchXMLUtil.getIdeDhEmi(xml);
             String tpNF = SearchXMLUtil.getIdeTpNF(xml);
+            String version = SearchXMLUtil.getVersion(xml);
             tpNF = tpNF.equals("1") ? "SAIDA" : "ENTRADA";
 
             if(errors.size() > 0) {
@@ -45,6 +46,7 @@ public class ValidateNfXML {
             file.setDetailOne(chNFe);
             file.setDetailTwo(dhEmi);
             file.setDetailThree(tpNF);
+            file.setDetailFour(version);
 
         } catch (IOException e) {
             e.printStackTrace();

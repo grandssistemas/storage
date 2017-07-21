@@ -9,7 +9,8 @@ import java.util.regex.Pattern;
 public class SearchXMLUtil {
     private static final String EMPTY = "";
 
-    private SearchXMLUtil(){}
+    private SearchXMLUtil() {
+    }
 
     public static String getEmitCNPJ(String xml) {
         return Optional
@@ -47,15 +48,34 @@ public class SearchXMLUtil {
                 .orElse(EMPTY);
     }
 
+    public static String getVersion(String xml) {
+        return Optional
+                .ofNullable(searchGroup2(xml, "<nfeProc(\\s)*versao=\"(.{4})\""))
+                .orElse("");
+
+    }
+
 
     private static String searchGroup1(String xml, String regex) {
-            String result = null;
-            Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(xml);
-            while (matcher.find()) {
-                if(matcher.groupCount() > 0) {
-                    result = matcher.group(1);
-                }
+        String result = null;
+        Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(xml);
+        while (matcher.find()) {
+            if (matcher.groupCount() > 0) {
+                result = matcher.group(1);
             }
-            return result;
         }
+        return result;
     }
+
+
+    private static String searchGroup2(String xml, String regex) {
+        String result = null;
+        Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(xml);
+        while (matcher.find()) {
+            if (matcher.groupCount() > 0) {
+                result = matcher.group(2);
+            }
+        }
+        return result;
+    }
+}

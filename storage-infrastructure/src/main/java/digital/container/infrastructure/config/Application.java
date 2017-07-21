@@ -10,6 +10,7 @@ import java.util.Properties;
 import io.gumga.domain.CriterionParser;
 import io.gumga.domain.GumgaQueryParserProvider;
 
+import javax.jms.Session;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
@@ -138,6 +139,7 @@ public class Application {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
         connectionFactory.setBrokerURL(DEFAULT_BROKER_URL);
 
+
 //        connectionFactory.setTrustedPackages(Arrays.asList("com.websystique.spring","java.util"));
         return connectionFactory;
     }
@@ -147,6 +149,8 @@ public class Application {
         JmsTemplate template = new JmsTemplate();
         template.setConnectionFactory(connectionFactory());
         template.setDefaultDestinationName(ORDER_QUEUE);
+        template.setSessionAcknowledgeMode(Session.SESSION_TRANSACTED);
+        template.setSessionTransacted(true);
         return template;
     }
 
@@ -155,6 +159,7 @@ public class Application {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory());
         factory.setConcurrency("1-1");
+
         return factory;
     }
 

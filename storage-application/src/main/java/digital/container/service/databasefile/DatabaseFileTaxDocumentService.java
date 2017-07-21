@@ -14,6 +14,7 @@ import io.gumga.presentation.exceptionhandler.GumgaRunTimeException;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +29,9 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
 
     @Autowired
     private DatabaseFilePartService databaseFilePartService;
+
+    @Autowired
+    private JmsTemplate jmsTemplate;
 
     @Autowired
     public DatabaseFileTaxDocumentService(GumgaCrudRepository<DatabaseFile, Long> repository) {
@@ -58,6 +62,16 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
         DatabaseFile newDatabaseFile = this.databaseFileRepository.saveAndFlush(databaseFile);
 
         this.databaseFilePartService.saveFile(newDatabaseFile, multipartFile);
+
+        Map invite = new HashMap();
+        invite.put("container", containerKey);
+        invite.put("fileName", databaseFile.getName());
+        invite.put("hash", databaseFile.getHash());
+        invite.put("taxDocumentModel", databaseFile.getFileType().toString());
+        invite.put("version", databaseFile.getDetailFour());
+
+
+        this.jmsTemplate.convertAndSend(invite);
 
         return new FileProcessed(this.databaseFileRepository.saveAndFlush(newDatabaseFile), Collections.EMPTY_LIST);
     }
