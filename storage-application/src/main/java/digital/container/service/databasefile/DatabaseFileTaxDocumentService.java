@@ -1,6 +1,11 @@
 package digital.container.service.databasefile;
 
+import digital.container.exception.FileNotFoundException;
+import digital.container.exception.KeyWasNotRegisteredInStorageYetException;
 import digital.container.repository.DatabaseFileRepository;
+import digital.container.service.container.PermissionContainerService;
+import digital.container.service.storage.LimitFileService;
+import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.DatabaseFilePart;
 import digital.container.storage.domain.model.file.FileStatus;
@@ -14,7 +19,6 @@ import io.gumga.presentation.exceptionhandler.GumgaRunTimeException;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,12 +38,22 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
 //    private JmsTemplate jmsTemplate;
 
     @Autowired
+    private LimitFileService limitFileService;
+
+    @Autowired
+    private PermissionContainerService permissionContainerService;
+
+    @Autowired
     public DatabaseFileTaxDocumentService(GumgaCrudRepository<DatabaseFile, Long> repository) {
         super(repository);
     }
 
     @Transactional
     public FileProcessed upload(String containerKey, MultipartFile multipartFile) {
+        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
+        }
+
         DatabaseFile databaseFile = new DatabaseFile();
         databaseFile.setName(multipartFile.getOriginalFilename());
         databaseFile.setFileStatus(FileStatus.NOT_SYNC);
@@ -55,7 +69,6 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
         databaseFile.setCreateDate(Calendar.getInstance());
         databaseFile.setFileType(taxDocumentModel.getFileType());
         databaseFile.setHash(GenerateHash.generateDatabaseFile());
-
         databaseFile.setContentType(multipartFile.getContentType());
         databaseFile.setSize(multipartFile.getSize());
 
@@ -78,6 +91,12 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
 
     @Transactional
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles) {
+        this.limitFileService.limitMaximumExceeded(multipartFiles);
+
+        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
+        }
+
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
             result.add(this.upload(containerKey,multipartFile));
@@ -89,7 +108,7 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
     public DatabaseFile getFileHash(String hash) {
         DatabaseFile result = this.databaseFileRepository
                 .getByHash(hash)
-                .orElseThrow(() -> new GumgaRunTimeException("Não foi encontrado o documento XML com o hash:" + hash, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FileNotFoundException(MessageStorage.FILE_NOT_FOUND + ":" + hash, HttpStatus.NOT_FOUND));
 
         Hibernate.initialize(result.getParts());
         return result;

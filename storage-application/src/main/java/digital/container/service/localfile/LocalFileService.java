@@ -1,6 +1,10 @@
 package digital.container.service.localfile;
 
+import digital.container.exception.*;
+import digital.container.exception.FileNotFoundException;
 import digital.container.service.container.PermissionContainerService;
+import digital.container.service.storage.LimitFileService;
+import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.FileType;
 import digital.container.storage.domain.model.file.LocalFile;
@@ -33,6 +37,9 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
     private PermissionContainerService permissionContainerService;
 
     @Autowired
+    private LimitFileService limitFileService;
+
+    @Autowired
     public LocalFileService(GumgaCrudRepository<LocalFile, Long> repository) {
         super(repository);
     }
@@ -43,7 +50,7 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
         localFile.setName(multipartFile.getOriginalFilename());
 
         if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-            return new FileProcessed(localFile, Arrays.asList("You are not allowed to use the container:"+containerKey));
+            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
         }
 
         localFile.setFileStatus(FileStatus.DO_NOT_SYNC);
@@ -73,6 +80,12 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
 
     @Transactional
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, boolean shared) {
+        this.limitFileService.limitMaximumExceeded(multipartFiles);
+
+        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
+        }
+
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
             result.add(this.upload(containerKey,multipartFile, shared));
@@ -85,8 +98,7 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
         LocalFile result;
         result = this.localFileRepository
                 .getByHash(hash, shared)
-                .orElseThrow(() -> new GumgaRunTimeException("Não foi encontrado o documento com o hash:" + hash, HttpStatus.NOT_FOUND));
-
+                .orElseThrow(() -> new FileNotFoundException(MessageStorage.FILE_NOT_FOUND + ":" + hash, HttpStatus.NOT_FOUND));
         return result;
     }
 
@@ -95,8 +107,7 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
         LocalFile result;
         result = this.localFileRepository
                 .getByHash(hash)
-                .orElseThrow(() -> new GumgaRunTimeException("Não foi encontrado o documento com o hash:" + hash, HttpStatus.NOT_FOUND));
-
+                .orElseThrow(() -> new digital.container.exception.FileNotFoundException(MessageStorage.FILE_NOT_FOUND + ":" + hash, HttpStatus.NOT_FOUND));
         return result;
     }
 

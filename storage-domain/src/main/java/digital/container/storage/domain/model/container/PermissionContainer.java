@@ -9,11 +9,11 @@ import javax.persistence.*;
 @Entity
 @Table(name = "permission_container",
         indexes = {
-            @Index(name = "permission_container_index_oi", columnList = "oi"),
+            @Index(name = "permission_container_index_oi", columnList = "oi")
         })
 @GumgaMultitenancy
-@SequenceGenerator(name = GumgaModel.SEQ_NAME, sequenceName = "seq_permission_container")
-public class PermissionContainer extends GumgaModel<Long> {
+@SequenceGenerator(name = GumgaSharedModel.SEQ_NAME, sequenceName = "seq_permission_container")
+public class PermissionContainer extends GumgaSharedModel<Long> {
 
     @Column(name = "container_key")
     private String containerKey;

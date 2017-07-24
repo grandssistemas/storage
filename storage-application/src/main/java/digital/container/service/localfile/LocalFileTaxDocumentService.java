@@ -1,7 +1,9 @@
 package digital.container.service.localfile;
 
-import digital.container.exception.LimitFilesExceededException;
+import digital.container.exception.*;
 import digital.container.service.container.PermissionContainerService;
+import digital.container.service.storage.LimitFileService;
+import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
@@ -36,6 +38,8 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
     private LocalFileRepository localFileRepository;
     @Autowired
     private PermissionContainerService permissionContainerService;
+    @Autowired
+    private LimitFileService limitFileService;
 
     @Autowired
     public LocalFileTaxDocumentService(GumgaCrudRepository<LocalFile, Long> repository) {
@@ -44,12 +48,12 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
 
     @Transactional
     public FileProcessed upload(String containerKey, MultipartFile multipartFile) {
+        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
+        }
+
         LocalFile localFile = new LocalFile();
         localFile.setName(multipartFile.getOriginalFilename());
-
-        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-            return new FileProcessed(localFile, Arrays.asList("You are not allowed to use the container:"+containerKey));
-        }
 
         localFile.setFileStatus(FileStatus.NOT_SYNC);
 
@@ -94,20 +98,13 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
 
     @Transactional
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles) {
-        if(multipartFiles.size() > 500) {
-            throw new LimitFilesExceededException(HttpStatus.FORBIDDEN);
+        this.limitFileService.limitMaximumExceeded(multipartFiles);
+
+        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
         }
 
         List<FileProcessed> result = new ArrayList<>();
-
-        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-            for(MultipartFile multipartFile : multipartFiles) {
-                LocalFile localFile = new LocalFile();
-                localFile.setName(multipartFile.getOriginalFilename());
-                result.add(new FileProcessed(localFile, Arrays.asList("You are not allowed to use the container:" + containerKey)));
-            }
-            return result;
-        }
 
         for(MultipartFile multipartFile : multipartFiles) {
             result.add(this.upload(containerKey,multipartFile));
@@ -121,8 +118,7 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
         LocalFile result;
         result = this.localFileRepository
                 .getByHash(hash)
-                .orElseThrow(() -> new GumgaRunTimeException("Não foi encontrado o documento XML com o hash:" + hash, HttpStatus.NOT_FOUND));
-
+                .orElseThrow(() -> new digital.container.exception.FileNotFoundException(MessageStorage.FILE_NOT_FOUND + ":" + hash, HttpStatus.NOT_FOUND));
         return result;
     }
 

@@ -1,7 +1,10 @@
 package digital.container.service.databasefile;
 
-import digital.container.exception.LimitFilesExceededException;
+import digital.container.exception.FileNotFoundException;
+import digital.container.exception.KeyWasNotRegisteredInStorageYetException;
 import digital.container.service.container.PermissionContainerService;
+import digital.container.service.storage.LimitFileService;
+import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.*;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.repository.DatabaseFileRepository;
@@ -31,6 +34,9 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
     private PermissionContainerService permissionContainerService;
 
     @Autowired
+    private LimitFileService limitFileService;
+
+    @Autowired
     public DatabaseFileService(GumgaCrudRepository<DatabaseFile, Long> repository) {
         super(repository);
     }
@@ -39,8 +45,9 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
     public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared) {
         DatabaseFile databaseFile = new DatabaseFile();
         databaseFile.setName(multipartFile.getOriginalFilename());
+
         if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-            return new FileProcessed(databaseFile, Arrays.asList("You are not allowed to use the container:" + containerKey));
+            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
         }
 
         databaseFile.setFileType(FileType.ANYTHING);
@@ -62,32 +69,27 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
 
     @Transactional
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, boolean shared) {
-        List<FileProcessed> result = new ArrayList<>();
-
-        if(multipartFiles.size() > 500) {
-            throw new LimitFilesExceededException(HttpStatus.FORBIDDEN);
-        }
+        this.limitFileService.limitMaximumExceeded(multipartFiles);
 
         if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-            for(MultipartFile multipartFile : multipartFiles) {
-                LocalFile localFile = new LocalFile();
-                localFile.setName(multipartFile.getOriginalFilename());
-                result.add(new FileProcessed(localFile, Arrays.asList("You are not allowed to use the container:" + containerKey)));
-            }
-            return result;
+            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
         }
 
+        List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
             result.add(this.upload(containerKey, multipartFile, shared));
         }
+
         return result;
     }
+
+
 
     @Transactional(readOnly = true)
     public DatabaseFile getFileHash(String hash, Boolean shared) {
         DatabaseFile result = this.databaseFileRepository
                 .getByHash(hash, shared)
-                .orElseThrow(() -> new GumgaRunTimeException("Não foi encontrado o documento com o hash:" + hash, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FileNotFoundException(MessageStorage.FILE_NOT_FOUND + ":" + hash, HttpStatus.NOT_FOUND));
 
         Hibernate.initialize(result.getParts());
         return result;
@@ -97,7 +99,7 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
     public DatabaseFile getFileHash(String hash) {
         DatabaseFile result = this.databaseFileRepository
                 .getByHash(hash)
-                .orElseThrow(() -> new GumgaRunTimeException("Não foi encontrado o documento com o hash:" + hash, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new FileNotFoundException(MessageStorage.FILE_NOT_FOUND + ":" + hash, HttpStatus.NOT_FOUND));
 
         Hibernate.initialize(result.getParts());
         return result;
