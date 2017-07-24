@@ -1,5 +1,6 @@
 package digital.container.storage.api.container;
 
+import com.wordnik.swagger.annotations.ApiOperation;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.storage.domain.model.container.PermissionContainer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ public class PermissionContainerAPI {
     private PermissionContainerService permissionContainerService;
 
     @RequestMapping(method = RequestMethod.POST)
+    @ApiOperation(value = "Cadastrar um CNPJ para gravar coisas no storage")
     public ResponseEntity<Object> save(@RequestBody PermissionContainer permissionContainer) {
         if(!this.permissionContainerService.containerKeyValid(permissionContainer.getContainerKey())) {
             return ResponseEntity.status(HttpStatus.CREATED).body(this.permissionContainerService.save(permissionContainer));

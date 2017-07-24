@@ -1,9 +1,8 @@
 package digital.container.service.databasefile;
 
-import digital.container.storage.domain.model.file.DatabaseFile;
-import digital.container.storage.domain.model.file.DatabaseFilePart;
-import digital.container.storage.domain.model.file.FileStatus;
-import digital.container.storage.domain.model.file.FileType;
+import digital.container.exception.LimitFilesExceededException;
+import digital.container.service.container.PermissionContainerService;
+import digital.container.storage.domain.model.file.*;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.repository.DatabaseFileRepository;
 import digital.container.util.GenerateHash;
@@ -29,6 +28,9 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
     private DatabaseFilePartService databaseFilePartService;
 
     @Autowired
+    private PermissionContainerService permissionContainerService;
+
+    @Autowired
     public DatabaseFileService(GumgaCrudRepository<DatabaseFile, Long> repository) {
         super(repository);
     }
@@ -36,9 +38,15 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
     @Transactional
     public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared) {
         DatabaseFile databaseFile = new DatabaseFile();
+        databaseFile.setName(multipartFile.getOriginalFilename());
+        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+            return new FileProcessed(databaseFile, Arrays.asList("You are not allowed to use the container:" + containerKey));
+        }
+
         databaseFile.setFileType(FileType.ANYTHING);
         databaseFile.setFileStatus(FileStatus.DO_NOT_SYNC);
         databaseFile.setFilePublic(shared);
+
 
         databaseFile.setName(multipartFile.getOriginalFilename());
         databaseFile.setContainerKey(containerKey);
@@ -55,6 +63,20 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
     @Transactional
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, boolean shared) {
         List<FileProcessed> result = new ArrayList<>();
+
+        if(multipartFiles.size() > 500) {
+            throw new LimitFilesExceededException(HttpStatus.FORBIDDEN);
+        }
+
+        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+            for(MultipartFile multipartFile : multipartFiles) {
+                LocalFile localFile = new LocalFile();
+                localFile.setName(multipartFile.getOriginalFilename());
+                result.add(new FileProcessed(localFile, Arrays.asList("You are not allowed to use the container:" + containerKey)));
+            }
+            return result;
+        }
+
         for(MultipartFile multipartFile : multipartFiles) {
             result.add(this.upload(containerKey, multipartFile, shared));
         }

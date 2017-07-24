@@ -1,5 +1,6 @@
 package digital.container.service.localfile;
 
+import digital.container.exception.LimitFilesExceededException;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.LocalFile;
@@ -93,10 +94,25 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
 
     @Transactional
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles) {
+        if(multipartFiles.size() > 500) {
+            throw new LimitFilesExceededException(HttpStatus.FORBIDDEN);
+        }
+
         List<FileProcessed> result = new ArrayList<>();
+
+        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+            for(MultipartFile multipartFile : multipartFiles) {
+                LocalFile localFile = new LocalFile();
+                localFile.setName(multipartFile.getOriginalFilename());
+                result.add(new FileProcessed(localFile, Arrays.asList("You are not allowed to use the container:" + containerKey)));
+            }
+            return result;
+        }
+
         for(MultipartFile multipartFile : multipartFiles) {
             result.add(this.upload(containerKey,multipartFile));
         }
+
         return result;
     }
 
