@@ -1,6 +1,7 @@
 package digital.container.storage.util;
 
 
+import com.sun.activation.registries.MimeTypeFile;
 import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.util.LocalFileUtil;
 import org.slf4j.Logger;

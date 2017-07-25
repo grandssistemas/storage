@@ -1,5 +1,7 @@
 package digital.container.storage.api;
 
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import digital.container.repository.DatabaseFileRepository;
 import digital.container.repository.LocalFileRepository;
 import digital.container.storage.domain.model.file.DatabaseFile;
@@ -40,7 +42,8 @@ public class HashAPI {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
-    public void download(@PathVariable String hash, HttpServletResponse httpServletResponse) {
+    @ApiOperation(value = "file-hash", notes = "Visualizar qualquer tipo de arquivo pelo hash")
+    public void download(@ApiParam(value = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
         Optional<DatabaseFile> df = this.databaseFileRepository.getByHash(hash);
         if(df.isPresent()) {
             SendDataDatabaseFileHttpServlet.send(df.get(), httpServletResponse);
@@ -58,7 +61,8 @@ public class HashAPI {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
-    public void downloadPublic(@PathVariable String hash, HttpServletResponse httpServletResponse) {
+    @ApiOperation(value = "file-hash-public", notes = "Visualizar qualquer tipo de arquivo publico pelo hash")
+    public void downloadPublic(@ApiParam(value = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
         Optional<DatabaseFile> df = this.databaseFileRepository.getByHash(hash, Boolean.TRUE);
         if(df.isPresent()) {
             SendDataDatabaseFileHttpServlet.send(df.get(), httpServletResponse);

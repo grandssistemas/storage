@@ -1,5 +1,9 @@
 package digital.container.storage.api.databasefile;
 
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.service.databasefile.DatabaseFileTaxDocumentService;
@@ -31,7 +35,13 @@ public class DatabaseFileTaxDocumentAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity<FileProcessed> upload(@PathVariable String containerKey, @RequestPart(name = "file") MultipartFile multipartFile) {
+    @ApiOperation(value = "database-file-tax-document-upload", notes = "Uploads de arquivos que serão salvo no banco de dados. Limite maximo de 500.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "", response = List.class),
+            @ApiResponse(code = 400, message = "", response = List.class)
+    })
+    public ResponseEntity<FileProcessed> upload(@ApiParam(name = "containerKey", value = "A chave cadastrada no storage no endpoint: /api/permission-container", required = true) @PathVariable String containerKey,
+                                                @ApiParam(name = "file", value = "O arquivo que será salvo no storage", required = true) @RequestPart(name = "file") MultipartFile multipartFile) {
         FileProcessed fileProcessed = this.databaseFileService.upload(containerKey, multipartFile);
         if(fileProcessed.getErrors().size() > 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(fileProcessed);
@@ -47,7 +57,13 @@ public class DatabaseFileTaxDocumentAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public ResponseEntity<List<FileProcessed>> upload(@PathVariable String containerKey, @RequestPart(name = "files") List<MultipartFile> multipartFiles) {
+    @ApiOperation(value = "database-file-tax-document-uploads", notes = "Uploads de arquivos que serão salvo no banco de dados. Limite maximo de 500.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "", response = List.class),
+            @ApiResponse(code = 400, message = "", response = List.class)
+    })
+    public ResponseEntity<List<FileProcessed>> upload(@ApiParam(name = "containerKey", value = "A chave cadastrada no storage no endpoint: /api/permission-container", required = true)@PathVariable String containerKey,
+                                                      @ApiParam(name = "files", value = "Os arquivos que serão salvos no storage", required = true)@RequestPart(name = "files") List<MultipartFile> multipartFiles) {
         List<FileProcessed> filesProcessed = this.databaseFileService.upload(containerKey, multipartFiles);
         return ResponseEntity.status(HttpStatus.CREATED).body(filesProcessed);
     }
@@ -58,7 +74,8 @@ public class DatabaseFileTaxDocumentAPI {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
-    public void download(@PathVariable String hash, HttpServletResponse httpServletResponse) {
+    @ApiOperation(value = "database-file-tax-document-hash", notes = "Visualizar o arquivo salvo no storage pelo hash.")
+    public void download(@ApiParam(name = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
         DatabaseFile result = this.databaseFileService.getFileHash(hash);
         SendDataDatabaseFileHttpServlet.send(result, httpServletResponse);
     }
@@ -68,7 +85,12 @@ public class DatabaseFileTaxDocumentAPI {
             path = URI_BASE + "/hash/{hash}",
             method = RequestMethod.DELETE
     )
-    public ResponseEntity<Void> delete(@PathVariable String hash) {
+    @ApiOperation(value = "database-file-tax-document-remove-hash", notes = "Remover o arquivo salvo no storage pelo hash.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = ""),
+            @ApiResponse(code = 404, message = "")
+    })
+    public ResponseEntity<Void> delete(@ApiParam(name = "hash", required = true) @PathVariable String hash) {
         if(this.databaseFileService.deleteFileByHash(hash)) {
             return ResponseEntity.noContent().build();
         }
@@ -80,7 +102,12 @@ public class DatabaseFileTaxDocumentAPI {
             path = URI_BASE + "/{id}",
             method = RequestMethod.DELETE
     )
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @ApiOperation(value = "database-file-tax-document-remove-id", notes = "Remover o arquivo salvo no storage pelo id.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = ""),
+            @ApiResponse(code = 404, message = "")
+    })
+    public ResponseEntity<Void> delete(@ApiParam(name = "id", required = true) @PathVariable Long id) {
         if(this.databaseFileService.deleteFileById(id)) {
             return ResponseEntity.noContent().build();
         }

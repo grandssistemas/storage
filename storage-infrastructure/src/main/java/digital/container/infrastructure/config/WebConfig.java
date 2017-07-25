@@ -33,7 +33,12 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import io.gumga.security_v2.GumgaRequestFilterV2;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+@EnableSwagger2
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = {"digital.container", "io.gumga"})
@@ -107,5 +112,14 @@ public class WebConfig extends WebMvcConfigurerAdapter implements WebApplication
         //Para utilizar o Segurança você precisa descomentar a linha abaixo.
         //registry.addInterceptor(gumgaRequestFilter());
     }
+
+
+//    @Bean
+//    public Docket createApiDocumentation() {
+//        return new Docket(DocumentationType.SWAGGER_2)
+//                .select()
+//                .paths(PathSelectors.regex("/api/.*"))
+//                .build();
+//    }
 
 }

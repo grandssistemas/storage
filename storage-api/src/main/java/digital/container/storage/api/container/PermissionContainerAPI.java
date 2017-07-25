@@ -1,6 +1,8 @@
 package digital.container.storage.api.container;
 
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.container.PermissionContainer;
@@ -17,7 +19,11 @@ public class PermissionContainerAPI {
     private PermissionContainerService permissionContainerService;
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation(value = "Cadastrar uma chave para permitir gravar dados no storage.")
+    @ApiOperation(value = "permission-container", notes = "Cadastrar uma chave para permitir gravar dados no storage.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "", response = PermissionContainer.class),
+            @ApiResponse(code = 400, message = MessageStorage.YOU_ALREADY_HAVE_ACCESS_TO_THE_CONTAINER)
+    })
     public ResponseEntity<Object> save(@RequestBody PermissionContainer permissionContainer) {
         if(!this.permissionContainerService.containerKeyValid(permissionContainer.getContainerKey())) {
             return ResponseEntity.status(HttpStatus.CREATED).body(this.permissionContainerService.save(permissionContainer));
