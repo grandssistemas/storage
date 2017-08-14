@@ -46,9 +46,9 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
         DatabaseFile databaseFile = new DatabaseFile();
         databaseFile.setName(multipartFile.getOriginalFilename());
 
-        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
-        }
+//        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+//            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
+//        }
 
         databaseFile.setFileType(FileType.ANYTHING);
         databaseFile.setFileStatus(FileStatus.DO_NOT_SYNC);
@@ -71,9 +71,9 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, boolean shared) {
         this.limitFileService.limitMaximumExceeded(multipartFiles);
 
-        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
-        }
+//        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+//            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
+//        }
 
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {

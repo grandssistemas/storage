@@ -50,9 +50,9 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
 
     @Transactional
     public FileProcessed upload(String containerKey, MultipartFile multipartFile) {
-        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
-        }
+//        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+//            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
+//        }
 
         DatabaseFile databaseFile = new DatabaseFile();
         databaseFile.setName(multipartFile.getOriginalFilename());
@@ -93,9 +93,9 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles) {
         this.limitFileService.limitMaximumExceeded(multipartFiles);
 
-        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
-        }
+//        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
+//            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
+//        }
 
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
