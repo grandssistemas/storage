@@ -33,6 +33,10 @@ public class LocalFileUtil {
         return sb.toString();
     }
 
+    public static String getRelativePathFileTAXDOCUMENTCanceled(String containerKey, Integer year, String month, FileType type, String movement) {
+        return getRelativePathFileTAXDOCUMENT(containerKey, year, month, type, movement) + "/CANCELED";
+    }
+
     private static String processContainerKey(String containerKey) {
         String key = containerKey.substring(0, 8);
         return key + '/' + containerKey;

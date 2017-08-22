@@ -1,6 +1,8 @@
 package digital.container.repository;
 
 import digital.container.storage.domain.model.file.LocalFile;
+import io.gumga.core.GumgaThreadScope;
+import io.gumga.domain.domains.GumgaOi;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,5 +18,8 @@ public interface LocalFileRepository extends GumgaCrudRepository<LocalFile, Long
 
     @Query(value = "from LocalFile df where df.hash = :hash")
     Optional<LocalFile> getByHash(@Param("hash") String hash);
+
+    @Query(value = "from LocalFile df where df.oi like :oi and df.detailOne = :chNFe")
+    Optional<LocalFile> getByChNFe(@Param("oi") GumgaOi oi, @Param("chNFe") String chNFe);
 
 }

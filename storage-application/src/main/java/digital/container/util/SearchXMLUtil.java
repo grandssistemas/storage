@@ -20,7 +20,7 @@ public class SearchXMLUtil {
 
     public static String getInfProtChNFe(String xml) {
         return Optional
-                .ofNullable(searchGroup1(xml, "<infProt>.*<chNFe>(.*)<\\/chNFe>.*<\\/infProt>"))
+                .ofNullable(searchGroup1(xml, "<infProt.*<chNFe>(.*)<\\/chNFe>.*<\\/infProt>"))
                 .orElse(EMPTY);
     }
 
@@ -51,10 +51,22 @@ public class SearchXMLUtil {
     public static String getVersion(String xml) {
         return Optional
                 .ofNullable(searchGroup2(xml, "<nfeProc(\\s)*versao=\"(.{4})\""))
-                .orElse("");
+                .orElse(Optional.ofNullable(searchGroup2(xml, "<procNFe(\\s)*versao=\"(.{4})\""))
+                        .orElse(EMPTY));
 
     }
 
+    public static String getInfEventoXevento(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infEvento.*<xEvento>(.*)<\\/xEvento>.*<\\/infEvento>"))
+                .orElse(EMPTY);
+    }
+
+    public static String getInfEventochNFe(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infEvento.*<chNFe>(.*)<\\/chNFe>.*<\\/infEvento>"))
+                .orElse(EMPTY);
+    }
 
     private static String searchGroup1(String xml, String regex) {
         String result = null;
