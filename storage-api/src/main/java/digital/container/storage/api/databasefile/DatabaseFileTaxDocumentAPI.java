@@ -35,7 +35,7 @@ public class DatabaseFileTaxDocumentAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "database-file-tax-document-upload", notes = "Uploads de arquivos que serão salvo no banco de dados. Limite maximo de 500.")
+    @ApiOperation(value = "database-file-tax-document-upload", notes = "Upload de arquivos que serão salvo no banco de dados.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = List.class),
             @ApiResponse(code = 400, message = "", response = List.class)

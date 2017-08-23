@@ -68,6 +68,12 @@ public class SearchXMLUtil {
                 .orElse(EMPTY);
     }
 
+    public static String getInfEventochDhRegEvento(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infEvento.*<dhRegEvento>(.*)<\\/dhRegEvento>.*<\\/infEvento>"))
+                .orElse(EMPTY);
+    }
+
     private static String searchGroup1(String xml, String regex) {
         String result = null;
         Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(xml);

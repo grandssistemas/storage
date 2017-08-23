@@ -19,7 +19,9 @@ public interface LocalFileRepository extends GumgaCrudRepository<LocalFile, Long
     @Query(value = "from LocalFile df where df.hash = :hash")
     Optional<LocalFile> getByHash(@Param("hash") String hash);
 
-    @Query(value = "from LocalFile df where df.oi like :oi and df.detailOne = :chNFe")
-    Optional<LocalFile> getByChNFe(@Param("oi") GumgaOi oi, @Param("chNFe") String chNFe);
+    @Query(value = "from LocalFile df where df.oi like :oi and df.detailOne = :chNFe and (df.fileType = 'NFE' or df.fileType = 'NFCE')")
+    Optional<LocalFile> getFileByGumgaOIAndChNFeAndNF(@Param("oi") GumgaOi oi, @Param("chNFe") String chNFe);
 
+    @Query(value = "from LocalFile df where df.oi like :oi and df.detailOne = :chNFe and (df.fileType = 'NFE_CANCELED' or df.fileType = 'NFCE_CANCELED')")
+    Optional<LocalFile> getFileByGumgaOIAndChNFeAndNFCanceled(@Param("oi") GumgaOi oi, @Param("chNFe") String chNFe);
 }

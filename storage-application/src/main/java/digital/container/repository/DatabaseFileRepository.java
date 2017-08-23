@@ -19,6 +19,9 @@ public interface DatabaseFileRepository extends GumgaCrudRepository<DatabaseFile
     @Query(value = "from DatabaseFile df where df.hash = :hash")
     Optional<DatabaseFile> getByHash(@Param("hash") String hash);
 
-    @Query(value = "from DatabaseFile df where df.oi like :oi and df.detailOne = :chNFe")
-    Optional<DatabaseFile> getByChNFe(@Param("oi") GumgaOi oi, @Param("chNFe") String chNFe);
+    @Query(value = "from DatabaseFile df where df.oi like :oi and df.detailOne = :chNFe and (df.fileType = 'NFE' or df.fileType = 'NFCE')")
+    Optional<DatabaseFile> getFileByGumgaOIAndChNFeAndNF(@Param("oi") GumgaOi oi, @Param("chNFe") String chNFe);
+
+    @Query(value = "from DatabaseFile df where df.oi like :oi and df.detailOne = :chNFe and (df.fileType = 'NFE_CANCELED' or df.fileType = 'NFCE_CANCELED')")
+    Optional<DatabaseFile> getFileByGumgaOIAndChNFeAndNFCanceled(@Param("oi") GumgaOi oi, @Param("chNFe") String chNFe);
 }
