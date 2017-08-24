@@ -49,12 +49,14 @@ public class CommonTaxDocumentService {
                     file.getDetailThree());
 
             ((LocalFile)file).setRelativePath(path + '/' + file.getName());
+            file.setHash(GenerateHash.generateLocalFile());
+        } else {
+            file.setHash(GenerateHash.generateDatabaseFile());
         }
-
 
         file.setContainerKey(containerKey);
         file.setCreateDate(Calendar.getInstance());
-        file.setHash(GenerateHash.generateLocalFile());
+
         file.setContentType(multipartFile.getContentType());
         file.setSize(multipartFile.getSize());
 
