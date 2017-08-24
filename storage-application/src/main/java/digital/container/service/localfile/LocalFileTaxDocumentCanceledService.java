@@ -1,7 +1,7 @@
 package digital.container.service.localfile;
 
 import digital.container.repository.LocalFileRepository;
-import digital.container.service.taxdocument.CommonTaxCocumentEventService;
+import digital.container.service.taxdocument.CommonTaxDocumentEventService;
 import digital.container.storage.domain.model.file.*;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.*;
@@ -26,7 +26,7 @@ public class LocalFileTaxDocumentCanceledService extends GumgaService<LocalFile,
     private LocalFileRepository localFileRepository;
 
     @Autowired
-    private CommonTaxCocumentEventService commonTaxCocumentEventService;
+    private CommonTaxDocumentEventService commonTaxCocumentEventService;
 
     @Autowired
     public LocalFileTaxDocumentCanceledService(GumgaCrudRepository<LocalFile, Long> repository) {

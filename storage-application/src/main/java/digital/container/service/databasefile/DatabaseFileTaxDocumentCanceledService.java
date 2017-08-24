@@ -1,7 +1,7 @@
 package digital.container.service.databasefile;
 
 import digital.container.repository.DatabaseFileRepository;
-import digital.container.service.taxdocument.CommonTaxCocumentEventService;
+import digital.container.service.taxdocument.CommonTaxDocumentEventService;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import io.gumga.application.GumgaService;
@@ -18,7 +18,7 @@ import java.util.Collections;
 public class DatabaseFileTaxDocumentCanceledService extends GumgaService<DatabaseFile, Long> {
 
     @Autowired
-    private CommonTaxCocumentEventService commonTaxCocumentEventService;
+    private CommonTaxDocumentEventService commonTaxCocumentEventService;
 
     private DatabaseFileRepository databaseFileRepository;
 

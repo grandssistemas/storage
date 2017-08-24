@@ -1,15 +1,11 @@
 package digital.container.service.taxdocument;
 
-import digital.container.repository.LocalFileRepository;
 import digital.container.storage.domain.model.file.AbstractFile;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.FileType;
 import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.util.GenerateHash;
-import digital.container.util.LocalFileUtil;
-import digital.container.util.SearchXMLUtil;
-import digital.container.util.ValidateNfXML;
+import digital.container.util.*;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.domains.GumgaOi;
 import org.apache.commons.io.IOUtils;
@@ -17,10 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -28,9 +22,9 @@ import java.time.ZoneId;
 import java.util.*;
 
 @Service
-public class CommonTaxCocumentEventService {
+public class CommonTaxDocumentEventService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonTaxCocumentEventService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonTaxDocumentEventService.class);
 
     @Autowired
     private SearchTaxDocumentService searchTaxDocumentService;
@@ -39,7 +33,7 @@ public class CommonTaxCocumentEventService {
         file.setName(multipartFile.getOriginalFilename());
         file.setFileStatus(FileStatus.NOT_SYNC);
 
-        String xml = getXml(multipartFile);
+        String xml = XMLUtil.getXml(multipartFile);
 
         FileProcessed fileProcessed = validateCancellationEvent(file, xml);
         if(fileProcessed.getErrors().size() > 0) {
@@ -92,18 +86,6 @@ public class CommonTaxCocumentEventService {
         file.setSize(multipartFile.getSize());
 
         return new FileProcessed(file, errors);
-    }
-
-    private String getXml(MultipartFile multipartFile) {
-        try(InputStream inputStream = multipartFile.getInputStream()) {
-            String xml = IOUtils.toString(inputStream, "UTF8");
-
-            return xml;
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-
-        return "";
     }
 
     private FileProcessed validateCancellationEvent(AbstractFile file, String xml) {

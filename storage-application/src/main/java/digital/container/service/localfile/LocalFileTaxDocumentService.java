@@ -4,6 +4,7 @@ import digital.container.exception.*;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
+import digital.container.service.taxdocument.CommonTaxDocumentService;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
@@ -40,6 +41,8 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
     private PermissionContainerService permissionContainerService;
     @Autowired
     private LimitFileService limitFileService;
+    @Autowired
+    private CommonTaxDocumentService commonTaxDocumentService;
 
     @Autowired
     public LocalFileTaxDocumentService(GumgaCrudRepository<LocalFile, Long> repository) {
@@ -53,40 +56,49 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
 //        }
 
         LocalFile localFile = new LocalFile();
-        localFile.setName(multipartFile.getOriginalFilename());
-
-        localFile.setFileStatus(FileStatus.NOT_SYNC);
-
-        TaxDocumentModel taxDocumentModel = new TaxDocumentModel();
-        FileProcessed errors = ValidateNfXML.validate(containerKey, multipartFile, localFile, taxDocumentModel);
-        if (errors != null) {
-            return errors;
+        FileProcessed data = this.commonTaxDocumentService.getData(localFile, multipartFile, containerKey);
+        if(data.getErrors().size() > 0) {
+            return data;
         }
 
-        localFile.setFileType(taxDocumentModel.getFileType());
 
-        Date date = ValidateNfXML.stringToDate(localFile.getDetailTwo());
-        LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//        localFile.setName(multipartFile.getOriginalFilename());
+//
+//        localFile.setFileStatus(FileStatus.NOT_SYNC);
+//
+//        TaxDocumentModel taxDocumentModel = new TaxDocumentModel();
+//        FileProcessed errors = ValidateNfXML.validate(containerKey, multipartFile, localFile, taxDocumentModel);
+//        if (errors != null) {
+//            return errors;
+//        }
+//
+//        localFile.setFileType(taxDocumentModel.getFileType());
+//
+//        Date date = ValidateNfXML.stringToDate(localFile.getDetailTwo());
+//        LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//
+//        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENT(containerKey,
+//                        ld.getYear(),
+//                        ld.getMonth().toString(),
+//                        localFile.getFileType(),
+//                        localFile.getDetailThree());
+//
+//        File folder = new File(LocalFileUtil.DIRECTORY_PATH + '/' + path);
+//
+//        folder.mkdirs();
+//
+//        localFile.setRelativePath(path + '/' + localFile.getName());
+//
+//        localFile.setContainerKey(containerKey);
+//        localFile.setCreateDate(Calendar.getInstance());
+//        localFile.setHash(GenerateHash.generateLocalFile());
+//
+//        localFile.setContentType(multipartFile.getContentType());
+//        localFile.setSize(multipartFile.getSize());
 
-        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENT(containerKey,
-                        ld.getYear(),
-                        ld.getMonth().toString(),
-                        localFile.getFileType(),
-                        localFile.getDetailThree());
-
-        File folder = new File(LocalFileUtil.DIRECTORY_PATH + '/' + path);
+        File folder = new File(LocalFileUtil.DIRECTORY_PATH + '/' + localFile.getRelativePath().substring(localFile.getRelativePath().lastIndexOf('/')));
 
         folder.mkdirs();
-
-        localFile.setRelativePath(path + '/' + localFile.getName());
-
-        localFile.setContainerKey(containerKey);
-        localFile.setCreateDate(Calendar.getInstance());
-        localFile.setHash(GenerateHash.generateLocalFile());
-
-        localFile.setContentType(multipartFile.getContentType());
-        localFile.setSize(multipartFile.getSize());
-
         try {
             SaveLocalFile.saveFile(folder, localFile.getName(), multipartFile.getInputStream());
         } catch (IOException e) {

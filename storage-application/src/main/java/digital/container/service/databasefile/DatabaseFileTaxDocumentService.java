@@ -6,6 +6,7 @@ import digital.container.repository.DatabaseFileRepository;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
+import digital.container.service.taxdocument.CommonTaxDocumentService;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.DatabaseFilePart;
 import digital.container.storage.domain.model.file.FileStatus;
@@ -44,6 +45,9 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
     private PermissionContainerService permissionContainerService;
 
     @Autowired
+    private CommonTaxDocumentService commonTaxDocumentService;
+
+    @Autowired
     public DatabaseFileTaxDocumentService(GumgaCrudRepository<DatabaseFile, Long> repository) {
         super(repository);
     }
@@ -55,26 +59,33 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
 //        }
 
         DatabaseFile databaseFile = new DatabaseFile();
-        databaseFile.setName(multipartFile.getOriginalFilename());
-        databaseFile.setFileStatus(FileStatus.NOT_SYNC);
 
+//        databaseFile.setName(multipartFile.getOriginalFilename());
+//        databaseFile.setFileStatus(FileStatus.NOT_SYNC);
+//
+//
+//        TaxDocumentModel taxDocumentModel = new TaxDocumentModel();
+//        FileProcessed errors = ValidateNfXML.validate(containerKey, multipartFile, databaseFile, taxDocumentModel);
+//        if (errors != null) {
+//            return errors;
+//        }
+//
+//        databaseFile.setContainerKey(containerKey);
+//        databaseFile.setCreateDate(Calendar.getInstance());
+//        databaseFile.setFileType(taxDocumentModel.getFileType());
+//        databaseFile.setHash(GenerateHash.generateDatabaseFile());
+//        databaseFile.setContentType(multipartFile.getContentType());
+//        databaseFile.setSize(multipartFile.getSize());
+//
+//        DatabaseFile newDatabaseFile = this.databaseFileRepository.saveAndFlush(databaseFile);
 
-        TaxDocumentModel taxDocumentModel = new TaxDocumentModel();
-        FileProcessed errors = ValidateNfXML.validate(containerKey, multipartFile, databaseFile, taxDocumentModel);
-        if (errors != null) {
-            return errors;
+        FileProcessed data = this.commonTaxDocumentService.getData(databaseFile, multipartFile, containerKey);
+        if(data.getErrors().size() > 0) {
+            return data;
         }
 
-        databaseFile.setContainerKey(containerKey);
-        databaseFile.setCreateDate(Calendar.getInstance());
-        databaseFile.setFileType(taxDocumentModel.getFileType());
-        databaseFile.setHash(GenerateHash.generateDatabaseFile());
-        databaseFile.setContentType(multipartFile.getContentType());
-        databaseFile.setSize(multipartFile.getSize());
-
-        DatabaseFile newDatabaseFile = this.databaseFileRepository.saveAndFlush(databaseFile);
-
-        this.databaseFilePartService.saveFile(newDatabaseFile, multipartFile);
+        this.databaseFileRepository.saveAndFlush(databaseFile);
+        this.databaseFilePartService.saveFile(databaseFile, multipartFile);
 
 //        Map invite = new HashMap();
 //        invite.put("container", containerKey);
@@ -86,7 +97,7 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
 //
 //        this.jmsTemplate.convertAndSend(invite);
 
-        return new FileProcessed(this.databaseFileRepository.saveAndFlush(newDatabaseFile), Collections.EMPTY_LIST);
+        return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.EMPTY_LIST);
     }
 
     @Transactional
