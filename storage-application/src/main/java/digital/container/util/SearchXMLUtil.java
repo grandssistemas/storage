@@ -80,6 +80,12 @@ public class SearchXMLUtil {
                 .orElse(EMPTY);
     }
 
+    public static String getInfInutXMotivo(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infInut.*<xMotivo>(.*)<\\/xMotivo>.*<\\/infInut>"))
+                .orElse(EMPTY);
+    }
+
     public static String getInfInutCNPJ(String xml) {
         return Optional
                 .ofNullable(searchGroup1(xml, "<infInut.*<CNPJ>(.*)<\\/CNPJ>.*<\\/infInut>"))

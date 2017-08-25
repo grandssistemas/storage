@@ -50,7 +50,18 @@ public class CommonTaxDocumentEventDisableService {
             return new FileProcessed(file, errors);
         }
 
+        String infInutDhRecbto = SearchXMLUtil.getInfInutDhRecbto(xml);
+        if(infInutDhRecbto.isEmpty()) {
+            errors.add("O evento de inutização precisa ter data e hora do recebimento.");
+            return new FileProcessed(file, errors);
+        }
+
         String infInutNProt = SearchXMLUtil.getInfInutNProt(xml);
+        if(infInutDhRecbto.isEmpty()) {
+            errors.add("O evento de inutização precisa ter numero do protocolo.");
+            return new FileProcessed(file, errors);
+        }
+
         AbstractFile fileFromDB = this.searchTaxDocumentService.getFileByGumgaOIAndNProtAndNFDisable(getGumgaOiToHQL(), infInutNProt);
         if(fileFromDB != null) {
             errors.add("Esse evento de inutização já existe.");
@@ -72,7 +83,6 @@ public class CommonTaxDocumentEventDisableService {
                 return new FileProcessed(file, errors);
         }
 
-        String infInutDhRecbto = SearchXMLUtil.getInfInutDhRecbto(xml);
         file.setDetailTwo(infInutDhRecbto);
 
         if(file instanceof LocalFile) {
@@ -102,8 +112,9 @@ public class CommonTaxDocumentEventDisableService {
     private FileProcessed validateDisableEvent(AbstractFile file, String xml) {
         List<String> errors = new ArrayList<>();
         String xServ = SearchXMLUtil.getInfInutXServ(xml);
+        String xMotivo = SearchXMLUtil.getInfInutXMotivo(xml);
 
-        if(!"INUTILIZAR".equalsIgnoreCase(xServ)) {
+        if((!xMotivo.isEmpty() && !xMotivo.toLowerCase().contains("inutilizacao")) || (!xServ.isEmpty() && !"INUTILIZAR".equalsIgnoreCase(xServ))) {
             errors.add("Não é um evento de inutilização.");
         }
 
