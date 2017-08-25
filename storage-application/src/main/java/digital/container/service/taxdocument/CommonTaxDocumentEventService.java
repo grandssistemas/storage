@@ -29,6 +29,9 @@ public class CommonTaxDocumentEventService {
     @Autowired
     private SearchTaxDocumentService searchTaxDocumentService;
 
+    @Autowired
+    private ValidateNfXML validateNfXML;
+
     public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey) {
         file.setName(multipartFile.getOriginalFilename());
         file.setFileStatus(FileStatus.NOT_SYNC);
@@ -66,7 +69,7 @@ public class CommonTaxDocumentEventService {
 
         if(file instanceof LocalFile) {
             String movement = taxDocument.getDetailThree();
-            Date date = ValidateNfXML.stringToDate(taxDocument.getDetailTwo());
+            Date date = validateNfXML.stringToDate(taxDocument.getDetailTwo());
             LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
             String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTCanceled(containerKey,

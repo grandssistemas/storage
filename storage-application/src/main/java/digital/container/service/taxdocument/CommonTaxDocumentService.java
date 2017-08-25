@@ -9,6 +9,7 @@ import digital.container.util.LocalFileUtil;
 import digital.container.util.ValidateNfXML;
 import digital.container.util.XMLUtil;
 import digital.container.vo.TaxDocumentModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,9 @@ import java.util.Date;
 @Transactional
 public class CommonTaxDocumentService {
 
+    @Autowired
+    private ValidateNfXML validateNfXML;
+
     public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey) {
         file.setName(multipartFile.getOriginalFilename());
         file.setFileStatus(FileStatus.NOT_SYNC);
@@ -31,7 +35,7 @@ public class CommonTaxDocumentService {
         String xml = XMLUtil.getXml(multipartFile);
 
         TaxDocumentModel taxDocumentModel = new TaxDocumentModel();
-        FileProcessed errors = ValidateNfXML.validate(containerKey, multipartFile, file, taxDocumentModel);
+        FileProcessed errors = validateNfXML.validate(containerKey, multipartFile, file, taxDocumentModel);
         if (errors != null) {
             return errors;
         }
@@ -39,7 +43,7 @@ public class CommonTaxDocumentService {
         file.setFileType(taxDocumentModel.getFileType());
 
         if(file instanceof LocalFile) {
-            Date date = ValidateNfXML.stringToDate(file.getDetailTwo());
+            Date date = validateNfXML.stringToDate(file.getDetailTwo());
             LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
             String path = LocalFileUtil.getRelativePathFileTAXDOCUMENT(containerKey,
