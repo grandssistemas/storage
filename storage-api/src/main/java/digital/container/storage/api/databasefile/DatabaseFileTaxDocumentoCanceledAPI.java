@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping
 public class DatabaseFileTaxDocumentoCanceledAPI {
@@ -30,7 +32,7 @@ public class DatabaseFileTaxDocumentoCanceledAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "database-file-tax-document-upload", notes = "Upload de arquivos que serão salvo no banco de dados.")
+    @ApiOperation(value = "database-file-tax-document-canceled-upload", notes = "Upload de arquivos que serão salvo no banco de dados.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = FileProcessed.class),
             @ApiResponse(code = 400, message = "", response = FileProcessed.class)
@@ -43,5 +45,23 @@ public class DatabaseFileTaxDocumentoCanceledAPI {
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(fileProcessed);
+    }
+
+    @Transactional
+    @RequestMapping(
+            path = URI_BASE + "/uploads/{containerKey}",
+            method = RequestMethod.POST,
+            consumes = MediaType.ALL_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    @ApiOperation(value = "database-file-tax-document-canceled-uploads", notes = "Uploads de arquivos que serão salvo no banco de dados. Limite maximo de 500.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "", response = List.class),
+            @ApiResponse(code = 400, message = "", response = List.class)
+    })
+    public ResponseEntity<List<FileProcessed>> upload(@ApiParam(name = "containerKey", value = "A chave cadastrada no storage no endpoint: /api/permission-container", required = true)@PathVariable String containerKey,
+                                                      @ApiParam(name = "files", value = "Os arquivos que serão salvos no storage", required = true)@RequestPart(name = "files") List<MultipartFile> multipartFiles) {
+        List<FileProcessed> filesProcessed = this.service.upload(containerKey, multipartFiles);
+        return ResponseEntity.status(HttpStatus.CREATED).body(filesProcessed);
     }
 }

@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 @Transactional
@@ -42,5 +44,13 @@ public class DatabaseFileTaxDocumentCanceledService extends GumgaService<Databas
         this.databaseFilePartService.saveFile(databaseFile, multipartFile);
 
         return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.EMPTY_LIST);
+    }
+
+    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles) {
+        List<FileProcessed> result = new ArrayList<>();
+        for(MultipartFile multipartFile : multipartFiles) {
+            result.add(this.upload(containerKey,multipartFile));
+        }
+        return result;
     }
 }
