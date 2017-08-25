@@ -1,5 +1,6 @@
 package digital.container.repository;
 
+import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.LocalFile;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.domains.GumgaOi;
@@ -24,4 +25,7 @@ public interface LocalFileRepository extends GumgaCrudRepository<LocalFile, Long
 
     @Query(value = "from LocalFile df where df.oi like :oi and df.detailOne = :chNFe and (df.fileType = 'NFE_CANCELED' or df.fileType = 'NFCE_CANCELED')")
     Optional<LocalFile> getFileByGumgaOIAndChNFeAndNFCanceled(@Param("oi") GumgaOi oi, @Param("chNFe") String chNFe);
+
+    @Query(value = "from LocalFile df where df.oi like :oi and df.detailOne = :nprot and (df.fileType = 'NFE_DISABLE' or df.fileType = 'NFCE_DISABLE')")
+    Optional<LocalFile> getFileByGumgaOIAndNProtAndNFDisable(@Param("oi")GumgaOi oi, @Param("nprot") String nprot);
 }

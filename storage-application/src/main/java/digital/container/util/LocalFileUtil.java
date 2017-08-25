@@ -37,6 +37,17 @@ public class LocalFileUtil {
         return getRelativePathFileTAXDOCUMENT(containerKey, year, month, type, movement) + "/CANCELED";
     }
 
+    public static String getRelativePathFileTAXDOCUMENTDisable(String containerKey, Integer year, String month, FileType type) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(GumgaThreadScope.organizationCode.get());
+        sb.append('/' + processContainerKey(containerKey));
+        sb.append("/TAX-DOCUMENT/" + year);
+        sb.append('/' + month);
+        sb.append('/' + type.toString());
+        sb.append("/DISABLE");
+        return sb.toString();
+    }
+
     private static String processContainerKey(String containerKey) {
         String key = containerKey.substring(0, 8);
         return key + '/' + containerKey;

@@ -74,6 +74,36 @@ public class SearchXMLUtil {
                 .orElse(EMPTY);
     }
 
+    public static String getInfInutXServ(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infInut.*<xServ>(.*)<\\/xServ>.*<\\/infInut>"))
+                .orElse(EMPTY);
+    }
+
+    public static String getInfInutCNPJ(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infInut.*<CNPJ>(.*)<\\/CNPJ>.*<\\/infInut>"))
+                .orElse(EMPTY);
+    }
+
+    public static String getInfInutMod(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infInut.*<mod>(.*)<\\/mod>.*<\\/infInut>"))
+                .orElse(EMPTY);
+    }
+
+    public static String getInfInutNProt(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infInut.*<nProt>(.*)<\\/nProt>.*<\\/infInut>"))
+                .orElse(EMPTY);
+    }
+
+    public static String getInfInutDhRecbto(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infInut.*<dhRecbto>(.*)<\\/dhRecbto>.*<\\/infInut>"))
+                .orElse(EMPTY);
+    }
+
     private static String searchGroup1(String xml, String regex) {
         String result = null;
         Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(xml);

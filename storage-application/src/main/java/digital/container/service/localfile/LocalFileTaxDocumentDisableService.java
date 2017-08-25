@@ -2,9 +2,11 @@ package digital.container.service.localfile;
 
 import digital.container.repository.LocalFileRepository;
 import digital.container.service.taxdocument.CommonTaxDocumentEventCanceledService;
-import digital.container.storage.domain.model.file.*;
+import digital.container.service.taxdocument.CommonTaxDocumentEventDisableService;
+import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.util.*;
+import digital.container.util.LocalFileUtil;
+import digital.container.util.SaveLocalFile;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.slf4j.Logger;
@@ -16,27 +18,29 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @Transactional
-public class LocalFileTaxDocumentCanceledService extends GumgaService<LocalFile, Long> {
+public class LocalFileTaxDocumentDisableService extends GumgaService<LocalFile, Long> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileTaxDocumentCanceledService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileTaxDocumentDisableService.class);
     private LocalFileRepository localFileRepository;
 
     @Autowired
-    private CommonTaxDocumentEventCanceledService commonTaxCocumentEventService;
+    private CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService;
 
     @Autowired
-    public LocalFileTaxDocumentCanceledService(GumgaCrudRepository<LocalFile, Long> repository) {
+    public LocalFileTaxDocumentDisableService(GumgaCrudRepository<LocalFile, Long> repository) {
         super(repository);
         this.localFileRepository = LocalFileRepository.class.cast(repository);
     }
 
     public FileProcessed upload(String containerKey, MultipartFile multipartFile) {
         LocalFile localFile = new LocalFile();
-        FileProcessed data = this.commonTaxCocumentEventService.getData(localFile, multipartFile, containerKey);
+        FileProcessed data = this.commonTaxDocumentEventDisableService.getData(localFile, multipartFile, containerKey);
         if(data.getErrors().size() > 0) {
             return data;
         }

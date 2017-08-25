@@ -1,7 +1,7 @@
 package digital.container.service.databasefile;
 
 import digital.container.repository.DatabaseFileRepository;
-import digital.container.service.taxdocument.CommonTaxDocumentEventCanceledService;
+import digital.container.service.taxdocument.CommonTaxDocumentEventDisableService;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import io.gumga.application.GumgaService;
@@ -17,29 +17,30 @@ import java.util.List;
 
 @Service
 @Transactional
-public class DatabaseFileTaxDocumentCanceledService extends GumgaService<DatabaseFile, Long> {
-
-    @Autowired
-    private CommonTaxDocumentEventCanceledService commonTaxCocumentEventService;
+public class DatabaseFileTaxDocumentDisableService extends GumgaService<DatabaseFile, Long> {
 
     private DatabaseFileRepository databaseFileRepository;
+
+    @Autowired
+    private CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService;
 
     @Autowired
     private DatabaseFilePartService databaseFilePartService;
 
     @Autowired
-    public DatabaseFileTaxDocumentCanceledService(GumgaCrudRepository<DatabaseFile, Long> repository) {
+    public DatabaseFileTaxDocumentDisableService(GumgaCrudRepository<DatabaseFile, Long> repository) {
         super(repository);
         this.databaseFileRepository = DatabaseFileRepository.class.cast(repository);
     }
 
     public FileProcessed upload(String containerKey, MultipartFile multipartFile) {
         DatabaseFile databaseFile = new DatabaseFile();
-        FileProcessed data = this.commonTaxCocumentEventService.getData(databaseFile, multipartFile, containerKey);
+        FileProcessed data = this.commonTaxDocumentEventDisableService.getData(databaseFile, multipartFile, containerKey);
 
         if(data.getErrors().size() > 0) {
             return data;
         }
+
         this.databaseFileRepository.saveAndFlush(databaseFile);
         this.databaseFilePartService.saveFile(databaseFile, multipartFile);
 

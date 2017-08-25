@@ -4,8 +4,10 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-import digital.container.service.localfile.LocalFileTaxDocumentCanceledService;
+import digital.container.service.databasefile.DatabaseFileTaxDocumentDisableService;
+import digital.container.service.localfile.LocalFileTaxDocumentDisableService;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
+import net.sf.cglib.core.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,11 +20,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping
-public class LocalFileTaxDocumentoCanceledAPI {
-    private final static String URI_BASE = "/api/local-file/tax-document-canceled";
+public class LocalFileTaxDocumentDisableAPI {
+    private final static String URI_BASE = "/api/local-file/tax-document-disable";
 
     @Autowired
-    private LocalFileTaxDocumentCanceledService service;
+    private LocalFileTaxDocumentDisableService service;
 
     @Transactional
     @RequestMapping(
@@ -31,7 +33,7 @@ public class LocalFileTaxDocumentoCanceledAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "local-file-tax-document-canceled-upload", notes = "Upload de arquivo que será salvo localmente.")
+    @ApiOperation(value = "local-file-tax-document-disable-upload", notes = "Upload de arquivo que será salvo localmente.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = FileProcessed.class),
             @ApiResponse(code = 400, message = "", response = FileProcessed.class)
@@ -45,6 +47,7 @@ public class LocalFileTaxDocumentoCanceledAPI {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(fileProcessed);
     }
+
     @Transactional
     @RequestMapping(
             path = URI_BASE + "/uploads/{containerKey}",
@@ -52,7 +55,7 @@ public class LocalFileTaxDocumentoCanceledAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "local-file-tax-document-canceled-uploads", notes = "Uploads de arquivos que serão salvos localmente.")
+    @ApiOperation(value = "local-file-tax-document-disable-uploads", notes = "Uploads de arquivos que serão salvos localmente.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = List.class),
             @ApiResponse(code = 400, message = "", response = List.class)

@@ -24,15 +24,14 @@ public class SearchTaxDocumentService {
 
 
     public AbstractFile getFileByGumgaOIAndChNFeAndNF(GumgaOi oi, String chNFe) {
+        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getFileByGumgaOIAndChNFeAndNF(new GumgaOi(oi), chNFe);
+        if(dbDocument.isPresent()) {
+            return dbDocument.get();
+        }
 
         Optional<LocalFile> lfDocument = this.localFileRepository.getFileByGumgaOIAndChNFeAndNF(new GumgaOi(oi), chNFe);
         if(lfDocument.isPresent()) {
             return lfDocument.get();
-        }
-
-        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getFileByGumgaOIAndChNFeAndNF(new GumgaOi(oi), chNFe);
-        if(dbDocument.isPresent()) {
-            return dbDocument.get();
         }
 
         return null;
@@ -40,17 +39,31 @@ public class SearchTaxDocumentService {
 
 
     public AbstractFile getFileByGumgaOIAndChNFeAndNFCanceled(GumgaOi oi, String chNFe) {
-        Optional<LocalFile> lfDocument = this.localFileRepository.getFileByGumgaOIAndChNFeAndNFCanceled(oi, chNFe);
-        if(lfDocument.isPresent()) {
-            return lfDocument.get();
-        }
-
         Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getFileByGumgaOIAndChNFeAndNFCanceled(oi, chNFe);
         if(dbDocument.isPresent()) {
             return dbDocument.get();
         }
 
+        Optional<LocalFile> lfDocument = this.localFileRepository.getFileByGumgaOIAndChNFeAndNFCanceled(oi, chNFe);
+        if(lfDocument.isPresent()) {
+            return lfDocument.get();
+        }
 
         return null;
+    }
+
+    public AbstractFile getFileByGumgaOIAndNProtAndNFDisable(GumgaOi oi, String nprot) {
+        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getFileByGumgaOIAndNProtAndNFDisable(oi, nprot);
+        if(dbDocument.isPresent()) {
+            return dbDocument.get();
+        }
+
+        Optional<LocalFile> lfDocument = this.localFileRepository.getFileByGumgaOIAndNProtAndNFDisable(oi, nprot);
+        if(lfDocument.isPresent()) {
+            return lfDocument.get();
+        }
+
+        return null;
+
     }
 }

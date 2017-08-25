@@ -8,23 +8,20 @@ import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.*;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.domains.GumgaOi;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
 @Service
-public class CommonTaxDocumentEventService {
+public class CommonTaxDocumentEventCanceledService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonTaxDocumentEventService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonTaxDocumentEventCanceledService.class);
 
     @Autowired
     private SearchTaxDocumentService searchTaxDocumentService;

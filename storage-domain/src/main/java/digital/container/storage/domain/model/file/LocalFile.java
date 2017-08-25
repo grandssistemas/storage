@@ -9,7 +9,9 @@ import javax.persistence.*;
 @Table(name = "local_file",
         indexes = {
                 @Index(name = "local_file_index_oi", columnList = "oi"),
-                @Index(name = "local_file_index_hash", columnList = "hash")
+                @Index(name = "local_file_index_hash", columnList = "hash"),
+                @Index(name = "local_file_index_hash_public", columnList = "hash, file_public"),
+                @Index(name = "local_file_index_oi_detailone_filetype", columnList = "oi, detail_one, file_type")
         })
 @GumgaMultitenancy
 @SequenceGenerator(name = GumgaSharedModel.SEQ_NAME, sequenceName = "seq_local_file")

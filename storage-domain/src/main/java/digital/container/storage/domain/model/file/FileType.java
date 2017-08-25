@@ -6,6 +6,8 @@ public enum FileType {
     NFCE,
     NFE_CANCELED,
     NFCE_CANCELED,
+    NFE_DISABLE,
+    NFCE_DISABLE,
     INVALID_TAX_DOCUMENT,
     ANYTHING;
 }
