@@ -110,6 +110,31 @@ public class SearchXMLUtil {
                 .orElse(EMPTY);
     }
 
+    public static String getInfEventoTpEvento(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infEvento.*<tpEvento>(.*)<\\/tpEvento>.*<\\/infEvento>"))
+                .orElse(EMPTY);
+    }
+
+    public static String getInfEventoCNPJ(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infEvento.*<CNPJ>(.*)<\\/CNPJ>.*<\\/infEvento>"))
+                .orElse(EMPTY);
+    }
+
+    public static String getInfEventoDhEvento(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infEvento.*<dhEvento>(.*)<\\/dhEvento>.*<\\/infEvento>"))
+                .orElse(EMPTY);
+    }
+
+    public static String getInfEventoChNFe(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infEvento.*<chNFe>(.*)<\\/chNFe>.*<\\/infEvento>"))
+                .orElse(EMPTY);
+    }
+
+
     private static String searchGroup1(String xml, String regex) {
         String result = null;
         Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(xml);
@@ -132,4 +157,5 @@ public class SearchXMLUtil {
         }
         return result;
     }
+
 }

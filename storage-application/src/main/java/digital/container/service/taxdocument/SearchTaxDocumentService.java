@@ -66,4 +66,18 @@ public class SearchTaxDocumentService {
         return null;
 
     }
+
+    public AbstractFile getFileByGumgaOIAndNProtAndNFLetterCorrection(GumgaOi oi, String chNFe) {
+        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getFileByGumgaOIAndNProtAndNFLetterCorrection(oi, chNFe);
+        if(dbDocument.isPresent()) {
+            return dbDocument.get();
+        }
+
+        Optional<LocalFile> lfDocument = this.localFileRepository.getFileByGumgaOIAndNProtAndNFLetterCorrection(oi, chNFe);
+        if(lfDocument.isPresent()) {
+            return lfDocument.get();
+        }
+
+        return null;
+    }
 }
