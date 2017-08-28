@@ -45,8 +45,16 @@ public class CommonTaxDocumentEventLetterCorrectionService {
         }
 
         String infInutCNPJ = SearchXMLUtil.getInfEventoCNPJ(xml);
+        String chNFe = SearchXMLUtil.getInfEventoChNFe(xml);
+
+        if(infInutCNPJ.isEmpty()) {
+            if(!chNFe.isEmpty() && chNFe.length() > 20) {
+                infInutCNPJ = chNFe.substring(6, 20);
+            }
+        }
+
         if(!containerKey.equals(infInutCNPJ)) {
-            errors.add("O CNPJ do evento de carta de correção é diferente da chave do container.");
+            errors.add("O CNPJ do evento da carta de correção é diferente da chave do container.");
             return new FileProcessed(file, errors);
         }
 
@@ -56,27 +64,25 @@ public class CommonTaxDocumentEventLetterCorrectionService {
             return new FileProcessed(file, errors);
         }
 
-        String chNFe = SearchXMLUtil.getInfEventoChNFe(xml);
+
+
         AbstractFile fileFromDB = this.searchTaxDocumentService.getFileByGumgaOIAndNProtAndNFLetterCorrection(getGumgaOiToHQL(), chNFe);
         if(fileFromDB != null) {
             errors.add("Esse evento de carta de correção já existe.");
             return new FileProcessed(file, errors);
         }
+
+        //        AbstractFile taxDocument = this.searchTaxDocumentService.getFileByGumgaOIAndChNFeAndNF(getGumgaOiToHQL(), chNFe);
+//        if(taxDocument == null) {
+//            errors.add("Não existe documento fiscal com essa chave de acesso.");
+//            return new FileProcessed(file, errors);
+//        }
+
+
+
         file.setDetailOne(chNFe);
 
-
-        String mod = SearchXMLUtil.getInfInutMod(xml);
-        switch (mod) {
-            case "55":
-                file.setFileType(FileType.NFE_LETTER_CORRECTION);
-                break;
-            case "65":
-                file.setFileType(FileType.NFCE_LETTER_CORRECTION);
-                break;
-            default:
-                errors.add("Tipo de documento invalido.");
-                return new FileProcessed(file, errors);
-        }
+        file.setFileType(FileType.NFE_LETTER_CORRECTION);
 
         file.setDetailTwo(infInutDhRecbto);
 
@@ -87,9 +93,10 @@ public class CommonTaxDocumentEventLetterCorrectionService {
             String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTLetterCorrection(containerKey,
                     ld.getYear(),
                     ld.getMonth().toString(),
-                    mod.equals("55") ? FileType.NFE : FileType.NFCE);
+                    FileType.NFE);
 
             ((LocalFile)file).setRelativePath(path + '/' + file.getName());
+
             file.setHash(GenerateHash.generateLocalFile());
         } else {
             file.setHash(GenerateHash.generateDatabaseFile());

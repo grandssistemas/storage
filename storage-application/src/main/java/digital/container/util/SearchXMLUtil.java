@@ -125,7 +125,11 @@ public class SearchXMLUtil {
     public static String getInfEventoDhEvento(String xml) {
         return Optional
                 .ofNullable(searchGroup1(xml, "<infEvento.*<dhEvento>(.*)<\\/dhEvento>.*<\\/infEvento>"))
-                .orElse(EMPTY);
+                .orElse(Optional
+                        .ofNullable(searchGroup1(xml, "<infEvento.*<dhRegEvento>(.*)<\\/dhRegEvento>.*<\\/infEvento>"))
+                        .orElse(EMPTY));
+
+
     }
 
     public static String getInfEventoChNFe(String xml) {
