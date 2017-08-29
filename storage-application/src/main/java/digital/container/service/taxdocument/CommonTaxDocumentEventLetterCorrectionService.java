@@ -72,11 +72,11 @@ public class CommonTaxDocumentEventLetterCorrectionService {
             return new FileProcessed(file, errors);
         }
 
-        //        AbstractFile taxDocument = this.searchTaxDocumentService.getFileByGumgaOIAndChNFeAndNF(getGumgaOiToHQL(), chNFe);
-//        if(taxDocument == null) {
-//            errors.add("Não existe documento fiscal com essa chave de acesso.");
-//            return new FileProcessed(file, errors);
-//        }
+        AbstractFile taxDocument = this.searchTaxDocumentService.getFileByGumgaOIAndChNFeAndNF(getGumgaOiToHQL(), chNFe);
+        if(taxDocument == null) {
+            errors.add("Não existe documento fiscal com essa chave de acesso.");
+            return new FileProcessed(file, errors);
+        }
 
 
 
@@ -113,13 +113,17 @@ public class CommonTaxDocumentEventLetterCorrectionService {
 
     private FileProcessed validateLetterCorrectionEvent(AbstractFile file, String xml) {
         List<String> errors = new ArrayList<>();
-        String tpEvento = SearchXMLUtil.getInfEventoTpEvento(xml);
 
-        if(!tpEvento.equals("110110")) {
+        if(!isLetterCorrectionEvent(xml)) {
             errors.add("Não é um evento de carta de correção.");
         }
 
         return new FileProcessed(file, errors);
+    }
+
+    public Boolean isLetterCorrectionEvent(String xml) {
+        String tpEvento = SearchXMLUtil.getInfEventoTpEvento(xml);
+        return "110110".equals(tpEvento);
     }
 
 

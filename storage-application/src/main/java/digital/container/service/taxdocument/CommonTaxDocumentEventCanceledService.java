@@ -113,7 +113,7 @@ public class CommonTaxDocumentEventCanceledService {
         return new FileProcessed(file, errors);
     }
 
-    private Boolean isCancellationEvent(String xml) {
+    public Boolean isCancellationEvent(String xml) {
         String xEvento = SearchXMLUtil.getInfEventoXevento(xml);
         return "Cancelamento".equalsIgnoreCase(xEvento);
     }

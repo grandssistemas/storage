@@ -121,9 +121,15 @@ public class CommonTaxDocumentEventDisableService {
         return new FileProcessed(file, errors);
     }
 
-    private Boolean isDisableEvent(String xml) {
-        String xEvento = SearchXMLUtil.getInfEventoXevento(xml);
-        return "INUTILIZAR".equalsIgnoreCase(xEvento);
+    public Boolean isDisableEvent(String xml) {
+        String xServ = SearchXMLUtil.getInfInutXServ(xml);
+        String xMotivo = SearchXMLUtil.getInfInutXMotivo(xml);
+        String infProtXMotivo = SearchXMLUtil.getInfProtXMotivo(xml);
+
+        if(((infProtXMotivo.isEmpty() || infProtXMotivo.toLowerCase().contains("autorizado")) && xServ.isEmpty() && xMotivo.isEmpty()) || (!xMotivo.isEmpty() && !xMotivo.toLowerCase().contains("inutilizacao")) || (!xServ.isEmpty() && !"INUTILIZAR".equalsIgnoreCase(xServ))) {
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
     }
 
     private GumgaOi getGumgaOiToHQL() {

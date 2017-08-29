@@ -62,6 +62,12 @@ public class SearchXMLUtil {
                 .orElse(EMPTY);
     }
 
+    public static String getInfProtXMotivo(String xml) {
+        return Optional
+                .ofNullable(searchGroup1(xml, "<infProt.*<xMotivo>(.*)<\\/xMotivo>.*<\\/infProt>"))
+                .orElse(EMPTY);
+    }
+
     public static String getInfEventochNFe(String xml) {
         return Optional
                 .ofNullable(searchGroup1(xml, "<infEvento.*<chNFe>(.*)<\\/chNFe>.*<\\/infEvento>"))
