@@ -30,4 +30,7 @@ public interface DatabaseFileRepository extends GumgaCrudRepository<DatabaseFile
 
     @Query(value = "from DatabaseFile df where df.oi like :oi and df.detailOne = :chNFe and (df.fileType = 'NFE_LETTER_CORRECTION' or df.fileType = 'NFCE_LETTER_CORRECTION')")
     Optional<DatabaseFile> getFileByGumgaOIAndNProtAndNFLetterCorrection(@Param("oi") GumgaOi oi, @Param("chNFe") String chNFe);
+
+    @Query(value = "from DatabaseFile df where df.hash = :hash and df.fileType != 'ANYTHING'")
+    Optional<DatabaseFile> getTaxDocumentByHash(@Param("hash") String hash);
 }

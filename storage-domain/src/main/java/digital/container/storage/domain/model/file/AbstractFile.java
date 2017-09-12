@@ -164,4 +164,6 @@ public abstract class AbstractFile extends GumgaSharedModel<Long> {
     public void setFilePublic(Boolean filePublic) {
         this.filePublic = filePublic;
     }
+
+
 }

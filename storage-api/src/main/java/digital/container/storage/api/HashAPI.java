@@ -11,6 +11,7 @@ import digital.container.storage.util.SendDataLocalFileHttpServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +30,7 @@ public class HashAPI {
 
 //    @Autowired
 //    JmsTemplate jmsTemplate;
+    private static final String TOKEN = "3cb73f59eb02-479b-b859-797e29eb8256-90703973edf5aa2d";
 
     @Autowired
     private DatabaseFileRepository databaseFileRepository;
@@ -73,6 +75,31 @@ public class HashAPI {
             }
         }
     }
+
+    @Transactional(readOnly = true)
+    @RequestMapping(
+            path = "/public-integrate/{hash}/{token}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    @ApiOperation(value = "public-integrate", notes = "Visualizar qualquer tipo de arquivo pelo hash e token")
+    public void integrate(@ApiParam(value = "hash", required = true) @PathVariable String hash, @PathVariable String token, HttpServletResponse httpServletResponse) {
+        if(!TOKEN.equals(token)) {
+            throw new RuntimeException("Token invalido.");
+        }
+
+        Optional<DatabaseFile> df = this.databaseFileRepository.getByHash(hash);
+        if(df.isPresent()) {
+            SendDataDatabaseFileHttpServlet.send(df.get(), httpServletResponse);
+        } else {
+            Optional<LocalFile> lf = this.localFileRepository.getByHash(hash);
+            if(lf.isPresent()){
+                SendDataLocalFileHttpServlet.send(lf.get(), httpServletResponse);
+            }
+        }
+    }
+
+
 
 //    @RequestMapping
 //    public void teste() {

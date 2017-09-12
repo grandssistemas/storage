@@ -80,4 +80,19 @@ public class SearchTaxDocumentService {
 
         return null;
     }
+
+    public AbstractFile getTaxDocumentByHash(String hash) {
+        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getTaxDocumentByHash(hash);
+        if(dbDocument.isPresent()) {
+            return dbDocument.get();
+        }
+
+        Optional<LocalFile> lfDocument = this.localFileRepository.getTaxDocumentByHash(hash);
+        if(lfDocument.isPresent()) {
+            return lfDocument.get();
+        }
+
+        return null;
+
+    }
 }

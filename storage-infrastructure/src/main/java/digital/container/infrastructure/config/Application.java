@@ -134,26 +134,25 @@ public class Application {
         return new JpaTransactionManager(emf);
     }
 
-//    @Bean
-//    public ActiveMQConnectionFactory connectionFactory() {
-//        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-//        connectionFactory.setBrokerURL(DEFAULT_BROKER_URL);
-//
-//
-////        connectionFactory.setTrustedPackages(Arrays.asList("com.websystique.spring","java.util"));
-//        return connectionFactory;
-//    }
-//
-//    @Bean
-//    public JmsTemplate jmsTemplate(){
-//        JmsTemplate template = new JmsTemplate();
-//        template.setConnectionFactory(connectionFactory());
-//        template.setDefaultDestinationName(ORDER_QUEUE);
+    @Bean
+    public ActiveMQConnectionFactory connectionFactory() {
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+        connectionFactory.setBrokerURL(DEFAULT_BROKER_URL);
+
+//        connectionFactory.setTrustedPackages(Arrays.asList("com.websystique.spring","java.util"));
+        return connectionFactory;
+    }
+
+    @Bean
+    public JmsTemplate jmsTemplate(){
+        JmsTemplate template = new JmsTemplate();
+        template.setConnectionFactory(connectionFactory());
+        template.setDefaultDestinationName(ORDER_QUEUE);
 //        template.setSessionAcknowledgeMode(Session.SESSION_TRANSACTED);
 //        template.setSessionTransacted(true);
-//        return template;
-//    }
-//
+        return template;
+    }
+
 //    @Bean
 //    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
 //        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
