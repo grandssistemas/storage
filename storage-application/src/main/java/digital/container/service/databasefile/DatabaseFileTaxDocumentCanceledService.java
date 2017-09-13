@@ -1,6 +1,7 @@
 package digital.container.service.databasefile;
 
 import digital.container.repository.DatabaseFileRepository;
+import digital.container.service.message.SendMessageMOMService;
 import digital.container.service.taxdocument.CommonTaxDocumentEventCanceledService;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
@@ -26,6 +27,8 @@ public class DatabaseFileTaxDocumentCanceledService extends GumgaService<Databas
 
     @Autowired
     private DatabaseFilePartService databaseFilePartService;
+    @Autowired
+    private SendMessageMOMService sendMessageMOMService;
 
     @Autowired
     public DatabaseFileTaxDocumentCanceledService(GumgaCrudRepository<DatabaseFile, Long> repository) {
@@ -42,6 +45,7 @@ public class DatabaseFileTaxDocumentCanceledService extends GumgaService<Databas
         }
         this.databaseFileRepository.saveAndFlush(databaseFile);
         this.databaseFilePartService.saveFile(databaseFile, multipartFile);
+        this.sendMessageMOMService.send(databaseFile, containerKey);
 
         return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.EMPTY_LIST);
     }

@@ -5,5 +5,7 @@ public enum FileStatus {
     DO_NOT_SYNC,
     NOT_SYNC,
     SYNCHRONIZED,
-    PROCESSED;
+    PROCESSED,
+    FAILED_SYNC;
+
 }

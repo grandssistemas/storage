@@ -4,6 +4,8 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import digital.container.repository.DatabaseFileRepository;
 import digital.container.repository.LocalFileRepository;
+import digital.container.service.taxdocument.SearchTaxDocumentService;
+import digital.container.storage.domain.model.file.AbstractFile;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
@@ -38,6 +40,9 @@ public class HashAPI {
     @Autowired
     private LocalFileRepository localFileRepository;
 
+    @Autowired
+    private SearchTaxDocumentService searchTaxDocumentService;
+
     @Transactional(readOnly = true)
     @RequestMapping(
             path = "/{hash}",
@@ -46,15 +51,7 @@ public class HashAPI {
     )
     @ApiOperation(value = "file-hash", notes = "Visualizar qualquer tipo de arquivo pelo hash")
     public void download(@ApiParam(value = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
-        Optional<DatabaseFile> df = this.databaseFileRepository.getByHash(hash);
-        if(df.isPresent()) {
-            SendDataDatabaseFileHttpServlet.send(df.get(), httpServletResponse);
-        } else {
-            Optional<LocalFile> lf = this.localFileRepository.getByHash(hash);
-            if(lf.isPresent()){
-                SendDataLocalFileHttpServlet.send(lf.get(), httpServletResponse);
-            }
-        }
+        sendFile(hash, httpServletResponse);
     }
 
     @Transactional(readOnly = true)
@@ -88,6 +85,10 @@ public class HashAPI {
             throw new RuntimeException("Token invalido.");
         }
 
+        sendFile(hash, httpServletResponse);
+    }
+
+    private void sendFile(String hash, HttpServletResponse httpServletResponse) {
         Optional<DatabaseFile> df = this.databaseFileRepository.getByHash(hash);
         if(df.isPresent()) {
             SendDataDatabaseFileHttpServlet.send(df.get(), httpServletResponse);
@@ -95,6 +96,26 @@ public class HashAPI {
             Optional<LocalFile> lf = this.localFileRepository.getByHash(hash);
             if(lf.isPresent()){
                 SendDataLocalFileHttpServlet.send(lf.get(), httpServletResponse);
+            }
+        }
+    }
+
+    @Transactional(readOnly = true)
+    @RequestMapping(
+            path = "/detail-one/{detailOne}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    @ApiOperation(value = "file-detailOne", notes = "Visualizar qualquer tipo de arquivo pelo detailOne")
+    public void searchDetailOne(@ApiParam(value = "detailOne", required = true) @PathVariable String detailOne, HttpServletResponse httpServletResponse) {
+        AbstractFile taxDocumentByDetailOneAndGumgaOI = this.searchTaxDocumentService.getTaxDocumentByDetailOneAndGumgaOI(detailOne);
+        if(taxDocumentByDetailOneAndGumgaOI != null) {
+            if(taxDocumentByDetailOneAndGumgaOI instanceof DatabaseFile) {
+                DatabaseFile df = (DatabaseFile) taxDocumentByDetailOneAndGumgaOI;
+                SendDataDatabaseFileHttpServlet.send(df, httpServletResponse);
+            } else {
+                LocalFile lf = (LocalFile) taxDocumentByDetailOneAndGumgaOI;
+                SendDataLocalFileHttpServlet.send(lf, httpServletResponse);
             }
         }
     }

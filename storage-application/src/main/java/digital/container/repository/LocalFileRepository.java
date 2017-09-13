@@ -34,4 +34,7 @@ public interface LocalFileRepository extends GumgaCrudRepository<LocalFile, Long
 
     @Query(value = "from LocalFile df where df.hash = :hash and df.fileType != 'ANYTHING'")
     Optional<LocalFile> getTaxDocumentByHash(@Param("hash") String hash);
+
+    @Query(value = "from LocalFile df where df.detailOne = :detailOne and df.oi like :gumgaOi and df.fileType != 'ANYTHING'")
+    Optional<LocalFile> getTaxDocumentByDetailOneAndGumgaOI(@Param("detailOne") String detailOne, @Param("gumgaOi") GumgaOi gumgaOi);
 }

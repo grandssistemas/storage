@@ -2,6 +2,7 @@ package digital.container.service.localfile;
 
 import digital.container.exception.*;
 import digital.container.service.container.PermissionContainerService;
+import digital.container.service.message.SendMessageMOMService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
 import digital.container.service.taxdocument.CommonTaxDocumentService;
@@ -43,6 +44,8 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
     private LimitFileService limitFileService;
     @Autowired
     private CommonTaxDocumentService commonTaxDocumentService;
+    @Autowired
+    private SendMessageMOMService sendMessageMOMService;
 
     @Autowired
     public LocalFileTaxDocumentService(GumgaCrudRepository<LocalFile, Long> repository) {
@@ -105,6 +108,7 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
             LOG.error(e.getMessage());
         }
 
+        this.sendMessageMOMService.send(localFile, containerKey);
         return new FileProcessed(this.localFileRepository.saveAndFlush(localFile), Collections.EMPTY_LIST);
     }
 

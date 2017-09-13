@@ -22,6 +22,8 @@ public class SendDataLocalFileHttpServlet {
         httpServletResponse.reset();
         if(file.getContentType().contains("pdf")) {
             httpServletResponse.setHeader("Content-disposition","attachment;filename="+file.getName());
+        } else {
+            httpServletResponse.setHeader("Content-disposition","filename="+file.getName());
         }
         httpServletResponse.setContentType(MediaType.parseMediaType(file.getContentType()).getType());
         httpServletResponse.setContentLength(Integer.parseInt(file.getSize().toString()));

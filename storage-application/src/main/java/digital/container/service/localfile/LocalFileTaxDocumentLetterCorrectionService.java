@@ -1,6 +1,7 @@
 package digital.container.service.localfile;
 
 import digital.container.repository.LocalFileRepository;
+import digital.container.service.message.SendMessageMOMService;
 import digital.container.service.taxdocument.CommonTaxDocumentEventDisableService;
 import digital.container.service.taxdocument.CommonTaxDocumentEventLetterCorrectionService;
 import digital.container.storage.domain.model.file.LocalFile;
@@ -33,6 +34,9 @@ public class LocalFileTaxDocumentLetterCorrectionService extends GumgaService<Lo
     private CommonTaxDocumentEventLetterCorrectionService service;
 
     @Autowired
+    private SendMessageMOMService sendMessageMOMService;
+
+    @Autowired
     public LocalFileTaxDocumentLetterCorrectionService(GumgaCrudRepository<LocalFile, Long> repository) {
         super(repository);
         this.localFileRepository = LocalFileRepository.class.cast(repository);
@@ -54,6 +58,7 @@ public class LocalFileTaxDocumentLetterCorrectionService extends GumgaService<Lo
             LOGGER.error(e.getMessage(), e);
         }
 
+        this.sendMessageMOMService.send(localFile, containerKey);
         return new FileProcessed(this.localFileRepository.saveAndFlush(localFile), Collections.EMPTY_LIST);
     }
 

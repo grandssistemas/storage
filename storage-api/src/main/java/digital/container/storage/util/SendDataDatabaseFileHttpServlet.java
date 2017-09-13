@@ -20,6 +20,8 @@ public class SendDataDatabaseFileHttpServlet {
 
         if(databaseFile.getContentType().contains("pdf")) {
             httpServletResponse.setHeader("Content-disposition","attachment;filename="+databaseFile.getName());
+        } else {
+            httpServletResponse.setHeader("Content-disposition","filename="+databaseFile.getName());
         }
 
         httpServletResponse.setContentType(MediaType.parseMediaType(databaseFile.getContentType()).getType());

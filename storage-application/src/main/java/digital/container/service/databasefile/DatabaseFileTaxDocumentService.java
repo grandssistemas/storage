@@ -1,7 +1,7 @@
 package digital.container.service.databasefile;
 
 import digital.container.exception.FileNotFoundException;
-import digital.container.exception.KeyWasNotRegisteredInStorageYetException;
+import digital.container.service.message.SendMessageMOMService;
 import digital.container.repository.DatabaseFileRepository;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.LimitFileService;
@@ -9,19 +9,12 @@ import digital.container.service.storage.MessageStorage;
 import digital.container.service.taxdocument.CommonTaxDocumentService;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.DatabaseFilePart;
-import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.util.GenerateHash;
-import digital.container.util.ValidateNfXML;
-import digital.container.vo.TaxDocumentModel;
 import io.gumga.application.GumgaService;
-import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.repository.GumgaCrudRepository;
-import io.gumga.presentation.exceptionhandler.GumgaRunTimeException;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,9 +31,6 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
     private DatabaseFilePartService databaseFilePartService;
 
     @Autowired
-    private JmsTemplate jmsTemplate;
-
-    @Autowired
     private LimitFileService limitFileService;
 
     @Autowired
@@ -48,6 +38,9 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
 
     @Autowired
     private CommonTaxDocumentService commonTaxDocumentService;
+
+    @Autowired
+    private SendMessageMOMService sendMessageMOMService;
 
     @Autowired
     public DatabaseFileTaxDocumentService(GumgaCrudRepository<DatabaseFile, Long> repository) {
@@ -88,16 +81,7 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
 
         this.databaseFileRepository.saveAndFlush(databaseFile);
         this.databaseFilePartService.saveFile(databaseFile, multipartFile);
-
-        Map invite = new HashMap();
-        invite.put("container", containerKey);
-        invite.put("fileName", databaseFile.getName());
-        invite.put("hash", databaseFile.getHash());
-        invite.put("taxDocumentModel", databaseFile.getFileType().toString());
-        invite.put("oi", GumgaThreadScope.organizationCode.get());
-
-
-        this.jmsTemplate.convertAndSend(invite);
+        this.sendMessageMOMService.send(databaseFile, containerKey);
 
         return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.EMPTY_LIST);
     }

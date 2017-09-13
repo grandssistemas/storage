@@ -5,6 +5,7 @@ import digital.container.repository.LocalFileRepository;
 import digital.container.storage.domain.model.file.AbstractFile;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.LocalFile;
+import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.domains.GumgaOi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -93,6 +94,21 @@ public class SearchTaxDocumentService {
         }
 
         return null;
+    }
 
+    public AbstractFile getTaxDocumentByDetailOneAndGumgaOI(String detailOne) {
+        String oi = GumgaThreadScope.organizationCode.get();
+        GumgaOi gumgaOi = new GumgaOi(oi + "%");
+        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getTaxDocumentByDetailOneAndGumgaOI(detailOne, gumgaOi);
+        if(dbDocument.isPresent()) {
+            return dbDocument.get();
+        }
+
+        Optional<LocalFile> lfDocument = this.localFileRepository.getTaxDocumentByDetailOneAndGumgaOI(detailOne, gumgaOi);
+        if(lfDocument.isPresent()) {
+            return lfDocument.get();
+        }
+
+        return null;
     }
 }

@@ -33,4 +33,7 @@ public interface DatabaseFileRepository extends GumgaCrudRepository<DatabaseFile
 
     @Query(value = "from DatabaseFile df where df.hash = :hash and df.fileType != 'ANYTHING'")
     Optional<DatabaseFile> getTaxDocumentByHash(@Param("hash") String hash);
+
+    @Query(value = "from DatabaseFile df where df.detailOne = :detailOne and df.oi like :gumgaOi and df.fileType != 'ANYTHING'")
+    Optional<DatabaseFile> getTaxDocumentByDetailOneAndGumgaOI(@Param("detailOne") String detailOne, @Param("gumgaOi") GumgaOi gumgaOi);
 }

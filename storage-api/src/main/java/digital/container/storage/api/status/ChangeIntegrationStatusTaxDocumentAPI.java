@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChangeIntegrationStatusTaxDocumentAPI {
 
     private static final String TOKEN = "3cb73f59eb02-479b-b859-797e29eb8256-90703973edf5aa2d";
-    private final static String URI_BASE = "/public/api/integrantion-status-tax-document";
+    private final static String URI_BASE = "api/public/integration-status-tax-document";
 
     @Autowired
     private ChangeIntegrationStatusTaxDocumentService changeIntegrationStatusTaxDocumentService;
