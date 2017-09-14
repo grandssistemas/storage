@@ -28,6 +28,7 @@ public class SendMessageMOMService {
             invite.put("hash", file.getHash());
             invite.put("taxDocumentModel", file.getFileType().toString());
             invite.put("oi", GumgaThreadScope.organizationCode.get());
+            invite.put("sizeFile", file.getSize());
 
             this.jmsTemplate.convertAndSend(invite);
         } catch (Exception ex) {
