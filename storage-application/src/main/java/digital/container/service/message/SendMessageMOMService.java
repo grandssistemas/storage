@@ -22,18 +22,34 @@ public class SendMessageMOMService {
 
     public void send(AbstractFile file, String containerKey) {
         try {
-            Map invite = new HashMap();
-            invite.put("container", containerKey);
-            invite.put("fileName", file.getName());
-            invite.put("hash", file.getHash());
-            invite.put("taxDocumentModel", file.getFileType().toString());
-            invite.put("oi", GumgaThreadScope.organizationCode.get());
-            invite.put("sizeFile", file.getSize());
+            Map invite = createInvete(file, containerKey, GumgaThreadScope.organizationCode.get());
 
             this.jmsTemplate.convertAndSend(invite);
         } catch (Exception ex) {
             file.setFileStatus(FileStatus.FAILED_SYNC);
             LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), ex);
         }
+    }
+
+    public void send(AbstractFile file) {
+        try {
+            Map invite = createInvete(file, file.getContainerKey(), file.getOi().getValue());
+
+            this.jmsTemplate.convertAndSend(invite);
+        } catch (Exception ex) {
+            file.setFileStatus(FileStatus.FAILED_SYNC);
+            LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), ex);
+        }
+    }
+
+    private Map createInvete(AbstractFile file, String containerKey, String oi) {
+        Map invite = new HashMap();
+        invite.put("container", containerKey);
+        invite.put("fileName", file.getName());
+        invite.put("hash", file.getHash());
+        invite.put("taxDocumentModel", file.getFileType().toString());
+        invite.put("oi", oi);
+        invite.put("sizeFile", file.getSize());
+        return invite;
     }
 }

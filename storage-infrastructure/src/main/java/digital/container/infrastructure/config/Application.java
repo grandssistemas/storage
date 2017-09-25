@@ -10,11 +10,15 @@ import java.util.Properties;
 import io.gumga.domain.CriterionParser;
 import io.gumga.domain.GumgaQueryParserProvider;
 
+import javax.annotation.PostConstruct;
 import javax.jms.Session;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
+import org.jboss.logging.annotations.Pos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +44,7 @@ import com.zaxxer.hikari.HikariDataSource;
 //@EnableJms
 public class Application {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
     private static final String DEFAULT_BROKER_URL = "tcp://localhost:61616";
     private static final String ORDER_QUEUE = "tax.document.queue";
 
@@ -128,6 +133,12 @@ public class Application {
         return factory;
     }
 
+    @PostConstruct
+    public void setPropertiesSystem() {
+        System.setProperty("url.mom", getProperties().getProperty("url.mom"));
+        System.setProperty("mom.queue", getProperties().getProperty("mom.queue"));
+    }
+
     @Bean
     @Autowired
     public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
@@ -136,8 +147,9 @@ public class Application {
 
     @Bean
     public ActiveMQConnectionFactory connectionFactory() {
+        LOGGER.info("connectionFactory url.mom-> " + System.getProperty("url.mom"));
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-        connectionFactory.setBrokerURL(DEFAULT_BROKER_URL);
+        connectionFactory.setBrokerURL(System.getProperty("url.mom"));
 
 //        connectionFactory.setTrustedPackages(Arrays.asList("com.websystique.spring","java.util"));
         return connectionFactory;
@@ -145,9 +157,10 @@ public class Application {
 
     @Bean
     public JmsTemplate jmsTemplate(){
+        LOGGER.info("jmsTemplate mom.queue -> " + System.getProperty("mom.queue"));
         JmsTemplate template = new JmsTemplate();
         template.setConnectionFactory(connectionFactory());
-        template.setDefaultDestinationName(ORDER_QUEUE);
+        template.setDefaultDestinationName(System.getProperty("mom.queue"));
 //        template.setSessionAcknowledgeMode(Session.SESSION_TRANSACTED);
 //        template.setSessionTransacted(true);
         return template;
