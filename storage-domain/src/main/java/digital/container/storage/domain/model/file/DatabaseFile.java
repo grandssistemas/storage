@@ -19,6 +19,7 @@ import java.util.List;
 @GumgaMultitenancy
 @SequenceGenerator(name = GumgaSharedModel.SEQ_NAME, sequenceName = "seq_database_file")
 public class DatabaseFile extends AbstractFile {
+
     @JsonIgnore
     @OneToMany(mappedBy = "databaseFile", fetch = FetchType.LAZY)
     @OrderBy("id")

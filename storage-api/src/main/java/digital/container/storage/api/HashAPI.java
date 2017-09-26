@@ -4,12 +4,14 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import digital.container.repository.DatabaseFileRepository;
 import digital.container.repository.LocalFileRepository;
+import digital.container.service.taxdocument.DownloadTaxDocumentService;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
-import digital.container.storage.domain.model.file.AbstractFile;
-import digital.container.storage.domain.model.file.DatabaseFile;
-import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.storage.domain.model.file.*;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
+import digital.container.util.SearchScheduling;
+import digital.container.util.TaxDocumentScheduling;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,9 +24,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.*;
 
 @RestController
 @RequestMapping(path = "/api/file-hash")
@@ -42,6 +47,9 @@ public class HashAPI {
 
     @Autowired
     private SearchTaxDocumentService searchTaxDocumentService;
+
+    @Autowired
+    private DownloadTaxDocumentService downloadTaxDocumentService;
 
     @Transactional(readOnly = true)
     @RequestMapping(
@@ -119,6 +127,21 @@ public class HashAPI {
             }
         }
     }
+
+    @RequestMapping(path = "/teste")
+    @Transactional
+    public String test(){
+        SearchScheduling searchScheduling = new SearchScheduling();
+        searchScheduling.addCnpj("01632317000103");
+        searchScheduling.addTaxDocumentScheduling(TaxDocumentScheduling.NFE);
+
+        String s = downloadTaxDocumentService.generateZip(searchScheduling);
+
+
+        return s;
+    }
+
+
 
 
 

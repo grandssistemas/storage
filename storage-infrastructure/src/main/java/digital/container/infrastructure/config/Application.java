@@ -137,6 +137,9 @@ public class Application {
     public void setPropertiesSystem() {
         System.setProperty("url.mom", getProperties().getProperty("url.mom"));
         System.setProperty("mom.queue", getProperties().getProperty("mom.queue"));
+
+        System.setProperty("storage.localfile", getProperties().getProperty("storage.localfile"));
+        System.setProperty("storage.foldertemp", getProperties().getProperty("storage.foldertemp"));
     }
 
     @Bean

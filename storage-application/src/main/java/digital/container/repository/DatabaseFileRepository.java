@@ -39,7 +39,8 @@ public interface DatabaseFileRepository extends GumgaCrudRepository<DatabaseFile
     @Query(value = "from DatabaseFile df where df.detailOne = :detailOne and df.oi like :gumgaOi and df.fileType != 'ANYTHING'")
     Optional<DatabaseFile> getTaxDocumentByDetailOneAndGumgaOI(@Param("detailOne") String detailOne, @Param("gumgaOi") GumgaOi gumgaOi);
 
-    @Query(value = "from DatabaseFile df where df.oi like :oi and df.fileType in :types and df.containerKey in :cnpjs")
+    //
+    @Query(value = "from DatabaseFile df where df.oi like :oi and df.fileType in :types and df.containerKey in :cnpjs and (df.detailTwo is not null and (to_date(df.detailTwo, 'YYYY-MM-DD') >= to_date('2017-06-09', 'YYYY-MM-DD') and to_date(df.detailTwo, 'YYYY-MM-DD') <= to_date('2017-06-09', 'YYYY-MM-DD')))")
     List<DatabaseFile> getTaxDocumentBySearchScheduling(@Param("oi") GumgaOi oi, @Param("types") List<FileType> types, @Param("cnpjs") List<String> cnpjs);
 
 }

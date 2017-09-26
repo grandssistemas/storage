@@ -121,6 +121,8 @@ public class SearchTaxDocumentService {
         String oi = GumgaThreadScope.organizationCode.get();
         GumgaOi gumgaOi = new GumgaOi(oi + "%");
         List<FileType> fileTypes = new ArrayList<>();
+        List<AbstractFile> files = new ArrayList<>();
+
         searchScheduling.getTypes().forEach(types -> {
             if(TaxDocumentScheduling.NFE.equals(types)) {
                 fileTypes.add(FileType.NFE);
@@ -128,6 +130,7 @@ public class SearchTaxDocumentService {
                 fileTypes.add(FileType.NFE_DISABLE);
                 fileTypes.add(FileType.NFE_LETTER_CORRECTION);
             }
+
             if(TaxDocumentScheduling.NFCE.equals(types)) {
                 fileTypes.add(FileType.NFCE);
                 fileTypes.add(FileType.NFCE_CANCELED);
@@ -135,7 +138,11 @@ public class SearchTaxDocumentService {
                 fileTypes.add(FileType.NFE_LETTER_CORRECTION);
             }
         });
-        this.databaseFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs());
-        return null;
+
+
+        List<DatabaseFile> taxDocumentBySearchScheduling = this.databaseFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs());
+        files.addAll(taxDocumentBySearchScheduling);
+
+        return files;
     }
 }

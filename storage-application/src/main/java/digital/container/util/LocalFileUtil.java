@@ -10,7 +10,7 @@ public class LocalFileUtil {
 
     private LocalFileUtil() {}
 
-    public static final String DIRECTORY_PATH = System.getProperty("user.home") + "/storage-files";
+    public static final String DIRECTORY_PATH = System.getProperty("storage.localfile");
 
     public static String getRelativePathFileANYTHING(String containerKey) {
         LocalDate today = LocalDate.now();
