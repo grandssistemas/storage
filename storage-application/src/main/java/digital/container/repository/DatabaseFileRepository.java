@@ -1,6 +1,7 @@
 package digital.container.repository;
 
 import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.FileType;
 import digital.container.storage.domain.model.file.LocalFile;
 import io.gumga.domain.domains.GumgaOi;
 import io.gumga.domain.repository.GumgaCrudRepository;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -36,4 +38,8 @@ public interface DatabaseFileRepository extends GumgaCrudRepository<DatabaseFile
 
     @Query(value = "from DatabaseFile df where df.detailOne = :detailOne and df.oi like :gumgaOi and df.fileType != 'ANYTHING'")
     Optional<DatabaseFile> getTaxDocumentByDetailOneAndGumgaOI(@Param("detailOne") String detailOne, @Param("gumgaOi") GumgaOi gumgaOi);
+
+    @Query(value = "from DatabaseFile df where df.oi like :oi and df.fileType in :types and df.containerKey in :cnpjs")
+    List<DatabaseFile> getTaxDocumentBySearchScheduling(@Param("oi") GumgaOi oi, @Param("types") List<FileType> types, @Param("cnpjs") List<String> cnpjs);
+
 }

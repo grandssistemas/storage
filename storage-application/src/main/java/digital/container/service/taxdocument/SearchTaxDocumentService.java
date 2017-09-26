@@ -4,13 +4,18 @@ import digital.container.repository.DatabaseFileRepository;
 import digital.container.repository.LocalFileRepository;
 import digital.container.storage.domain.model.file.AbstractFile;
 import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.FileType;
 import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.util.SearchScheduling;
+import digital.container.util.TaxDocumentScheduling;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.domains.GumgaOi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -109,6 +114,28 @@ public class SearchTaxDocumentService {
             return lfDocument.get();
         }
 
+        return null;
+    }
+
+    public List<AbstractFile> getTaxDocumentBySearchScheduling(SearchScheduling searchScheduling) {
+        String oi = GumgaThreadScope.organizationCode.get();
+        GumgaOi gumgaOi = new GumgaOi(oi + "%");
+        List<FileType> fileTypes = new ArrayList<>();
+        searchScheduling.getTypes().forEach(types -> {
+            if(TaxDocumentScheduling.NFE.equals(types)) {
+                fileTypes.add(FileType.NFE);
+                fileTypes.add(FileType.NFE_CANCELED);
+                fileTypes.add(FileType.NFE_DISABLE);
+                fileTypes.add(FileType.NFE_LETTER_CORRECTION);
+            }
+            if(TaxDocumentScheduling.NFCE.equals(types)) {
+                fileTypes.add(FileType.NFCE);
+                fileTypes.add(FileType.NFCE_CANCELED);
+                fileTypes.add(FileType.NFCE_DISABLE);
+                fileTypes.add(FileType.NFE_LETTER_CORRECTION);
+            }
+        });
+        this.databaseFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs());
         return null;
     }
 }
