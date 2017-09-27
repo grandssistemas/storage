@@ -14,6 +14,9 @@ public class GenerateHash {
     public static String generateDatabaseFile() {
         return generateHash() + "DF";
     }
+    public static String generateDownload() {
+        return generateHash() + "DL";
+    }
 
     private static String generateHash() {
 

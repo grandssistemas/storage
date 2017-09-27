@@ -1,7 +1,9 @@
 package digital.container.service.taxdocument;
 
+import digital.container.storage.domain.model.download.LinkDownload;
 import digital.container.storage.domain.model.file.*;
-import digital.container.util.SearchScheduling;
+import digital.container.util.GenerateHash;
+import digital.container.storage.domain.model.util.SearchScheduling;
 import digital.container.util.ZipUtil;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Hibernate;
@@ -28,7 +30,20 @@ public class DownloadTaxDocumentService {
     @Autowired
     private SearchTaxDocumentService searchTaxDocumentService;
 
-    public String generateZip(SearchScheduling searchScheduling) {
+    public LinkDownload generateLinkToDownload(SearchScheduling searchScheduling) {
+        String nameZip = "download";
+        String path = this.generateZip(searchScheduling, nameZip);
+
+        LinkDownload linkDownload = new LinkDownload();
+        linkDownload.setHash(GenerateHash.generateDownload());
+        linkDownload.generateDescription(searchScheduling);
+        linkDownload.setName(nameZip);
+        linkDownload.setRelativePath(path);
+
+        return linkDownload;
+    }
+
+    private String generateZip(SearchScheduling searchScheduling, String nameZip) {
 
         List<AbstractFile> taxDocumentBySearchScheduling = this.searchTaxDocumentService.getTaxDocumentBySearchScheduling(searchScheduling);
         String path = getDirectoryPath();
@@ -70,7 +85,7 @@ public class DownloadTaxDocumentService {
 
         try {
 
-            zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFileName+"download.zip"));
+            zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFileName+nameZip+".zip"));
             ZipUtil.zipFolder(new File(path), zipOutputStream, "");
         } catch (Exception e) {
             LOGGER.error("Erro ao tentar zipar os arquivos."+e.getMessage());
@@ -108,4 +123,5 @@ public class DownloadTaxDocumentService {
 
         return path;
     }
+
 }

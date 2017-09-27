@@ -1,6 +1,4 @@
-package digital.container.util;
-
-import digital.container.vo.TaxDocumentModel;
+package digital.container.storage.domain.model.util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,6 +6,8 @@ import java.util.List;
 
 
 public class SearchScheduling implements Serializable {
+
+    private String organizationCode;
     private List<TaxDocumentScheduling> types = new ArrayList<>();
     private List<String> cnpjs = new ArrayList<>();
 
@@ -33,5 +33,13 @@ public class SearchScheduling implements Serializable {
 
     public void addCnpj(String cnpj) {
         this.cnpjs.add(cnpj);
+    }
+
+    public String getOrganizationCode() {
+        return organizationCode;
+    }
+
+    public void setOrganizationCode(String organizationCode) {
+        this.organizationCode = organizationCode;
     }
 }

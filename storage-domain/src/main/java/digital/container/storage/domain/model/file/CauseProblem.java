@@ -4,6 +4,7 @@ import io.gumga.domain.GumgaMultitenancy;
 import io.gumga.domain.shared.GumgaSharedModel;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "cause_problem",
@@ -18,6 +19,9 @@ public class CauseProblem extends GumgaSharedModel<Long> {
     private String reason;
     @Column(name = "hash")
     private String hash;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "cp_created")
+    private Date created = new Date();
 
     public String getReason() {
         return reason;
@@ -33,5 +37,13 @@ public class CauseProblem extends GumgaSharedModel<Long> {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 }
