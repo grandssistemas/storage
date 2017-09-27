@@ -1,6 +1,7 @@
 package digital.container.service.taxdocument;
 
 import digital.container.storage.domain.model.file.AbstractFile;
+import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
@@ -42,19 +43,19 @@ public class CommonTaxDocumentService {
 
         file.setFileType(taxDocumentModel.getFileType());
 
+        Date date = validateNfXML.stringToDate(file.getDetailTwo());
+        LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENT(containerKey,
+                ld.getYear(),
+                ld.getMonth().toString(),
+                file.getFileType(),
+                file.getDetailThree());
         if(file instanceof LocalFile) {
-            Date date = validateNfXML.stringToDate(file.getDetailTwo());
-            LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-            String path = LocalFileUtil.getRelativePathFileTAXDOCUMENT(containerKey,
-                    ld.getYear(),
-                    ld.getMonth().toString(),
-                    file.getFileType(),
-                    file.getDetailThree());
-
             ((LocalFile)file).setRelativePath(path + '/' + file.getName());
             file.setHash(GenerateHash.generateLocalFile());
         } else {
+            ((DatabaseFile)file).setRelativePath(path + '/' + file.getName());
             file.setHash(GenerateHash.generateDatabaseFile());
         }
 

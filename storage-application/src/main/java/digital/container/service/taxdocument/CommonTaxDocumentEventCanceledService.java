@@ -1,9 +1,6 @@
 package digital.container.service.taxdocument;
 
-import digital.container.storage.domain.model.file.AbstractFile;
-import digital.container.storage.domain.model.file.FileStatus;
-import digital.container.storage.domain.model.file.FileType;
-import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.storage.domain.model.file.*;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.*;
 import io.gumga.core.GumgaThreadScope;
@@ -64,20 +61,21 @@ public class CommonTaxDocumentEventCanceledService {
         String infEventochDhRegEvento = SearchXMLUtil.getInfEventochDhRegEvento(xml);
         file.setDetailTwo(infEventochDhRegEvento);
 
+        String movement = taxDocument.getDetailThree();
+        Date date = validateNfXML.stringToDate(taxDocument.getDetailTwo());
+        LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTCanceled(containerKey,
+                ld.getYear(),
+                ld.getMonth().toString(),
+                file.getFileType(),
+                movement);
+
         if(file instanceof LocalFile) {
-            String movement = taxDocument.getDetailThree();
-            Date date = validateNfXML.stringToDate(taxDocument.getDetailTwo());
-            LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-            String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTCanceled(containerKey,
-                    ld.getYear(),
-                    ld.getMonth().toString(),
-                    file.getFileType(),
-                    movement);
-
             ((LocalFile)file).setRelativePath(path + '/' + file.getName());
             file.setHash(GenerateHash.generateLocalFile());
         } else {
+            ((DatabaseFile)file).setRelativePath(path + '/' + file.getName());
             file.setHash(GenerateHash.generateDatabaseFile());
         }
 

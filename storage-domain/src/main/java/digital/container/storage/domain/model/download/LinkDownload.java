@@ -1,5 +1,6 @@
 package digital.container.storage.domain.model.download;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import digital.container.storage.domain.model.util.SearchScheduling;
 import io.gumga.domain.GumgaMultitenancy;
 import io.gumga.domain.shared.GumgaSharedModel;
@@ -27,6 +28,8 @@ public class LinkDownload extends GumgaSharedModel<Long> {
     private String relativePath;
     @Column(name = "name")
     private String name;
+    @Column(name = "size")
+    private Long size;
 
     public Date getCreated() {
         return created;
@@ -58,6 +61,7 @@ public class LinkDownload extends GumgaSharedModel<Long> {
                 " dos cnpjs " + searchScheduling.getCnpjs().toString();
     }
 
+    @JsonIgnore
     public String getRelativePath() {
         return relativePath;
     }
@@ -66,11 +70,20 @@ public class LinkDownload extends GumgaSharedModel<Long> {
         this.relativePath = relativePath;
     }
 
+    @JsonIgnore
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
     }
 }

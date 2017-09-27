@@ -1,6 +1,7 @@
 package digital.container.repository;
 
 import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.FileType;
 import digital.container.storage.domain.model.file.LocalFile;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.domains.GumgaOi;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -37,4 +39,7 @@ public interface LocalFileRepository extends GumgaCrudRepository<LocalFile, Long
 
     @Query(value = "from LocalFile df where df.detailOne = :detailOne and df.oi like :gumgaOi and df.fileType != 'ANYTHING'")
     Optional<LocalFile> getTaxDocumentByDetailOneAndGumgaOI(@Param("detailOne") String detailOne, @Param("gumgaOi") GumgaOi gumgaOi);
+
+    @Query(value = "from LocalFile df where df.oi like :oi and df.fileType in :types and df.containerKey in :cnpjs and (df.detailTwo is not null and (to_date(df.detailTwo, 'YYYY-MM-DD') >= to_date('2017-06-09', 'YYYY-MM-DD') and to_date(df.detailTwo, 'YYYY-MM-DD') <= to_date('2017-06-09', 'YYYY-MM-DD')))")
+    List<LocalFile> getTaxDocumentBySearchScheduling(@Param("oi") GumgaOi oi, @Param("types") List<FileType> types, @Param("cnpjs") List<String> cnpjs);
 }

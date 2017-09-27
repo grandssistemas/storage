@@ -118,7 +118,7 @@ public class SearchTaxDocumentService {
     }
 
     public List<AbstractFile> getTaxDocumentBySearchScheduling(SearchScheduling searchScheduling) {
-        String oi = GumgaThreadScope.organizationCode.get();
+        String oi = searchScheduling.getOrganizationCode();
         GumgaOi gumgaOi = new GumgaOi(oi + "%");
         List<FileType> fileTypes = new ArrayList<>();
         List<AbstractFile> files = new ArrayList<>();
@@ -142,6 +142,10 @@ public class SearchTaxDocumentService {
 
         List<DatabaseFile> taxDocumentBySearchScheduling = this.databaseFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs());
         files.addAll(taxDocumentBySearchScheduling);
+
+        List<LocalFile> lfs = this.localFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs());
+        files.addAll(lfs);
+
 
         return files;
     }

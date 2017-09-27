@@ -4,8 +4,10 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import digital.container.repository.DatabaseFileRepository;
 import digital.container.repository.LocalFileRepository;
+import digital.container.service.download.LinkDownloadService;
 import digital.container.service.taxdocument.DownloadTaxDocumentService;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
+import digital.container.storage.domain.model.download.LinkDownload;
 import digital.container.storage.domain.model.file.*;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
@@ -38,7 +40,8 @@ public class HashAPI {
     private SearchTaxDocumentService searchTaxDocumentService;
 
     @Autowired
-    private DownloadTaxDocumentService downloadTaxDocumentService;
+    private LinkDownloadService linkDownloadService;
+
 
     @Transactional(readOnly = true)
     @RequestMapping(
@@ -117,7 +120,19 @@ public class HashAPI {
         }
     }
 
-
+    @Transactional
+    @RequestMapping(
+            path = "/public-download/{hash}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    @ApiOperation(value = "public-download", notes = "Baixa o zip do agendamento do container digital")
+    public void downloadFileZip(@ApiParam(value = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
+        LinkDownload linkDownload = linkDownloadService.getLinkDownloadByHash(hash);
+        if(linkDownload != null) {
+            SendDataLocalFileHttpServlet.send(linkDownload, httpServletResponse);
+        }
+    }
 
 
 

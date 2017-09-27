@@ -99,7 +99,7 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
 //        localFile.setContentType(multipartFile.getContentType());
 //        localFile.setSize(multipartFile.getSize());
 
-        File folder = new File(LocalFileUtil.DIRECTORY_PATH + '/' + localFile.getRelativePath().substring(localFile.getRelativePath().lastIndexOf('/')));
+        File folder = new File(LocalFileUtil.DIRECTORY_PATH + '/' + localFile.getRelativePath().substring(0, localFile.getRelativePath().lastIndexOf('/')));
 
         folder.mkdirs();
         try {

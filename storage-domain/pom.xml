@@ -74,18 +74,18 @@
                 </executions>
             </plugin>
             <!-- Plugin Para gerar o diagrama toda a vez que da build    -->
-                       <plugin>
-                           <groupId>io.gumga</groupId>
-                           <artifactId>gumgag</artifactId>
-                           <executions>
-                               <execution>
-                                   <phase>install</phase>
-                                   <goals>
-                                       <goal>diagrama</goal>
-                                   </goals>
-                               </execution>
-                           </executions>
-                       </plugin>
+                       <!--<plugin>-->
+                           <!--<groupId>io.gumga</groupId>-->
+                           <!--<artifactId>gumgag</artifactId>-->
+                           <!--<executions>-->
+                               <!--<execution>-->
+                                   <!--<phase>install</phase>-->
+                                   <!--<goals>-->
+                                       <!--<goal>diagrama</goal>-->
+                                   <!--</goals>-->
+                               <!--</execution>-->
+                           <!--</executions>-->
+                       <!--</plugin>-->
         </plugins>
     </build>
 </project>

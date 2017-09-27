@@ -1,9 +1,6 @@
 package digital.container.service.taxdocument;
 
-import digital.container.storage.domain.model.file.AbstractFile;
-import digital.container.storage.domain.model.file.FileStatus;
-import digital.container.storage.domain.model.file.FileType;
-import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.storage.domain.model.file.*;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.*;
 import io.gumga.core.GumgaThreadScope;
@@ -86,20 +83,21 @@ public class CommonTaxDocumentEventLetterCorrectionService {
 
         file.setDetailTwo(infInutDhRecbto);
 
+        Date date = validateNfXML.stringToDate(file.getDetailTwo());
+        LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTLetterCorrection(containerKey,
+                ld.getYear(),
+                ld.getMonth().toString(),
+                FileType.NFE);
+
+        ((LocalFile)file).setRelativePath(path + '/' + file.getName());
+
         if(file instanceof LocalFile) {
-            Date date = validateNfXML.stringToDate(file.getDetailTwo());
-            LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-            String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTLetterCorrection(containerKey,
-                    ld.getYear(),
-                    ld.getMonth().toString(),
-                    FileType.NFE);
-
-            ((LocalFile)file).setRelativePath(path + '/' + file.getName());
-
             file.setHash(GenerateHash.generateLocalFile());
         } else {
             file.setHash(GenerateHash.generateDatabaseFile());
+            ((DatabaseFile)file).setRelativePath(path + '/' + file.getName());
         }
 
 

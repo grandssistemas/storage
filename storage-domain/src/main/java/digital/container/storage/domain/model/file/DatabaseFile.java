@@ -25,6 +25,9 @@ public class DatabaseFile extends AbstractFile {
     @OrderBy("id")
     private List<DatabaseFilePart> parts;
 
+    @Column(name = "relative_path")
+    private String relativePath;
+
     public DatabaseFile() {
         this.parts = new ArrayList<>();
     }
@@ -39,5 +42,13 @@ public class DatabaseFile extends AbstractFile {
 
     public void setParts(List<DatabaseFilePart> parts) {
         this.parts = parts;
+    }
+
+    public String getRelativePath() {
+        return relativePath;
+    }
+
+    public void setRelativePath(String relativePath) {
+        this.relativePath = relativePath;
     }
 }
