@@ -13,8 +13,11 @@ import io.gumga.domain.domains.GumgaOi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -123,6 +126,23 @@ public class SearchTaxDocumentService {
         List<FileType> fileTypes = new ArrayList<>();
         List<AbstractFile> files = new ArrayList<>();
 
+        String startDate = null;
+        String endDate = null;
+        if(!StringUtils.isEmpty(searchScheduling.getStartDate()) && !StringUtils.isEmpty(searchScheduling.getEndDate())) {
+
+        } else {
+            Calendar instance = Calendar.getInstance();
+            instance.set(Calendar.MONTH, instance.get(Calendar.MONTH)-1);
+            instance.set(Calendar.DAY_OF_MONTH, instance.getActualMinimum(Calendar.DAY_OF_MONTH));
+
+            SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+            startDate = sdf.format(instance.getTime());
+
+            instance.set(Calendar.DAY_OF_MONTH, instance.getActualMaximum(Calendar.DAY_OF_MONTH));
+            endDate = sdf.format(instance.getTime());
+
+        }
+
         searchScheduling.getTypes().forEach(types -> {
             if(TaxDocumentScheduling.NFE.equals(types)) {
                 fileTypes.add(FileType.NFE);
@@ -139,12 +159,16 @@ public class SearchTaxDocumentService {
             }
         });
 
+        if(searchScheduling.getCnpjs().size() > 0) {
+            List<DatabaseFile> taxDocumentBySearchScheduling = this.databaseFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs(), startDate, endDate);
+            files.addAll(taxDocumentBySearchScheduling);
 
-        List<DatabaseFile> taxDocumentBySearchScheduling = this.databaseFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs());
-        files.addAll(taxDocumentBySearchScheduling);
+            List<LocalFile> lfs = this.localFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs(), startDate, endDate);
+            files.addAll(lfs);
+        } else {
 
-        List<LocalFile> lfs = this.localFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs());
-        files.addAll(lfs);
+        }
+
 
 
         return files;
