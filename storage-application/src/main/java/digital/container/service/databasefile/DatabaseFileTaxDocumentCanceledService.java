@@ -3,8 +3,10 @@ package digital.container.service.databasefile;
 import digital.container.repository.DatabaseFileRepository;
 import digital.container.service.message.SendMessageMOMService;
 import digital.container.service.taxdocument.CommonTaxDocumentEventCanceledService;
+import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.util.TokenResultProxy;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +33,17 @@ public class DatabaseFileTaxDocumentCanceledService extends GumgaService<Databas
     private SendMessageMOMService sendMessageMOMService;
 
     @Autowired
+    private SecurityTokenService securityTokenService;
+
+    @Autowired
     public DatabaseFileTaxDocumentCanceledService(GumgaCrudRepository<DatabaseFile, Long> repository) {
         super(repository);
         this.databaseFileRepository = DatabaseFileRepository.class.cast(repository);
     }
 
-    public FileProcessed upload(String containerKey, MultipartFile multipartFile) {
+    private FileProcessed saveFile(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
         DatabaseFile databaseFile = new DatabaseFile();
-        FileProcessed data = this.commonTaxCocumentEventService.getData(databaseFile, multipartFile, containerKey);
+        FileProcessed data = this.commonTaxCocumentEventService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
 
         if(data.getErrors().size() > 0) {
             return data;
@@ -50,10 +55,16 @@ public class DatabaseFileTaxDocumentCanceledService extends GumgaService<Databas
         return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.EMPTY_LIST);
     }
 
-    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles) {
+    public FileProcessed upload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
+        return this.saveFile(containerKey, multipartFile, tokenResultProxy);
+    }
+
+    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, String tokenSoftwareHouse, String tokenAccountant) {
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
-            result.add(this.upload(containerKey,multipartFile));
+            result.add(this.saveFile(containerKey,multipartFile, tokenResultProxy));
         }
         return result;
     }

@@ -3,10 +3,12 @@ package digital.container.service.localfile;
 import digital.container.repository.LocalFileRepository;
 import digital.container.service.message.SendMessageMOMService;
 import digital.container.service.taxdocument.CommonTaxDocumentEventDisableService;
+import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.LocalFileUtil;
 import digital.container.util.SaveLocalFile;
+import digital.container.util.TokenResultProxy;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.slf4j.Logger;
@@ -26,7 +28,7 @@ import java.util.List;
 @Transactional
 public class LocalFileTaxDocumentDisableService extends GumgaService<LocalFile, Long> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileTaxDocumentDisableService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LocalFileTaxDocumentDisableService.class);
     private LocalFileRepository localFileRepository;
 
     @Autowired
@@ -35,14 +37,17 @@ public class LocalFileTaxDocumentDisableService extends GumgaService<LocalFile, 
     private SendMessageMOMService sendMessageMOMService;
 
     @Autowired
+    private SecurityTokenService securityTokenService;
+
+    @Autowired
     public LocalFileTaxDocumentDisableService(GumgaCrudRepository<LocalFile, Long> repository) {
         super(repository);
         this.localFileRepository = LocalFileRepository.class.cast(repository);
     }
 
-    public FileProcessed upload(String containerKey, MultipartFile multipartFile) {
+    private FileProcessed saveFile(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
         LocalFile localFile = new LocalFile();
-        FileProcessed data = this.commonTaxDocumentEventDisableService.getData(localFile, multipartFile, containerKey);
+        FileProcessed data = this.commonTaxDocumentEventDisableService.getData(localFile, multipartFile, containerKey, tokenResultProxy);
         if(data.getErrors().size() > 0) {
             return data;
         }
@@ -53,16 +58,22 @@ public class LocalFileTaxDocumentDisableService extends GumgaService<LocalFile, 
         try {
             SaveLocalFile.saveFile(folder, localFile.getName(), multipartFile.getInputStream());
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         this.sendMessageMOMService.send(localFile, containerKey);
         return new FileProcessed(this.localFileRepository.saveAndFlush(localFile), Collections.EMPTY_LIST);
     }
 
-    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles) {
+    public FileProcessed upload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
+        return this.saveFile(containerKey, multipartFile, tokenResultProxy);
+    }
+
+    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, String tokenSoftwareHouse, String tokenAccountant) {
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
-            result.add(this.upload(containerKey,multipartFile));
+            result.add(this.saveFile(containerKey,multipartFile, tokenResultProxy));
         }
         return result;
     }

@@ -5,10 +5,7 @@ import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.util.GenerateHash;
-import digital.container.util.LocalFileUtil;
-import digital.container.util.ValidateNfXML;
-import digital.container.util.XMLUtil;
+import digital.container.util.*;
 import digital.container.vo.TaxDocumentModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +26,7 @@ public class CommonTaxDocumentService {
     @Autowired
     private ValidateNfXML validateNfXML;
 
-    public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey) {
+    public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey, TokenResultProxy tokenResultProxy) {
         file.setName(multipartFile.getOriginalFilename());
         file.setFileStatus(FileStatus.NOT_SYNC);
 
@@ -39,6 +36,14 @@ public class CommonTaxDocumentService {
         FileProcessed errors = validateNfXML.validate(containerKey, multipartFile, file, taxDocumentModel);
         if (errors != null) {
             return errors;
+        }
+
+        if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
+            file.addOrganization(tokenResultProxy.accountantOi);
+        }
+
+        if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
+            file.addOrganization(tokenResultProxy.softwareHouseOi);
         }
 
         file.setFileType(taxDocumentModel.getFileType());
@@ -51,6 +56,7 @@ public class CommonTaxDocumentService {
                 ld.getMonth().toString(),
                 file.getFileType(),
                 file.getDetailThree());
+
         if(file instanceof LocalFile) {
             ((LocalFile)file).setRelativePath(path + '/' + file.getName());
             file.setHash(GenerateHash.generateLocalFile());

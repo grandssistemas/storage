@@ -6,14 +6,12 @@ import digital.container.service.message.SendMessageMOMService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
 import digital.container.service.taxdocument.CommonTaxDocumentService;
+import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.repository.LocalFileRepository;
-import digital.container.util.GenerateHash;
-import digital.container.util.LocalFileUtil;
-import digital.container.util.SaveLocalFile;
-import digital.container.util.ValidateNfXML;
+import digital.container.util.*;
 import digital.container.vo.TaxDocumentModel;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
@@ -48,18 +46,21 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
     private SendMessageMOMService sendMessageMOMService;
 
     @Autowired
+    private SecurityTokenService securityTokenService;
+
+    @Autowired
     public LocalFileTaxDocumentService(GumgaCrudRepository<LocalFile, Long> repository) {
         super(repository);
     }
 
     @Transactional
-    public FileProcessed upload(String containerKey, MultipartFile multipartFile) {
+    private FileProcessed saveFile(String containerKey, MultipartFile multipartFile,TokenResultProxy tokenResultProxy) {
 //        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
 //            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
 //        }
 
         LocalFile localFile = new LocalFile();
-        FileProcessed data = this.commonTaxDocumentService.getData(localFile, multipartFile, containerKey);
+        FileProcessed data = this.commonTaxDocumentService.getData(localFile, multipartFile, containerKey, tokenResultProxy);
         if(data.getErrors().size() > 0) {
             return data;
         }
@@ -113,17 +114,21 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
     }
 
     @Transactional
-    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles) {
-        this.limitFileService.limitMaximumExceeded(multipartFiles);
+    public FileProcessed upload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
 
-//        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-//            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
-//        }
+        return this.saveFile(containerKey, multipartFile, tokenResultProxy);
+    }
+
+    @Transactional
+    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, String tokenSoftwareHouse, String tokenAccountant) {
+        this.limitFileService.limitMaximumExceeded(multipartFiles);
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
 
         List<FileProcessed> result = new ArrayList<>();
 
         for(MultipartFile multipartFile : multipartFiles) {
-            result.add(this.upload(containerKey,multipartFile));
+            result.add(this.saveFile(containerKey, multipartFile, tokenResultProxy));
         }
 
         return result;

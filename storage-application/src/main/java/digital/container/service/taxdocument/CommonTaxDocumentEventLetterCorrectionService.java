@@ -29,7 +29,7 @@ public class CommonTaxDocumentEventLetterCorrectionService {
     @Autowired
     private ValidateNfXML validateNfXML;
 
-    public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey) {
+    public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey, TokenResultProxy tokenResultProxy) {
         List<String> errors = new ArrayList<>();
         file.setName(multipartFile.getOriginalFilename());
         file.setFileStatus(FileStatus.NOT_SYNC);
@@ -42,7 +42,7 @@ public class CommonTaxDocumentEventLetterCorrectionService {
         }
 
         String infInutCNPJ = SearchXMLUtil.getInfEventoCNPJ(xml);
-        String chNFe = SearchXMLUtil.getInfEventoChNFe(xml);
+        String chNFe = SearchXMLUtil.getInfEventochNFe(xml);
 
         if(infInutCNPJ.isEmpty()) {
             if(!chNFe.isEmpty() && chNFe.length() > 20) {
@@ -75,6 +75,14 @@ public class CommonTaxDocumentEventLetterCorrectionService {
             return new FileProcessed(file, errors);
         }
 
+
+        if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
+            file.addOrganization(tokenResultProxy.accountantOi);
+        }
+
+        if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
+            file.addOrganization(tokenResultProxy.softwareHouseOi);
+        }
 
 
         file.setDetailOne(chNFe);

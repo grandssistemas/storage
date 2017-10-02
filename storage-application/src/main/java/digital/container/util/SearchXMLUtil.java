@@ -74,6 +74,13 @@ public class SearchXMLUtil {
                 .orElse(EMPTY);
     }
 
+//    public static String getInfEventoChNFe(String xml) {
+//        return Optional
+//                .ofNullable(searchGroup1(xml, "<infEvento.*<chNFe>(.*)<\\/chNFe>.*<\\/infEvento>"))
+//                .orElse(EMPTY);
+//    }
+
+
     public static String getInfEventochDhRegEvento(String xml) {
         return Optional
                 .ofNullable(searchGroup1(xml, "<infEvento.*<dhRegEvento>(.*)<\\/dhRegEvento>.*<\\/infEvento>"))
@@ -138,11 +145,7 @@ public class SearchXMLUtil {
 
     }
 
-    public static String getInfEventoChNFe(String xml) {
-        return Optional
-                .ofNullable(searchGroup1(xml, "<infEvento.*<chNFe>(.*)<\\/chNFe>.*<\\/infEvento>"))
-                .orElse(EMPTY);
-    }
+
 
 
     private static String searchGroup1(String xml, String regex) {

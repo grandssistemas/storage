@@ -3,13 +3,14 @@ package digital.container.service.databasefile;
 import digital.container.exception.FileNotFoundException;
 import digital.container.service.message.SendMessageMOMService;
 import digital.container.repository.DatabaseFileRepository;
-import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
 import digital.container.service.taxdocument.CommonTaxDocumentService;
+import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.DatabaseFilePart;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.util.TokenResultProxy;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.hibernate.Hibernate;
@@ -34,13 +35,13 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
     private LimitFileService limitFileService;
 
     @Autowired
-    private PermissionContainerService permissionContainerService;
-
-    @Autowired
     private CommonTaxDocumentService commonTaxDocumentService;
 
     @Autowired
     private SendMessageMOMService sendMessageMOMService;
+
+    @Autowired
+    private SecurityTokenService securityTokenService;
 
     @Autowired
     public DatabaseFileTaxDocumentService(GumgaCrudRepository<DatabaseFile, Long> repository) {
@@ -48,33 +49,11 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
     }
 
     @Transactional
-    public FileProcessed upload(String containerKey, MultipartFile multipartFile) {
-//        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-//            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
-//        }
+    private FileProcessed saveFile(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
 
         DatabaseFile databaseFile = new DatabaseFile();
 
-//        databaseFile.setName(multipartFile.getOriginalFilename());
-//        databaseFile.setFileStatus(FileStatus.NOT_SYNC);
-//
-//
-//        TaxDocumentModel taxDocumentModel = new TaxDocumentModel();
-//        FileProcessed errors = ValidateNfXML.validate(containerKey, multipartFile, databaseFile, taxDocumentModel);
-//        if (errors != null) {
-//            return errors;
-//        }
-//
-//        databaseFile.setContainerKey(containerKey);
-//        databaseFile.setCreateDate(Calendar.getInstance());
-//        databaseFile.setFileType(taxDocumentModel.getFileType());
-//        databaseFile.setHash(GenerateHash.generateDatabaseFile());
-//        databaseFile.setContentType(multipartFile.getContentType());
-//        databaseFile.setSize(multipartFile.getSize());
-//
-//        DatabaseFile newDatabaseFile = this.databaseFileRepository.saveAndFlush(databaseFile);
-
-        FileProcessed data = this.commonTaxDocumentService.getData(databaseFile, multipartFile, containerKey);
+        FileProcessed data = this.commonTaxDocumentService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
         if(data.getErrors().size() > 0) {
             return data;
         }
@@ -87,16 +66,20 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
     }
 
     @Transactional
-    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles) {
-        this.limitFileService.limitMaximumExceeded(multipartFiles);
+    public FileProcessed upload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {
+        TokenResultProxy result = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
+        return this.saveFile(containerKey, multipartFile, result);
+    }
 
-//        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-//            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
-//        }
+
+    @Transactional
+    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, String tokenSoftwareHouse, String tokenAccountant) {
+        this.limitFileService.limitMaximumExceeded(multipartFiles);
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
 
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
-            result.add(this.upload(containerKey,multipartFile));
+            result.add(this.saveFile(containerKey,multipartFile, tokenResultProxy));
         }
         return result;
     }

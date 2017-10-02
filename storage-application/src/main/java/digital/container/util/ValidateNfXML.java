@@ -45,8 +45,8 @@ public class ValidateNfXML {
 
             String tpNF = SearchXMLUtil.getIdeTpNF(xml);
             tpNF = tpNF.equals("1") ? "SAIDA" : "ENTRADA";
-
-            if(!SearchXMLUtil.getEmitCNPJ(xml).equals(containerKey) && tpNF.equals("SAIDA")) {
+            String emitCNPJ = SearchXMLUtil.getEmitCNPJ(xml);
+            if(!emitCNPJ.equals(containerKey) && tpNF.equals("SAIDA")) {
                 errors.add("O CNPJ do XML é diferente da chave do container informada.");
             }
             taxDocumentModel.model = SearchXMLUtil.getIdeMod(xml);

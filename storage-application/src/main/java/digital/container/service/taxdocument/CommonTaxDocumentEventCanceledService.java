@@ -26,7 +26,7 @@ public class CommonTaxDocumentEventCanceledService {
     @Autowired
     private ValidateNfXML validateNfXML;
 
-    public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey) {
+    public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey, TokenResultProxy tokenResultProxy) {
         file.setName(multipartFile.getOriginalFilename());
         file.setFileStatus(FileStatus.NOT_SYNC);
 
@@ -53,6 +53,14 @@ public class CommonTaxDocumentEventCanceledService {
             default:
                 errors.add("Tipo de documento invalido.");
                 return new FileProcessed(file, errors);
+        }
+
+        if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
+            file.addOrganization(tokenResultProxy.accountantOi);
+        }
+
+        if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
+            file.addOrganization(tokenResultProxy.softwareHouseOi);
         }
 
         String chNFe = getChNFe(xml);

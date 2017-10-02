@@ -7,8 +7,10 @@ import digital.container.service.taxdocument.CommonTaxDocumentEventCanceledServi
 import digital.container.service.taxdocument.CommonTaxDocumentEventDisableService;
 import digital.container.service.taxdocument.CommonTaxDocumentEventLetterCorrectionService;
 import digital.container.service.taxdocument.CommonTaxDocumentService;
+import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.util.TokenResultProxy;
 import digital.container.util.XMLUtil;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
@@ -44,6 +46,9 @@ public class DatabaseFileTaxDocumentAnyService extends GumgaService<DatabaseFile
     @Autowired
     private SendMessageMOMService sendMessageMOMService;
 
+    @Autowired
+    private SecurityTokenService securityTokenService;
+
     private DatabaseFileRepository databaseFileRepository;
 
     @Autowired
@@ -53,7 +58,7 @@ public class DatabaseFileTaxDocumentAnyService extends GumgaService<DatabaseFile
     }
 
 
-    public FileProcessed upload(String containerKey, MultipartFile multipartFile) {
+    private FileProcessed saveFile(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
         DatabaseFile databaseFile = new DatabaseFile();
         String xml = XMLUtil.getXml(multipartFile);
 
@@ -61,21 +66,21 @@ public class DatabaseFileTaxDocumentAnyService extends GumgaService<DatabaseFile
 
         FileProcessed fileProcessed = null;
         if(cancellationEvent) {
-            fileProcessed = this.commonTaxCocumentEventService.getData(databaseFile, multipartFile, containerKey);
+            fileProcessed = this.commonTaxCocumentEventService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
         } else {
             Boolean disableEvent = this.commonTaxDocumentEventDisableService.isDisableEvent(xml);
             if(disableEvent) {
-                fileProcessed = this.commonTaxDocumentEventDisableService.getData(databaseFile, multipartFile, containerKey);
+                fileProcessed = this.commonTaxDocumentEventDisableService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
             } else {
                 Boolean letterCorrectionEvent = this.commonTaxDocumentEventLetterCorrectionService.isLetterCorrectionEvent(xml);
                 if(letterCorrectionEvent) {
-                    fileProcessed = this.commonTaxDocumentEventLetterCorrectionService.getData(databaseFile, multipartFile, containerKey);
+                    fileProcessed = this.commonTaxDocumentEventLetterCorrectionService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
                 }
             }
         }
 
         if(fileProcessed == null) {
-            fileProcessed = this.commonTaxDocumentService.getData(databaseFile, multipartFile, containerKey);
+            fileProcessed = this.commonTaxDocumentService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
         }
 
         if(fileProcessed.getErrors().size() > 0) {
@@ -89,10 +94,16 @@ public class DatabaseFileTaxDocumentAnyService extends GumgaService<DatabaseFile
         return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.EMPTY_LIST);
     }
 
-    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles) {
+    public FileProcessed upload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
+        return this.saveFile(containerKey, multipartFile, tokenResultProxy);
+    }
+
+    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, String tokenSoftwareHouse, String tokenAccountant) {
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
-            result.add(this.upload(containerKey,multipartFile));
+            result.add(this.saveFile(containerKey,multipartFile, tokenResultProxy));
         }
         return result;
     }

@@ -29,7 +29,7 @@ public class CommonTaxDocumentEventDisableService {
     @Autowired
     private ValidateNfXML validateNfXML;
 
-    public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey) {
+    public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey, TokenResultProxy tokenResultProxy) {
         List<String> errors = new ArrayList<>();
         file.setName(multipartFile.getOriginalFilename());
         file.setFileStatus(FileStatus.NOT_SYNC);
@@ -65,6 +65,14 @@ public class CommonTaxDocumentEventDisableService {
             return new FileProcessed(file, errors);
         }
         file.setDetailOne(infInutNProt);
+
+        if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
+            file.addOrganization(tokenResultProxy.accountantOi);
+        }
+
+        if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
+            file.addOrganization(tokenResultProxy.softwareHouseOi);
+        }
 
 
         String mod = SearchXMLUtil.getInfInutMod(xml);

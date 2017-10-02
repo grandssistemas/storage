@@ -140,6 +140,8 @@ public class Application {
 
         System.setProperty("storage.localfile", getProperties().getProperty("storage.localfile"));
         System.setProperty("storage.foldertemp", getProperties().getProperty("storage.foldertemp"));
+
+        System.setProperty("url.host", getProperties().getProperty("url.host"));
     }
 
     @Bean

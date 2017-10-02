@@ -26,8 +26,6 @@ import java.util.*;
 @RequestMapping(path = "/api/file-hash")
 public class HashAPI {
 
-//    @Autowired
-//    JmsTemplate jmsTemplate;
     private static final String TOKEN = "3cb73f59eb02-479b-b859-797e29eb8256-90703973edf5aa2d";
 
     @Autowired
@@ -133,17 +131,5 @@ public class HashAPI {
             SendDataLocalFileHttpServlet.send(linkDownload, httpServletResponse);
         }
     }
-
-
-
-
-
-//    @RequestMapping
-//    public void teste() {
-//        Map map = new HashMap<>();
-//        map.put("model", "55");
-//        map.put("hash", "1500213312d3c3fac497df4521a7cf9f454e05db02DF");
-//        this.jmsTemplate.convertAndSend(map);
-//    }
 
 }
