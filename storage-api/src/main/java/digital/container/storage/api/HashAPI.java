@@ -11,6 +11,7 @@ import digital.container.storage.domain.model.download.LinkDownload;
 import digital.container.storage.domain.model.file.*;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
+import digital.container.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,8 +49,19 @@ public class HashAPI {
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
     @ApiOperation(value = "file-hash", notes = "Visualizar qualquer tipo de arquivo pelo hash")
+    public void view(@ApiParam(value = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
+        sendFile(hash, httpServletResponse, Boolean.FALSE);
+    }
+
+    @Transactional(readOnly = true)
+    @RequestMapping(
+            path = "/download/{hash}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    @ApiOperation(value = "download-file-hash", notes = "Download qualquer tipo de arquivo pelo hash")
     public void download(@ApiParam(value = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
-        sendFile(hash, httpServletResponse);
+        sendFile(hash, httpServletResponse, Boolean.TRUE);
     }
 
     @Transactional(readOnly = true)
@@ -62,11 +74,11 @@ public class HashAPI {
     public void downloadPublic(@ApiParam(value = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
         Optional<DatabaseFile> df = this.databaseFileRepository.getByHash(hash, Boolean.TRUE);
         if(df.isPresent()) {
-            SendDataDatabaseFileHttpServlet.send(df.get(), httpServletResponse);
+            SendDataDatabaseFileHttpServlet.send(df.get(), httpServletResponse, Boolean.FALSE);
         } else {
             Optional<LocalFile> lf = this.localFileRepository.getByHash(hash, Boolean.TRUE);
             if(lf.isPresent()){
-                SendDataLocalFileHttpServlet.send(lf.get(), httpServletResponse);
+                SendDataLocalFileHttpServlet.send(lf.get(), httpServletResponse, Boolean.FALSE);
             }
         }
     }
@@ -83,17 +95,17 @@ public class HashAPI {
             throw new RuntimeException("Token invalido.");
         }
 
-        sendFile(hash, httpServletResponse);
+        sendFile(hash, httpServletResponse, Boolean.FALSE);
     }
 
-    private void sendFile(String hash, HttpServletResponse httpServletResponse) {
-        Optional<DatabaseFile> df = this.databaseFileRepository.getByHash(hash);
+    private void sendFile(String hash, HttpServletResponse httpServletResponse, Boolean download) {
+        Optional<DatabaseFile> df = this.databaseFileRepository.getByHash(hash, TokenUtil.getEndWithOi(), TokenUtil.getContainsSharedOi());
         if(df.isPresent()) {
-            SendDataDatabaseFileHttpServlet.send(df.get(), httpServletResponse);
+            SendDataDatabaseFileHttpServlet.send(df.get(), httpServletResponse, download);
         } else {
-            Optional<LocalFile> lf = this.localFileRepository.getByHash(hash);
+            Optional<LocalFile> lf = this.localFileRepository.getByHash(hash, TokenUtil.getEndWithOi(), TokenUtil.getContainsSharedOi());
             if(lf.isPresent()){
-                SendDataLocalFileHttpServlet.send(lf.get(), httpServletResponse);
+                SendDataLocalFileHttpServlet.send(lf.get(), httpServletResponse, download);
             }
         }
     }
@@ -110,10 +122,10 @@ public class HashAPI {
         if(taxDocumentByDetailOneAndGumgaOI != null) {
             if(taxDocumentByDetailOneAndGumgaOI instanceof DatabaseFile) {
                 DatabaseFile df = (DatabaseFile) taxDocumentByDetailOneAndGumgaOI;
-                SendDataDatabaseFileHttpServlet.send(df, httpServletResponse);
+                SendDataDatabaseFileHttpServlet.send(df, httpServletResponse, Boolean.FALSE);
             } else {
                 LocalFile lf = (LocalFile) taxDocumentByDetailOneAndGumgaOI;
-                SendDataLocalFileHttpServlet.send(lf, httpServletResponse);
+                SendDataLocalFileHttpServlet.send(lf, httpServletResponse, Boolean.FALSE);
             }
         }
     }

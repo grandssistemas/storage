@@ -15,10 +15,10 @@ public class SendDataDatabaseFileHttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(SendDataDatabaseFileHttpServlet.class);
     private SendDataDatabaseFileHttpServlet() {}
 
-    public static void send(DatabaseFile databaseFile, HttpServletResponse httpServletResponse) {
+    public static void send(DatabaseFile databaseFile, HttpServletResponse httpServletResponse, Boolean download) {
         httpServletResponse.reset();
 
-        if(databaseFile.getContentType().contains("pdf")) {
+        if(databaseFile.getContentType().contains("pdf") || download) {
             httpServletResponse.setHeader("Content-disposition","attachment;filename="+databaseFile.getName());
         } else {
             httpServletResponse.setHeader("Content-disposition","filename="+databaseFile.getName());

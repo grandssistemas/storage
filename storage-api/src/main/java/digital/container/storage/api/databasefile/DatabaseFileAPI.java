@@ -74,9 +74,21 @@ public class DatabaseFileAPI {
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
     @ApiOperation(value = "database-file-hash", notes = "Visualizar o arquivo salvo no storage pelo hash.")
+    public void view(@ApiParam(name = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
+        DatabaseFile result = this.databaseFileService.getFileHash(hash);
+        SendDataDatabaseFileHttpServlet.send(result, httpServletResponse, Boolean.FALSE);
+    }
+
+    @Transactional(readOnly = true)
+    @RequestMapping(
+            path = "/download/{hash}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    @ApiOperation(value = "database-download-file-hash", notes = "Download o arquivo salvo no storage pelo hash.")
     public void download(@ApiParam(name = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
         DatabaseFile result = this.databaseFileService.getFileHash(hash);
-        SendDataDatabaseFileHttpServlet.send(result, httpServletResponse);
+        SendDataDatabaseFileHttpServlet.send(result, httpServletResponse, Boolean.TRUE);
     }
 
     @Transactional(readOnly = true)
@@ -88,7 +100,7 @@ public class DatabaseFileAPI {
     @ApiOperation(value = "database-file-public-hash", notes = "Visualizar o arquivo publico salvo no storage pelo hash.")
     public void downloadShared(@ApiParam(name = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
         DatabaseFile result = this.databaseFileService.getFileHash(hash, Boolean.TRUE);
-        SendDataDatabaseFileHttpServlet.send(result, httpServletResponse);
+        SendDataDatabaseFileHttpServlet.send(result, httpServletResponse, Boolean.FALSE);
     }
 
     @Transactional

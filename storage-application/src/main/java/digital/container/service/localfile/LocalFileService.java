@@ -13,6 +13,7 @@ import digital.container.repository.LocalFileRepository;
 import digital.container.util.GenerateHash;
 import digital.container.util.LocalFileUtil;
 import digital.container.util.SaveLocalFile;
+import digital.container.util.TokenUtil;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import io.gumga.presentation.exceptionhandler.GumgaRunTimeException;
@@ -106,14 +107,14 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
     public LocalFile getFileHash(String hash) {
         LocalFile result;
         result = this.localFileRepository
-                .getByHash(hash)
+                .getByHash(hash, TokenUtil.getEndWithOi(), TokenUtil.getContainsSharedOi())
                 .orElseThrow(() -> new digital.container.exception.FileNotFoundException(MessageStorage.FILE_NOT_FOUND + ":" + hash, HttpStatus.NOT_FOUND));
         return result;
     }
 
     @Transactional
     public Boolean deleteFileByHash(String hash) {
-        Optional<LocalFile> result = this.localFileRepository.getByHash(hash);
+        Optional<LocalFile> result = this.localFileRepository.getByHash(hash, TokenUtil.getEndWithOi(), TokenUtil.getContainsSharedOi());
         if(result.isPresent()) {
             delete(result.get());
             return Boolean.TRUE;

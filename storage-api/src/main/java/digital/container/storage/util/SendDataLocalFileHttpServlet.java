@@ -19,9 +19,9 @@ public class SendDataLocalFileHttpServlet {
 
     private SendDataLocalFileHttpServlet() {}
 
-    public static void send(LocalFile file, HttpServletResponse httpServletResponse) {
+    public static void send(LocalFile file, HttpServletResponse httpServletResponse, Boolean download) {
         httpServletResponse.reset();
-        if(file.getContentType().contains("pdf")) {
+        if(file.getContentType().contains("pdf") || download) {
             httpServletResponse.setHeader("Content-disposition","attachment;filename="+file.getName());
         } else {
             httpServletResponse.setHeader("Content-disposition","filename="+file.getName());

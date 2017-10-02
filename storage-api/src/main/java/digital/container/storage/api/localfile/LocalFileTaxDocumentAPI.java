@@ -80,9 +80,21 @@ public class LocalFileTaxDocumentAPI {
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
     @ApiOperation(value = "local-file-hash", notes = "Visualizar o arquivo salvo no storage pelo hash.")
+    public void view(@ApiParam(name = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
+        LocalFile result = this.localFileService.getFileHash(hash);
+        SendDataLocalFileHttpServlet.send(result, httpServletResponse, Boolean.FALSE);
+    }
+
+    @Transactional(readOnly = true)
+    @RequestMapping(
+            path = URI_BASE + "/download/{hash}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    @ApiOperation(value = "download-local-file-hash", notes = "Download o arquivo salvo no storage pelo hash.")
     public void download(@ApiParam(name = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
         LocalFile result = this.localFileService.getFileHash(hash);
-        SendDataLocalFileHttpServlet.send(result, httpServletResponse);
+        SendDataLocalFileHttpServlet.send(result, httpServletResponse, Boolean.TRUE);
     }
 
     @Transactional

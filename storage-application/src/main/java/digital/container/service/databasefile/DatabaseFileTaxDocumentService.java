@@ -11,6 +11,7 @@ import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.DatabaseFilePart;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.TokenResultProxy;
+import digital.container.util.TokenUtil;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.hibernate.Hibernate;
@@ -87,7 +88,7 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
     @Transactional(readOnly = true)
     public DatabaseFile getFileHash(String hash) {
         DatabaseFile result = this.databaseFileRepository
-                .getByHash(hash)
+                .getByHash(hash, TokenUtil.getEndWithOi(), TokenUtil.getContainsSharedOi())
                 .orElseThrow(() -> new FileNotFoundException(MessageStorage.FILE_NOT_FOUND + ":" + hash, HttpStatus.NOT_FOUND));
 
         Hibernate.initialize(result.getParts());
@@ -106,7 +107,7 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
 
     @Transactional
     public Boolean deleteFileByHash(String hash) {
-        Optional<DatabaseFile> result = this.databaseFileRepository.getByHash(hash);
+        Optional<DatabaseFile> result = this.databaseFileRepository.getByHash(hash, TokenUtil.getEndWithOi(), TokenUtil.getContainsSharedOi());
         if(result.isPresent()) {
             delete(result.get());
             return Boolean.TRUE;

@@ -19,8 +19,8 @@ public interface LocalFileRepository extends GumgaCrudRepository<LocalFile, Long
     @Query(value = "from LocalFile df where df.hash = :hash and df.filePublic = :shared")
     Optional<LocalFile> getByHash(@Param("hash") String hash, @Param("shared") Boolean shared);
 
-    @Query(value = "from LocalFile df where df.hash = :hash")
-    Optional<LocalFile> getByHash(@Param("hash") String hash);
+    @Query(value = "from LocalFile df where (df.oi like :oi or df.gumgaOrganizations like :sharedOi) and df.hash = :hash")
+    Optional<LocalFile> getByHash(@Param("hash") String hash, @Param("oi") GumgaOi oi, @Param("sharedOi") String sharedOi);
 
     @Query(value = "from LocalFile df where df.oi like :oi and df.detailOne = :chNFe and (df.fileType = 'NFE' or df.fileType = 'NFCE')")
     Optional<LocalFile> getFileByGumgaOIAndChNFeAndNF(@Param("oi") GumgaOi oi, @Param("chNFe") String chNFe);

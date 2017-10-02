@@ -138,14 +138,14 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
     public LocalFile getFileHash(String hash) {
         LocalFile result;
         result = this.localFileRepository
-                .getByHash(hash)
+                .getByHash(hash, TokenUtil.getEndWithOi(), TokenUtil.getContainsSharedOi())
                 .orElseThrow(() -> new digital.container.exception.FileNotFoundException(MessageStorage.FILE_NOT_FOUND + ":" + hash, HttpStatus.NOT_FOUND));
         return result;
     }
 
     @Transactional
     public Boolean deleteFileByHash(String hash) {
-        Optional<LocalFile> result = this.localFileRepository.getByHash(hash);
+        Optional<LocalFile> result = this.localFileRepository.getByHash(hash, TokenUtil.getEndWithOi(), TokenUtil.getContainsSharedOi());
         if(result.isPresent()) {
             delete(result.get());
             return Boolean.TRUE;
