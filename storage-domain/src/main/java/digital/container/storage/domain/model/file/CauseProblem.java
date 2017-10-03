@@ -22,6 +22,9 @@ public class CauseProblem extends GumgaSharedModel<Long> {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "cp_created")
     private Date created = new Date();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "situation")
+    private SituationCauseProblem situation = SituationCauseProblem.NOT_RESOLVED;
 
     public String getReason() {
         return reason;
@@ -45,5 +48,13 @@ public class CauseProblem extends GumgaSharedModel<Long> {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public SituationCauseProblem getSituation() {
+        return situation;
+    }
+
+    public void setSituation(SituationCauseProblem situation) {
+        this.situation = situation;
     }
 }
