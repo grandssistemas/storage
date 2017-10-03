@@ -27,7 +27,7 @@ public class RestExceptionHandler {
         StorageError error = ex.getStorageError();
         String message = error.getCodeError().concat(" - ").concat(error.getMessage());
         LOGGER.error(error.getCodeError().concat(" - ").concat(error.getMessage()), ex);
-        this.causeProblemService.create(message);
+        this.causeProblemService.create(message, ex.getSituationCauseProblem());
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 }

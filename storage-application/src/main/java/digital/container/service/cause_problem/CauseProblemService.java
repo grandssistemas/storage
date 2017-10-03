@@ -1,6 +1,7 @@
 package digital.container.service.cause_problem;
 
 import digital.container.storage.domain.model.file.CauseProblem;
+import digital.container.storage.domain.model.file.SituationCauseProblem;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,10 @@ public class CauseProblemService extends GumgaService<CauseProblem, Long> {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void create(String description) {
+    public void create(String description, SituationCauseProblem situationCauseProblem) {
         CauseProblem causeProblem = new CauseProblem();
         causeProblem.setReason(description);
+        causeProblem.setSituation(situationCauseProblem);
         this.save(causeProblem);
     }
 }
