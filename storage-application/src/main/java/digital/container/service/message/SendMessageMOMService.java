@@ -50,6 +50,8 @@ public class SendMessageMOMService {
         invite.put("taxDocumentModel", file.getFileType().toString());
         invite.put("oi", oi);
         invite.put("sizeFile", file.getSize());
+        invite.put("gumgaOrganizations", file.getGumgaOrganizations());
+
         return invite;
     }
 }
