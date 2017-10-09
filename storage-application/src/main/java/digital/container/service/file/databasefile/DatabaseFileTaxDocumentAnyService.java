@@ -1,12 +1,16 @@
-package digital.container.service.databasefile;
+package digital.container.service.file.databasefile;
 
 import digital.container.repository.file.DatabaseFileRepository;
 import digital.container.service.message.SendMessageMOMService;
+import digital.container.service.taxdocument.CommonTaxDocumentEventCanceledService;
 import digital.container.service.taxdocument.CommonTaxDocumentEventDisableService;
+import digital.container.service.taxdocument.CommonTaxDocumentEventLetterCorrectionService;
+import digital.container.service.taxdocument.CommonTaxDocumentService;
 import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.TokenResultProxy;
+import digital.container.util.XMLUtil;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,33 +24,65 @@ import java.util.List;
 
 @Service
 @Transactional
-public class DatabaseFileTaxDocumentDisableService extends GumgaService<DatabaseFile, Long> {
+public class DatabaseFileTaxDocumentAnyService extends GumgaService<DatabaseFile, Long> {
 
-    private DatabaseFileRepository databaseFileRepository;
+    @Autowired
+    private CommonTaxDocumentEventCanceledService commonTaxCocumentEventService;
 
     @Autowired
     private CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService;
 
     @Autowired
+    private CommonTaxDocumentEventLetterCorrectionService commonTaxDocumentEventLetterCorrectionService;
+
+    @Autowired
+    private CommonTaxDocumentService commonTaxDocumentService;
+
+    @Autowired
     private DatabaseFilePartService databaseFilePartService;
+
     @Autowired
     private SendMessageMOMService sendMessageMOMService;
 
     @Autowired
     private SecurityTokenService securityTokenService;
 
+    private DatabaseFileRepository databaseFileRepository;
+
     @Autowired
-    public DatabaseFileTaxDocumentDisableService(GumgaCrudRepository<DatabaseFile, Long> repository) {
+    public DatabaseFileTaxDocumentAnyService(GumgaCrudRepository<DatabaseFile, Long> repository) {
         super(repository);
         this.databaseFileRepository = DatabaseFileRepository.class.cast(repository);
     }
 
+
     private FileProcessed saveFile(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
         DatabaseFile databaseFile = new DatabaseFile();
-        FileProcessed data = this.commonTaxDocumentEventDisableService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
+        String xml = XMLUtil.getXml(multipartFile);
 
-        if(data.getErrors().size() > 0) {
-            return data;
+        Boolean cancellationEvent = this.commonTaxCocumentEventService.isCancellationEvent(xml);
+
+        FileProcessed fileProcessed = null;
+        if(cancellationEvent) {
+            fileProcessed = this.commonTaxCocumentEventService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
+        } else {
+            Boolean disableEvent = this.commonTaxDocumentEventDisableService.isDisableEvent(xml);
+            if(disableEvent) {
+                fileProcessed = this.commonTaxDocumentEventDisableService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
+            } else {
+                Boolean letterCorrectionEvent = this.commonTaxDocumentEventLetterCorrectionService.isLetterCorrectionEvent(xml);
+                if(letterCorrectionEvent) {
+                    fileProcessed = this.commonTaxDocumentEventLetterCorrectionService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
+                }
+            }
+        }
+
+        if(fileProcessed == null) {
+            fileProcessed = this.commonTaxDocumentService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
+        }
+
+        if(fileProcessed.getErrors().size() > 0) {
+            return  fileProcessed;
         }
 
         this.databaseFileRepository.saveAndFlush(databaseFile);
@@ -61,9 +97,8 @@ public class DatabaseFileTaxDocumentDisableService extends GumgaService<Database
         return this.saveFile(containerKey, multipartFile, tokenResultProxy);
     }
 
-
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, String tokenSoftwareHouse, String tokenAccountant) {
-            TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
             result.add(this.saveFile(containerKey,multipartFile, tokenResultProxy));

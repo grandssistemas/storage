@@ -1,10 +1,10 @@
-package digital.container.storage.api.databasefile;
+package digital.container.storage.api.file.databasefile;
 
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-import digital.container.service.databasefile.DatabaseFileTaxDocumentDisableService;
+import digital.container.service.file.databasefile.DatabaseFileTaxDocumentLetterCorrectionService;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +19,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping
-public class DatabaseFileTaxDocumentDisableAPI {
-    private final static String URI_BASE = "/api/database-file/tax-document-disable";
+public class DatabaseFileTaxDocumentLetterCorrectionAPI {
+    private final static String URI_BASE = "/api/database-file/tax-document-letter-correction";
 
     @Autowired
-    private DatabaseFileTaxDocumentDisableService service;
+    private DatabaseFileTaxDocumentLetterCorrectionService service;
 
     @Transactional
     @RequestMapping(
@@ -32,7 +32,7 @@ public class DatabaseFileTaxDocumentDisableAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "database-file-tax-document-disable-upload", notes = "Upload de arquivos que serão salvo no banco de dados.")
+    @ApiOperation(value = "database-file-tax-document-letter-correction-upload", notes = "Upload de arquivos que serão salvo no banco de dados.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = FileProcessed.class),
             @ApiResponse(code = 400, message = "", response = FileProcessed.class)
@@ -56,7 +56,7 @@ public class DatabaseFileTaxDocumentDisableAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "database-file-tax-document-disable-uploads", notes = "Uploads de arquivos que serão salvo no banco de dados. Limite maximo de 500.")
+    @ApiOperation(value = "database-file-tax-document-letter-correction-uploads", notes = "Uploads de arquivos que serão salvo no banco de dados. Limite maximo de 500.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = List.class),
             @ApiResponse(code = 400, message = "", response = List.class)

@@ -1,16 +1,15 @@
-package digital.container.service.databasefile;
+package digital.container.service.file.databasefile;
 
 import digital.container.exception.FileNotFoundException;
-import digital.container.service.message.SendMessageMOMService;
-import digital.container.repository.file.DatabaseFileRepository;
+import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
-import digital.container.service.taxdocument.CommonTaxDocumentService;
-import digital.container.service.token.SecurityTokenService;
+import digital.container.storage.domain.model.file.*;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.database.DatabaseFilePart;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.util.TokenResultProxy;
+import digital.container.repository.file.DatabaseFileRepository;
+import digital.container.util.GenerateHash;
 import digital.container.util.TokenUtil;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
@@ -24,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 
 @Service
-public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, Long> {
+public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
 
     @Autowired
     private DatabaseFileRepository databaseFileRepository;
@@ -33,55 +32,59 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, L
     private DatabaseFilePartService databaseFilePartService;
 
     @Autowired
+    private PermissionContainerService permissionContainerService;
+
+    @Autowired
     private LimitFileService limitFileService;
 
     @Autowired
-    private CommonTaxDocumentService commonTaxDocumentService;
-
-    @Autowired
-    private SendMessageMOMService sendMessageMOMService;
-
-    @Autowired
-    private SecurityTokenService securityTokenService;
-
-    @Autowired
-    public DatabaseFileTaxDocumentService(GumgaCrudRepository<DatabaseFile, Long> repository) {
+    public DatabaseFileService(GumgaCrudRepository<DatabaseFile, Long> repository) {
         super(repository);
     }
 
     @Transactional
-    private FileProcessed saveFile(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
-
+    public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared) {
         DatabaseFile databaseFile = new DatabaseFile();
+        databaseFile.setName(multipartFile.getOriginalFilename());
 
-        FileProcessed data = this.commonTaxDocumentService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
-        if(data.getErrors().size() > 0) {
-            return data;
-        }
+        databaseFile.setFileType(FileType.ANYTHING);
+        databaseFile.setFileStatus(FileStatus.DO_NOT_SYNC);
+        databaseFile.setFilePublic(shared);
 
-        this.databaseFileRepository.saveAndFlush(databaseFile);
-        this.databaseFilePartService.saveFile(databaseFile, multipartFile);
-        this.sendMessageMOMService.send(databaseFile, containerKey);
 
-        return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.EMPTY_LIST);
+        databaseFile.setName(multipartFile.getOriginalFilename());
+        databaseFile.setContainerKey(containerKey);
+        databaseFile.setCreateDate(Calendar.getInstance());
+        databaseFile.setHash(GenerateHash.generateDatabaseFile());
+        databaseFile.setContentType(multipartFile.getContentType());
+        databaseFile.setSize(multipartFile.getSize());
+        DatabaseFile newDatabaseFile = this.databaseFileRepository.saveAndFlush(databaseFile);
+
+        this.databaseFilePartService.saveFile(newDatabaseFile, multipartFile);
+        return new FileProcessed(this.databaseFileRepository.saveAndFlush(newDatabaseFile), Collections.EMPTY_LIST);
     }
 
     @Transactional
-    public FileProcessed upload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {
-        TokenResultProxy result = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
-        return this.saveFile(containerKey, multipartFile, result);
-    }
-
-
-    @Transactional
-    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, String tokenSoftwareHouse, String tokenAccountant) {
+    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, boolean shared) {
         this.limitFileService.limitMaximumExceeded(multipartFiles);
-        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
 
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
-            result.add(this.saveFile(containerKey,multipartFile, tokenResultProxy));
+            result.add(this.upload(containerKey, multipartFile, shared));
         }
+
+        return result;
+    }
+
+
+
+    @Transactional(readOnly = true)
+    public DatabaseFile getFileHash(String hash, Boolean shared) {
+        DatabaseFile result = this.databaseFileRepository
+                .getByHash(hash, shared)
+                .orElseThrow(() -> new FileNotFoundException(MessageStorage.FILE_NOT_FOUND + ":" + hash, HttpStatus.NOT_FOUND));
+
+        Hibernate.initialize(result.getParts());
         return result;
     }
 

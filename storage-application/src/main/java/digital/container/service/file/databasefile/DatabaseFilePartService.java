@@ -1,4 +1,4 @@
-package digital.container.service.databasefile;
+package digital.container.service.file.databasefile;
 
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.database.DatabaseFilePart;

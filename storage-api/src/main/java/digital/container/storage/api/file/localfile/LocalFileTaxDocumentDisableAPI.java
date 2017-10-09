@@ -1,11 +1,10 @@
-package digital.container.storage.api.localfile;
+package digital.container.storage.api.file.localfile;
 
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-import digital.container.service.localfile.LocalFileTaxDocumentDisableService;
-import digital.container.service.localfile.LocalFileTaxDocumentLetterCorrectionService;
+import digital.container.service.file.localfile.LocalFileTaxDocumentDisableService;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +19,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping
-public class LocalFileTaxDocumentLetterCorrectionAPI {
-    private final static String URI_BASE = "/api/local-file/tax-document-letter-correction";
+public class LocalFileTaxDocumentDisableAPI {
+    private final static String URI_BASE = "/api/local-file/tax-document-disable";
 
     @Autowired
-    private LocalFileTaxDocumentLetterCorrectionService service;
+    private LocalFileTaxDocumentDisableService service;
 
     @Transactional
     @RequestMapping(
@@ -33,7 +32,7 @@ public class LocalFileTaxDocumentLetterCorrectionAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "local-file-tax-document-letter-correction-upload", notes = "Upload de arquivo que será salvo localmente.")
+    @ApiOperation(value = "local-file-tax-document-disable-upload", notes = "Upload de arquivo que será salvo localmente.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = FileProcessed.class),
             @ApiResponse(code = 400, message = "", response = FileProcessed.class)
@@ -57,7 +56,7 @@ public class LocalFileTaxDocumentLetterCorrectionAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "local-file-tax-document-letter-correction-uploads", notes = "Uploads de arquivos que serão salvos localmente.")
+    @ApiOperation(value = "local-file-tax-document-disable-uploads", notes = "Uploads de arquivos que serão salvos localmente.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = List.class),
             @ApiResponse(code = 400, message = "", response = List.class)

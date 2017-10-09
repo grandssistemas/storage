@@ -1,4 +1,4 @@
-package digital.container.service.localfile;
+package digital.container.service.file.localfile;
 
 import digital.container.service.container.PermissionContainerService;
 import digital.container.service.message.SendMessageMOMService;

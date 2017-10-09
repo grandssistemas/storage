@@ -1,10 +1,10 @@
-package digital.container.storage.api.localfile;
+package digital.container.storage.api.file.localfile;
 
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-import digital.container.service.localfile.LocalFileTaxDocumentCanceledService;
+import digital.container.service.file.localfile.LocalFileTaxDocumentCanceledService;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;

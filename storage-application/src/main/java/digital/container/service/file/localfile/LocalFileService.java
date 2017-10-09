@@ -1,4 +1,4 @@
-package digital.container.service.localfile;
+package digital.container.service.file.localfile;
 
 import digital.container.exception.FileNotFoundException;
 import digital.container.service.container.PermissionContainerService;

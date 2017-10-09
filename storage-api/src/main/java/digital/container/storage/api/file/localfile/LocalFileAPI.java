@@ -1,13 +1,10 @@
-package digital.container.storage.api.localfile;
+package digital.container.storage.api.file.localfile;
 
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
+import com.wordnik.swagger.annotations.*;
 import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
-import digital.container.service.localfile.LocalFileService;
+import digital.container.service.file.localfile.LocalFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,8 +20,12 @@ import java.util.List;
 @RequestMapping(path = "/api/local-file")
 public class LocalFileAPI {
 
+    private final LocalFileService localFileService;
+
     @Autowired
-    private LocalFileService localFileService;
+    public LocalFileAPI(LocalFileService localFileService) {
+        this.localFileService = localFileService;
+    }
 
     @Transactional
     @RequestMapping(
