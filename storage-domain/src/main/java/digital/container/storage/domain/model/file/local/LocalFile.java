@@ -1,10 +1,17 @@
 package digital.container.storage.domain.model.file.local;
 
 import digital.container.storage.domain.model.file.AbstractFile;
+import digital.container.storage.domain.model.file.FileStatus;
+import digital.container.storage.domain.model.file.FileType;
+import digital.container.storage.domain.model.util.GenerateHash;
+import digital.container.storage.domain.model.util.LocalFileUtil;
 import io.gumga.domain.GumgaMultitenancy;
 import io.gumga.domain.shared.GumgaSharedModel;
+import net.sf.cglib.core.Local;
 
 import javax.persistence.*;
+import java.io.File;
+import java.util.Calendar;
 
 @Entity
 @Table(name = "local_file",
@@ -29,4 +36,5 @@ public class LocalFile extends AbstractFile {
     public void setRelativePath(String relativePath) {
         this.relativePath = relativePath;
     }
+
 }

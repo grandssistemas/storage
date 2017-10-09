@@ -9,7 +9,7 @@ import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.database.DatabaseFilePart;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.repository.file.DatabaseFileRepository;
-import digital.container.util.GenerateHash;
+import digital.container.storage.domain.model.util.GenerateHash;
 import digital.container.util.TokenUtil;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;

@@ -1,5 +1,8 @@
 package digital.container.storage.domain.model.file;
 
+import digital.container.storage.domain.model.file.local.LocalFile;
+import digital.container.storage.domain.model.util.GenerateHash;
+import digital.container.storage.domain.model.util.LocalFileUtil;
 import io.gumga.domain.shared.GumgaSharedModel;
 
 import javax.persistence.*;
@@ -165,5 +168,19 @@ public abstract class AbstractFile extends GumgaSharedModel<Long> {
         this.filePublic = filePublic;
     }
 
+    public static LocalFile buildAnything(String fileName, String contentType, Long size, Boolean shared, String containerKey) {
+        LocalFile file = new LocalFile();
+        file.setName(fileName);
+        file.setFileStatus(FileStatus.DO_NOT_SYNC);
+        file.setFileType(FileType.ANYTHING);
 
+        file.setContentType(contentType);
+        file.setSize(size);
+        file.setFilePublic(shared);
+        file.setCreateDate(Calendar.getInstance());
+        file.setHash(GenerateHash.generateLocalFile());
+        file.setRelativePath(LocalFileUtil.getRelativePathFileANYTHING(containerKey) + '/' + file.getName());
+        file.setContainerKey(containerKey);
+        return file;
+    }
 }

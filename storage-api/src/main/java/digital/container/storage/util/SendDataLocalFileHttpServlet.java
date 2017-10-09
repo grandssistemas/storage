@@ -3,7 +3,7 @@ package digital.container.storage.util;
 
 import digital.container.storage.domain.model.download.LinkDownload;
 import digital.container.storage.domain.model.file.local.LocalFile;
-import digital.container.util.LocalFileUtil;
+import digital.container.storage.domain.model.util.LocalFileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;

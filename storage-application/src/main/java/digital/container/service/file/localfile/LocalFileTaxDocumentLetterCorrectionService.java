@@ -6,7 +6,7 @@ import digital.container.service.taxdocument.CommonTaxDocumentEventLetterCorrect
 import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.util.LocalFileUtil;
+import digital.container.storage.domain.model.util.LocalFileUtil;
 import digital.container.util.SaveLocalFile;
 import digital.container.util.TokenResultProxy;
 import io.gumga.application.GumgaService;

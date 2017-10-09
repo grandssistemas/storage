@@ -1,4 +1,4 @@
-package digital.container.util;
+package digital.container.storage.domain.model.util;
 
 
 import digital.container.storage.domain.model.file.FileType;

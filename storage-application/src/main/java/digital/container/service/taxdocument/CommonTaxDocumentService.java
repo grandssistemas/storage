@@ -5,6 +5,8 @@ import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.storage.domain.model.util.GenerateHash;
+import digital.container.storage.domain.model.util.LocalFileUtil;
 import digital.container.util.*;
 import digital.container.vo.TaxDocumentModel;
 import org.springframework.beans.factory.annotation.Autowired;

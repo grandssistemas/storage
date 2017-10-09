@@ -4,13 +4,10 @@ import digital.container.exception.FileNotFoundException;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
-import digital.container.storage.domain.model.file.FileStatus;
-import digital.container.storage.domain.model.file.FileType;
 import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.repository.file.LocalFileRepository;
-import digital.container.util.GenerateHash;
-import digital.container.util.LocalFileUtil;
+import digital.container.storage.domain.model.util.LocalFileUtil;
 import digital.container.util.SaveLocalFile;
 import digital.container.util.TokenUtil;
 import io.gumga.application.GumgaService;
@@ -46,24 +43,15 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
 
     @Transactional
     public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared) {
-        LocalFile localFile = new LocalFile();
-        localFile.setName(multipartFile.getOriginalFilename());
-
-        localFile.setFileStatus(FileStatus.DO_NOT_SYNC);
-        localFile.setFileType(FileType.ANYTHING);
-        localFile.setFilePublic(shared);
+        LocalFile localFile = LocalFile.buildAnything(
+                multipartFile.getName(),
+                multipartFile.getContentType(),
+                multipartFile.getSize(),
+                shared,
+                containerKey);
 
         File folder = new File(LocalFileUtil.DIRECTORY_PATH + '/' + LocalFileUtil.getRelativePathFileANYTHING(containerKey));
         folder.mkdirs();
-
-        localFile.setRelativePath(LocalFileUtil.getRelativePathFileANYTHING(containerKey) + '/' + localFile.getName());
-
-        localFile.setContainerKey(containerKey);
-        localFile.setCreateDate(Calendar.getInstance());
-        localFile.setHash(GenerateHash.generateLocalFile());
-
-        localFile.setContentType(multipartFile.getContentType());
-        localFile.setSize(multipartFile.getSize());
 
         try {
             SaveLocalFile.saveFile(folder, localFile.getName(), multipartFile.getInputStream());

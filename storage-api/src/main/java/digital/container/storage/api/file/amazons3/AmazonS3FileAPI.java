@@ -40,6 +40,7 @@ public class AmazonS3FileAPI {
     public ResponseEntity<FileProcessed> upload(@ApiParam(name = "containerKey", value = "A chave cadastrada no storage no endpoint: /api/permission-container", required = true) @PathVariable String containerKey,
                                                 @ApiParam(name = "shared", value = "Para enviar o arquivo como publico setar esse parametro como true", defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
                                                 @ApiParam(name = "file", value = "O arquivo que será salvo no storage", required = true) @RequestPart(name = "file") MultipartFile multipartFile) {
+        this.amazonS3FileService.processUpload(containerKey, multipartFile, shared);
 //        FileProcessed fileProcessed = this.localFileService.upload(containerKey, multipartFile, shared);
 //
 //        if(fileProcessed.getErrors().size() > 0) {
