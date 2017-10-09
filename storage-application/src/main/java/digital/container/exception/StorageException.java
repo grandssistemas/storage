@@ -1,7 +1,6 @@
 package digital.container.exception;
 
-import digital.container.storage.domain.model.file.CauseProblem;
-import digital.container.storage.domain.model.file.SituationCauseProblem;
+import digital.container.storage.domain.model.exception.SituationCauseProblem;
 
 public class StorageException extends RuntimeException {
     private StorageError storageError;

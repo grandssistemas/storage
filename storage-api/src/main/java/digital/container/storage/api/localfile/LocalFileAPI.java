@@ -4,7 +4,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
 import digital.container.service.localfile.LocalFileService;
@@ -42,6 +42,7 @@ public class LocalFileAPI {
                                                 @ApiParam(name = "shared", value = "Para enviar o arquivo como publico setar esse parametro como true", defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
                                                 @ApiParam(name = "file", value = "O arquivo que será salvo no storage", required = true) @RequestPart(name = "file") MultipartFile multipartFile) {
         FileProcessed fileProcessed = this.localFileService.upload(containerKey, multipartFile, shared);
+
         if(fileProcessed.getErrors().size() > 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(fileProcessed);
         }

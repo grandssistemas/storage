@@ -6,9 +6,9 @@ import io.gumga.core.GumgaThreadScope;
 
 import java.time.LocalDate;
 
-public class LocalFileUtil {
+public final class LocalFileUtil {
 
-    private LocalFileUtil() {}
+    protected LocalFileUtil() {}
 
     public static final String DIRECTORY_PATH = System.getProperty("storage.localfile");
 

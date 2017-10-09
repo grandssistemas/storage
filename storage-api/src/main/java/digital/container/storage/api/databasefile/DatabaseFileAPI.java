@@ -1,9 +1,7 @@
 package digital.container.storage.api.databasefile;
 
 import com.wordnik.swagger.annotations.*;
-import digital.container.service.storage.MessageStorage;
-import digital.container.storage.domain.model.container.PermissionContainer;
-import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.service.databasefile.DatabaseFileService;

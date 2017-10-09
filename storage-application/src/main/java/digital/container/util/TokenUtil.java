@@ -3,9 +3,9 @@ package digital.container.util;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.domains.GumgaOi;
 
-public class TokenUtil {
+public final class TokenUtil {
 
-    private TokenUtil(){}
+    protected TokenUtil(){}
 
     public static final String SOFTWARE_HOUSE_NO_HAVE_TOKEN = "NO_TOKEN_SOFTWARE_HOUSE";
     public static final String ACCOUNTANT_NO_HAVE_TOKEN = "NO_TOKEN_ACCOUNTANT";

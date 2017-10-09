@@ -1,8 +1,8 @@
 package digital.container.storage.util;
 
 
-import digital.container.storage.domain.model.file.DatabaseFile;
-import digital.container.storage.domain.model.file.DatabaseFilePart;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
+import digital.container.storage.domain.model.file.database.DatabaseFilePart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;

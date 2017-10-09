@@ -1,4 +1,4 @@
-package digital.container.storage.domain.model.file;
+package digital.container.storage.domain.model.exception;
 
 import io.gumga.domain.GumgaMultitenancy;
 import io.gumga.domain.shared.GumgaSharedModel;
@@ -9,7 +9,7 @@ import java.util.Date;
 @Entity
 @Table(name = "cause_problem",
         indexes = {
-                @Index(name = "cause_problem_index_oi", columnList = "oi")
+            @Index(name = "cause_problem_index_oi", columnList = "oi")
         })
 @GumgaMultitenancy
 @SequenceGenerator(name = GumgaSharedModel.SEQ_NAME, sequenceName = "seq_cause_problem")

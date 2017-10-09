@@ -1,21 +1,17 @@
 package digital.container.service.localfile;
 
-import digital.container.exception.*;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.service.message.SendMessageMOMService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
 import digital.container.service.taxdocument.CommonTaxDocumentService;
 import digital.container.service.token.SecurityTokenService;
-import digital.container.storage.domain.model.file.FileStatus;
-import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.repository.LocalFileRepository;
+import digital.container.repository.file.LocalFileRepository;
 import digital.container.util.*;
-import digital.container.vo.TaxDocumentModel;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
-import io.gumga.presentation.exceptionhandler.GumgaRunTimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
 @Service

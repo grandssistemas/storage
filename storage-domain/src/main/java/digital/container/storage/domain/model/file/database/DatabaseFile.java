@@ -1,6 +1,7 @@
-package digital.container.storage.domain.model.file;
+package digital.container.storage.domain.model.file.database;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import digital.container.storage.domain.model.file.AbstractFile;
 import io.gumga.domain.GumgaMultitenancy;
 import io.gumga.domain.shared.GumgaSharedModel;
 

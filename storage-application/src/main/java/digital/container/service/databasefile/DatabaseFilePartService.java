@@ -1,8 +1,8 @@
 package digital.container.service.databasefile;
 
-import digital.container.storage.domain.model.file.DatabaseFile;
-import digital.container.storage.domain.model.file.DatabaseFilePart;
-import digital.container.repository.DatabaseFilePartRepository;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
+import digital.container.storage.domain.model.file.database.DatabaseFilePart;
+import digital.container.repository.file.DatabaseFilePartRepository;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;

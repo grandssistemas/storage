@@ -1,9 +1,7 @@
-package digital.container.repository;
+package digital.container.repository.file;
 
-import digital.container.storage.domain.model.file.DatabaseFile;
 import digital.container.storage.domain.model.file.FileType;
-import digital.container.storage.domain.model.file.LocalFile;
-import io.gumga.core.GumgaThreadScope;
+import digital.container.storage.domain.model.file.local.LocalFile;
 import io.gumga.domain.domains.GumgaOi;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.data.jpa.repository.Query;

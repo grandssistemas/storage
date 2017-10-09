@@ -1,9 +1,9 @@
 package digital.container.service.taxdocument;
 
 import digital.container.storage.domain.model.file.AbstractFile;
-import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.FileStatus;
-import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.*;
 import digital.container.vo.TaxDocumentModel;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;

@@ -1,4 +1,4 @@
-package digital.container.repository;
+package digital.container.repository.download;
 
 import digital.container.storage.domain.model.download.LinkDownload;
 import io.gumga.domain.repository.GumgaCrudRepository;

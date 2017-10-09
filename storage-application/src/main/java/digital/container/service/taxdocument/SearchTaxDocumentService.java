@@ -1,11 +1,11 @@
 package digital.container.service.taxdocument;
 
-import digital.container.repository.DatabaseFileRepository;
-import digital.container.repository.LocalFileRepository;
+import digital.container.repository.file.DatabaseFileRepository;
+import digital.container.repository.file.LocalFileRepository;
 import digital.container.storage.domain.model.file.AbstractFile;
-import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.FileType;
-import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.util.SearchScheduling;
 import digital.container.storage.domain.model.util.TaxDocumentScheduling;
 import io.gumga.core.GumgaThreadScope;
@@ -25,11 +25,15 @@ import java.util.Optional;
 @Transactional
 public class SearchTaxDocumentService {
 
-    @Autowired
-    private LocalFileRepository localFileRepository;
+    private final LocalFileRepository localFileRepository;
+    private final DatabaseFileRepository databaseFileRepository;
 
     @Autowired
-    private DatabaseFileRepository databaseFileRepository;
+    public SearchTaxDocumentService(LocalFileRepository localFileRepository,
+                                    DatabaseFileRepository databaseFileRepository) {
+        this.localFileRepository = localFileRepository;
+        this.databaseFileRepository = databaseFileRepository;
+    }
 
 
     public AbstractFile getFileByGumgaOIAndChNFeAndNF(GumgaOi oi, String chNFe) {

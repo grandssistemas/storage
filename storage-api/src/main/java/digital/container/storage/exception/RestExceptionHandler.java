@@ -18,8 +18,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class RestExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RestExceptionHandler.class);
+
+    private final CauseProblemService causeProblemService;
+
     @Autowired
-    private CauseProblemService causeProblemService;
+    public RestExceptionHandler(CauseProblemService causeProblemService) {
+        this.causeProblemService = causeProblemService;
+    }
 
     @ResponseBody
     @ExceptionHandler(StorageException.class)

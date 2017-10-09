@@ -2,13 +2,15 @@ package digital.container.storage.api;
 
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import digital.container.repository.DatabaseFileRepository;
-import digital.container.repository.LocalFileRepository;
+import digital.container.repository.file.DatabaseFileRepository;
+import digital.container.repository.file.LocalFileRepository;
 import digital.container.service.download.LinkDownloadService;
-import digital.container.service.taxdocument.DownloadTaxDocumentService;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
 import digital.container.storage.domain.model.download.LinkDownload;
 import digital.container.storage.domain.model.file.*;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
+import digital.container.storage.domain.model.file.local.LocalFile;
+import digital.container.storage.domain.model.util.IntegrationTokenUtil;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
 import digital.container.util.TokenUtil;
@@ -27,19 +29,21 @@ import java.util.*;
 @RequestMapping(path = "/api/file-hash")
 public class HashAPI {
 
-    private static final String TOKEN = "3cb73f59eb02-479b-b859-797e29eb8256-90703973edf5aa2d";
+    private final DatabaseFileRepository databaseFileRepository;
+    private final LocalFileRepository localFileRepository;
+    private final SearchTaxDocumentService searchTaxDocumentService;
+    private final LinkDownloadService linkDownloadService;
 
     @Autowired
-    private DatabaseFileRepository databaseFileRepository;
-
-    @Autowired
-    private LocalFileRepository localFileRepository;
-
-    @Autowired
-    private SearchTaxDocumentService searchTaxDocumentService;
-
-    @Autowired
-    private LinkDownloadService linkDownloadService;
+    public HashAPI(LinkDownloadService linkDownloadService,
+                   SearchTaxDocumentService searchTaxDocumentService,
+                   LocalFileRepository localFileRepository,
+                   DatabaseFileRepository databaseFileRepository) {
+        this.linkDownloadService = linkDownloadService;
+        this.searchTaxDocumentService = searchTaxDocumentService;
+        this.localFileRepository = localFileRepository;
+        this.databaseFileRepository = databaseFileRepository;
+    }
 
 
     @Transactional(readOnly = true)
@@ -91,7 +95,7 @@ public class HashAPI {
     )
     @ApiOperation(value = "public-integrate", notes = "Visualizar qualquer tipo de arquivo pelo hash e token")
     public void integrate(@ApiParam(value = "hash", required = true) @PathVariable String hash, @PathVariable String token, HttpServletResponse httpServletResponse) {
-        if(!TOKEN.equals(token)) {
+        if(!IntegrationTokenUtil.PUBLIC_TOKEN_INTEGRATION.equals(token)) {
             throw new RuntimeException("Token invalido.");
         }
 

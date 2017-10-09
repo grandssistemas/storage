@@ -41,13 +41,9 @@ import com.zaxxer.hikari.HikariDataSource;
 @ComponentScan(basePackages = {"digital.container", "io.gumga"})
 @EnableJpaRepositories(repositoryFactoryBeanClass = GumgaRepositoryFactoryBean.class, basePackages = {"digital.container", "io.gumga"})
 @EnableTransactionManagement(proxyTargetClass = true)
-//@EnableJms
 public class Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
-    private static final String DEFAULT_BROKER_URL = "tcp://localhost:61616";
-    private static final String ORDER_QUEUE = "tax.document.queue";
-
 
     private Properties properties;
 
@@ -135,13 +131,16 @@ public class Application {
 
     @PostConstruct
     public void setPropertiesSystem() {
-        System.setProperty("url.mom", getProperties().getProperty("url.mom"));
-        System.setProperty("mom.queue", getProperties().getProperty("mom.queue"));
+        System.setProperty("url.mom", getProperties().getProperty("url.mom", "tcp://localhost:61616"));
+        System.setProperty("mom.queue", getProperties().getProperty("mom.queue", "tax.document.queue"));
 
-        System.setProperty("storage.localfile", getProperties().getProperty("storage.localfile"));
-        System.setProperty("storage.foldertemp", getProperties().getProperty("storage.foldertemp"));
+        System.setProperty("storage.localfile", getProperties().getProperty("storage.localfile", "/root/storage-files/perm"));
+        System.setProperty("storage.foldertemp", getProperties().getProperty("storage.foldertemp", "/root/storage-files/temp"));
 
         System.setProperty("url.host", getProperties().getProperty("url.host"));
+
+        System.setProperty("public.token.integration", getProperties().getProperty("public.token.integration", "3cb73f59eb02-479b-b859-797e29eb8256-90703973edf5aa2d"));
+
     }
 
     @Bean
@@ -152,34 +151,20 @@ public class Application {
 
     @Bean
     public ActiveMQConnectionFactory connectionFactory() {
-        LOGGER.info("connectionFactory url.mom-> " + System.getProperty("url.mom"));
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
         connectionFactory.setBrokerURL(System.getProperty("url.mom"));
 
-//        connectionFactory.setTrustedPackages(Arrays.asList("com.websystique.spring","java.util"));
         return connectionFactory;
     }
 
     @Bean
     public JmsTemplate jmsTemplate(){
-        LOGGER.info("jmsTemplate mom.queue -> " + System.getProperty("mom.queue"));
         JmsTemplate template = new JmsTemplate();
         template.setConnectionFactory(connectionFactory());
         template.setDefaultDestinationName(System.getProperty("mom.queue"));
-//        template.setSessionAcknowledgeMode(Session.SESSION_TRANSACTED);
-//        template.setSessionTransacted(true);
+
         return template;
     }
-
-//    @Bean
-//    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
-//        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-//        factory.setConnectionFactory(connectionFactory());
-//        factory.setConcurrency("1-1");
-//
-//        return factory;
-//    }
-
 }
 enum Database {
     POSTGRES, MYSQL, ORACLE, H2;

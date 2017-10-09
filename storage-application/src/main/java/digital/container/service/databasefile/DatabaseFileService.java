@@ -1,18 +1,18 @@
 package digital.container.service.databasefile;
 
 import digital.container.exception.FileNotFoundException;
-import digital.container.exception.KeyWasNotRegisteredInStorageYetException;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.*;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
+import digital.container.storage.domain.model.file.database.DatabaseFilePart;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.repository.DatabaseFileRepository;
+import digital.container.repository.file.DatabaseFileRepository;
 import digital.container.util.GenerateHash;
 import digital.container.util.TokenUtil;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
-import io.gumga.presentation.exceptionhandler.GumgaRunTimeException;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,10 +47,6 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
         DatabaseFile databaseFile = new DatabaseFile();
         databaseFile.setName(multipartFile.getOriginalFilename());
 
-//        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-//            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
-//        }
-
         databaseFile.setFileType(FileType.ANYTHING);
         databaseFile.setFileStatus(FileStatus.DO_NOT_SYNC);
         databaseFile.setFilePublic(shared);
@@ -71,10 +67,6 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
     @Transactional
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, boolean shared) {
         this.limitFileService.limitMaximumExceeded(multipartFiles);
-
-//        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-//            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
-//        }
 
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {

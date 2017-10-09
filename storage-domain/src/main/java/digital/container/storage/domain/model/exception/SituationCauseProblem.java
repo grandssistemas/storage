@@ -1,4 +1,4 @@
-package digital.container.storage.domain.model.file;
+package digital.container.storage.domain.model.exception;
 
 
 public enum SituationCauseProblem {

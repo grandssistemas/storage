@@ -1,10 +1,10 @@
 package digital.container.service.localfile;
 
-import digital.container.repository.LocalFileRepository;
+import digital.container.repository.file.LocalFileRepository;
 import digital.container.service.message.SendMessageMOMService;
 import digital.container.service.taxdocument.CommonTaxDocumentEventCanceledService;
 import digital.container.service.token.SecurityTokenService;
-import digital.container.storage.domain.model.file.*;
+import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.*;
 import io.gumga.application.GumgaService;

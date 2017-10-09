@@ -1,6 +1,7 @@
 package digital.container.util;
 
 
+import digital.container.service.storage.MessageStorage;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
 import digital.container.storage.domain.model.file.AbstractFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
@@ -39,7 +40,7 @@ public class ValidateNfXML {
             AbstractFile fileFromDB = this.searchTaxDocumentService.getFileByGumgaOIAndChNFeAndNF(new GumgaOi(GumgaThreadScope.organizationCode.get() + "%"), chNFe);
 
             if(fileFromDB != null) {
-                errors.add("Ja existe um documento fiscal com essa chave de acesso.");
+                errors.add(MessageStorage.TAX_DOCUMENT_WITH_THIS_ACCESS_KEY_ALREADY_EXISTS);
                 return new FileProcessed(file, errors);
             }
 
@@ -47,12 +48,12 @@ public class ValidateNfXML {
             tpNF = tpNF.equals("1") ? "SAIDA" : "ENTRADA";
             String emitCNPJ = SearchXMLUtil.getEmitCNPJ(xml);
             if(!emitCNPJ.equals(containerKey) && tpNF.equals("SAIDA")) {
-                errors.add("O CNPJ do XML é diferente da chave do container informada.");
+                errors.add(MessageStorage.CNPJ_OF_XML_IS_DIFFERENT_CONTAINER_KEY);
             }
             taxDocumentModel.model = SearchXMLUtil.getIdeMod(xml);
 
             if(!taxDocumentModel.isValid()) {
-                errors.add("Não suportamos o modelo informado no seu xml.");
+                errors.add(MessageStorage.WE_DONT_SUPPORT_TEMPLATE_REPORTED_IN_YOUR_XML);
             }
 
             String dhEmi = SearchXMLUtil.getIdeDhEmi(xml);

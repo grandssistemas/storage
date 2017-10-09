@@ -1,6 +1,9 @@
 package digital.container.service.taxdocument;
 
+import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.*;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
+import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.*;
 import io.gumga.core.GumgaThreadScope;
@@ -51,7 +54,7 @@ public class CommonTaxDocumentEventCanceledService {
                 file.setFileType(FileType.NFCE_CANCELED);
                 break;
             default:
-                errors.add("Tipo de documento invalido.");
+                errors.add(MessageStorage.WE_DONT_SUPPORT_TEMPLATE_REPORTED_IN_YOUR_XML);
                 return new FileProcessed(file, errors);
         }
 
@@ -101,18 +104,18 @@ public class CommonTaxDocumentEventCanceledService {
         List<String> errors = new ArrayList<>();
 
         if(!isCancellationEvent(xml)) {
-            errors.add("Não é um evento de cancelamento.");
+            errors.add(MessageStorage.FILE_ISNT_CANCELLATION_EVENT_TAX_DOCUMENT);
             return new FileProcessed(file, errors);
         }
 
         if(existsCancellationEventToChNFe(xml)) {
-            errors.add("Já existe um evento de cancelamento com essa chave de acesso.");
+            errors.add(MessageStorage.CANCEL_EVENT_ALREADY_EXISTIS_THIS_ACCESS_KEY);
             return new FileProcessed(file, errors);
         }
 
         AbstractFile taxDocument = getTaxDocument(xml);
         if(taxDocument == null) {
-            errors.add("Não existe documento fiscal com essa chave de acesso.");
+            errors.add(MessageStorage.THERE_ISNT_TAX_DOCUMENT_THIS_ACCESS_KEY);
             return new FileProcessed(file, errors);
         }
 

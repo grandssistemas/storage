@@ -1,6 +1,6 @@
 package digital.container.service.download;
 
-import digital.container.repository.LinkDownloadRepository;
+import digital.container.repository.download.LinkDownloadRepository;
 import digital.container.storage.domain.model.download.LinkDownload;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;

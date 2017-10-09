@@ -4,7 +4,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.service.databasefile.DatabaseFileTaxDocumentService;
 import digital.container.storage.domain.model.file.vo.FileProcessed;

@@ -1,4 +1,4 @@
-package digital.container.repository;
+package digital.container.repository.container;
 
 import digital.container.storage.domain.model.container.PermissionContainer;
 import io.gumga.domain.domains.GumgaOi;

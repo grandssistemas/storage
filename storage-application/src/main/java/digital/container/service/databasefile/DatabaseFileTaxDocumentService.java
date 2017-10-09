@@ -2,13 +2,13 @@ package digital.container.service.databasefile;
 
 import digital.container.exception.FileNotFoundException;
 import digital.container.service.message.SendMessageMOMService;
-import digital.container.repository.DatabaseFileRepository;
+import digital.container.repository.file.DatabaseFileRepository;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
 import digital.container.service.taxdocument.CommonTaxDocumentService;
 import digital.container.service.token.SecurityTokenService;
-import digital.container.storage.domain.model.file.DatabaseFile;
-import digital.container.storage.domain.model.file.DatabaseFilePart;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
+import digital.container.storage.domain.model.file.database.DatabaseFilePart;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.TokenResultProxy;
 import digital.container.util.TokenUtil;

@@ -1,12 +1,12 @@
 package digital.container.service.status;
 
-import digital.container.repository.DatabaseFileRepository;
-import digital.container.repository.LocalFileRepository;
+import digital.container.repository.file.DatabaseFileRepository;
+import digital.container.repository.file.LocalFileRepository;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
 import digital.container.storage.domain.model.file.AbstractFile;
-import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.FileStatus;
-import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.storage.domain.model.file.local.LocalFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

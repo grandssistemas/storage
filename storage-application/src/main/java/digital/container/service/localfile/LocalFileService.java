@@ -1,22 +1,20 @@
 package digital.container.service.localfile;
 
-import digital.container.exception.*;
 import digital.container.exception.FileNotFoundException;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.FileType;
-import digital.container.storage.domain.model.file.LocalFile;
+import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.repository.LocalFileRepository;
+import digital.container.repository.file.LocalFileRepository;
 import digital.container.util.GenerateHash;
 import digital.container.util.LocalFileUtil;
 import digital.container.util.SaveLocalFile;
 import digital.container.util.TokenUtil;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
-import io.gumga.presentation.exceptionhandler.GumgaRunTimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,27 +30,24 @@ import java.util.*;
 public class LocalFileService extends GumgaService<LocalFile, Long> {
     private static final Logger LOG = LoggerFactory.getLogger(LocalFileService.class);
 
-    @Autowired
-    private LocalFileRepository localFileRepository;
-    @Autowired
-    private PermissionContainerService permissionContainerService;
+    private final LocalFileRepository localFileRepository;
+    private final PermissionContainerService permissionContainerService;
+    private final LimitFileService limitFileService;
 
     @Autowired
-    private LimitFileService limitFileService;
-
-    @Autowired
-    public LocalFileService(GumgaCrudRepository<LocalFile, Long> repository) {
+    public LocalFileService(GumgaCrudRepository<LocalFile, Long> repository,
+                            PermissionContainerService permissionContainerService,
+                            LimitFileService limitFileService) {
         super(repository);
+        this.localFileRepository = LocalFileRepository.class.cast(repository);
+        this.permissionContainerService = permissionContainerService;
+        this.limitFileService = limitFileService;
     }
 
     @Transactional
     public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared) {
         LocalFile localFile = new LocalFile();
         localFile.setName(multipartFile.getOriginalFilename());
-
-//        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-//            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
-//        }
 
         localFile.setFileStatus(FileStatus.DO_NOT_SYNC);
         localFile.setFileType(FileType.ANYTHING);
@@ -82,10 +77,6 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
     @Transactional
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, boolean shared) {
         this.limitFileService.limitMaximumExceeded(multipartFiles);
-
-//        if(!this.permissionContainerService.containerKeyValid(containerKey)) {
-//            throw new KeyWasNotRegisteredInStorageYetException(HttpStatus.FORBIDDEN);
-//        }
 
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
@@ -130,8 +121,8 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
         return Boolean.FALSE;
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void delete(LocalFile resource) {
         super.delete(resource);
         new File(LocalFileUtil.DIRECTORY_PATH + "/" + resource.getRelativePath()).delete();

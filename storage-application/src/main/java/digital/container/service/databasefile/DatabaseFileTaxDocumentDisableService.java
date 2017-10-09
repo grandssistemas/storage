@@ -1,10 +1,10 @@
 package digital.container.service.databasefile;
 
-import digital.container.repository.DatabaseFileRepository;
+import digital.container.repository.file.DatabaseFileRepository;
 import digital.container.service.message.SendMessageMOMService;
 import digital.container.service.taxdocument.CommonTaxDocumentEventDisableService;
 import digital.container.service.token.SecurityTokenService;
-import digital.container.storage.domain.model.file.DatabaseFile;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.util.TokenResultProxy;
 import io.gumga.application.GumgaService;
