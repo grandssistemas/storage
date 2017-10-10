@@ -1,11 +1,9 @@
 package digital.container.service.security_proxy;
 
-import digital.container.util.TokenUtil;
+import digital.container.storage.domain.model.util.TokenUtil;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.presentation.api.GumgaJsonRestTemplate;
 import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.OkHttpClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 

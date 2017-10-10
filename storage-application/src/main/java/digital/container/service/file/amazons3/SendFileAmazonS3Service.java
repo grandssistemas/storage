@@ -3,8 +3,8 @@ package digital.container.service.file.amazons3;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
 import digital.container.storage.domain.model.file.AbstractFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,11 @@ public class SendFileAmazonS3Service {
             File file = new File(multipartFile.getOriginalFilename());
             multipartFile.transferTo(file);
             try {
-                amazonS3.putObject(new PutObjectRequest(bucketName, abstractFile.getRelativePath(), file));
+                PutObjectRequest objectRequest = new PutObjectRequest(bucketName, abstractFile.getRelativePath(), file);
+                if(shared) {
+                    objectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
+                }
+                amazonS3.putObject(objectRequest);
             } catch (AmazonServiceException ase) {
                 System.out.println("Caught an AmazonServiceException, which " +
                         "means your request made it " +

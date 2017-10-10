@@ -6,7 +6,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import digital.container.service.file.localfile.LocalFileTaxDocumentCanceledService;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.util.TokenUtil;
+import digital.container.storage.domain.model.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

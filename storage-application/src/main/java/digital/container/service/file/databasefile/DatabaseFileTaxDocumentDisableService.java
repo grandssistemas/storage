@@ -6,7 +6,7 @@ import digital.container.service.taxdocument.CommonTaxDocumentEventDisableServic
 import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.util.TokenResultProxy;
+import digital.container.storage.domain.model.util.TokenResultProxy;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;

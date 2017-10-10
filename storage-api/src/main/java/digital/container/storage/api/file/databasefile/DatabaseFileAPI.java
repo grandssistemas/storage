@@ -3,6 +3,7 @@ package digital.container.storage.api.file.databasefile;
 import com.wordnik.swagger.annotations.*;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.storage.domain.model.util.TokenUtil;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.service.file.databasefile.DatabaseFileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,10 @@ public class DatabaseFileAPI {
     })
     public ResponseEntity<FileProcessed> upload(@ApiParam(name = "containerKey", value = "A chave cadastrada no storage no endpoint: /api/permission-container", required = true) @PathVariable String containerKey,
                                                 @ApiParam(name = "shared", value = "Para enviar o arquivo como publico setar esse parametro como true", defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
-                                                @ApiParam(name = "file", value = "O arquivo que será salvo no storage", required = true) @RequestPart(name = "file") MultipartFile multipartFile) {
-        FileProcessed fileProcessed = this.databaseFileService.upload(containerKey, multipartFile, shared);
+                                                @ApiParam(name = "file", value = "O arquivo que será salvo no storage", required = true) @RequestPart(name = "file") MultipartFile multipartFile,
+                                                @ApiParam(name = "tokenSoftwareHouse", required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
+                                                @ApiParam(name = "tokenAccountant", required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
+        FileProcessed fileProcessed = this.databaseFileService.upload(containerKey, multipartFile, shared, tokenSoftwareHouse, tokenAccountant);
         if(fileProcessed.getErrors().size() > 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(fileProcessed);
         }
@@ -60,8 +63,10 @@ public class DatabaseFileAPI {
     })
     public ResponseEntity<List<FileProcessed>> upload(@ApiParam(name = "containerKey", value = "A chave cadastrada no storage no endpoint: /api/permission-container", required = true) @PathVariable String containerKey,
                                                       @ApiParam(name = "shared", value = "Para enviar o arquivo como publico setar esse parametro como true", defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
-                                                      @ApiParam(name = "files", value = "Os arquivo que serão salvos no storage", required = true) @RequestPart(name = "files") List<MultipartFile> multipartFiles) {
-        List<FileProcessed> filesProcessed = this.databaseFileService.upload(containerKey, multipartFiles, shared);
+                                                      @ApiParam(name = "files", value = "Os arquivo que serão salvos no storage", required = true) @RequestPart(name = "files") List<MultipartFile> multipartFiles,
+                                                      @ApiParam(name = "tokenSoftwareHouse", required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
+                                                      @ApiParam(name = "tokenAccountant", required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
+        List<FileProcessed> filesProcessed = this.databaseFileService.upload(containerKey, multipartFiles, shared, tokenSoftwareHouse, tokenAccountant);
         return ResponseEntity.status(HttpStatus.CREATED).body(filesProcessed);
     }
 

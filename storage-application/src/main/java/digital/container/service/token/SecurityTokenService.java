@@ -1,12 +1,10 @@
 package digital.container.service.token;
 
 import digital.container.service.security_proxy.SecurityProxyClient;
-import digital.container.util.TokenResultProxy;
-import digital.container.util.TokenUtil;
+import digital.container.storage.domain.model.util.TokenResultProxy;
+import digital.container.storage.domain.model.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 public class SecurityTokenService {

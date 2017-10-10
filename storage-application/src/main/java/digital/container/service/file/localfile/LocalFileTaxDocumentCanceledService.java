@@ -7,6 +7,7 @@ import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.storage.domain.model.util.LocalFileUtil;
+import digital.container.storage.domain.model.util.TokenResultProxy;
 import digital.container.util.*;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;

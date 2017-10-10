@@ -22,7 +22,7 @@ public class GenerateHash {
 
     private static String generateHash() {
 
-        return Instant.now().getEpochSecond()+ UUID.randomUUID().toString().replaceAll("-", "");
+        return Instant.now().toEpochMilli() + UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
     }
 
 }

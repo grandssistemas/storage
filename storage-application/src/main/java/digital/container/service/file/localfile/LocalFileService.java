@@ -3,12 +3,14 @@ package digital.container.service.file.localfile;
 import digital.container.exception.FileNotFoundException;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
+import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.repository.file.LocalFileRepository;
 import digital.container.storage.domain.model.util.LocalFileUtil;
+import digital.container.storage.domain.model.util.TokenResultProxy;
 import digital.container.util.SaveLocalFile;
-import digital.container.util.TokenUtil;
+import digital.container.storage.domain.model.util.TokenUtil;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.slf4j.Logger;
@@ -28,24 +30,45 @@ public class LocalFileService extends GumgaService<LocalFile, String> {
 
     private final LocalFileRepository localFileRepository;
     private final LimitFileService limitFileService;
+    private final SecurityTokenService securityTokenService;
 
     @Autowired
     public LocalFileService(GumgaCrudRepository<LocalFile, String> repository,
-                            LimitFileService limitFileService) {
+                            LimitFileService limitFileService,
+                            SecurityTokenService securityTokenService) {
         super(repository);
         this.localFileRepository = LocalFileRepository.class.cast(repository);
         this.limitFileService = limitFileService;
+        this.securityTokenService = securityTokenService;
     }
 
     @Transactional
-    public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared) {
+    public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared, String tokenSoftwareHouse, String tokenAccountant) {
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
+        return this.save(containerKey,multipartFile, shared, tokenResultProxy);
+    }
+
+    @Transactional
+    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, boolean shared, String tokenSoftwareHouse, String tokenAccountant) {
+        this.limitFileService.limitMaximumExceeded(multipartFiles);
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
+
+        List<FileProcessed> result = new ArrayList<>();
+        for(MultipartFile multipartFile : multipartFiles) {
+            result.add(this.save(containerKey,multipartFile, shared, tokenResultProxy));
+        }
+        return result;
+    }
+
+    private FileProcessed save(String containerKey, MultipartFile multipartFile, boolean shared, TokenResultProxy tokenResultProxy) {
         LocalFile localFile = (LocalFile) new LocalFile()
                 .buildAnything(
-                multipartFile.getOriginalFilename(),
-                multipartFile.getContentType(),
-                multipartFile.getSize(),
-                shared,
-                containerKey);
+                        multipartFile.getOriginalFilename(),
+                        multipartFile.getContentType(),
+                        multipartFile.getSize(),
+                        shared,
+                        containerKey,
+                        tokenResultProxy);
 
         File folder = new File(LocalFileUtil.DIRECTORY_PATH + '/' + LocalFileUtil.getRelativePathFileANYTHING(containerKey));
         folder.mkdirs();
@@ -57,17 +80,6 @@ public class LocalFileService extends GumgaService<LocalFile, String> {
         }
 
         return new FileProcessed(this.localFileRepository.saveAndFlush(localFile), Collections.emptyList());
-    }
-
-    @Transactional
-    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, boolean shared) {
-        this.limitFileService.limitMaximumExceeded(multipartFiles);
-
-        List<FileProcessed> result = new ArrayList<>();
-        for(MultipartFile multipartFile : multipartFiles) {
-            result.add(this.upload(containerKey,multipartFile, shared));
-        }
-        return result;
     }
 
     @Transactional(readOnly = true)

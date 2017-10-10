@@ -8,7 +8,7 @@ import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.storage.domain.model.util.LocalFileUtil;
 import digital.container.util.SaveLocalFile;
-import digital.container.util.TokenResultProxy;
+import digital.container.storage.domain.model.util.TokenResultProxy;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.slf4j.Logger;

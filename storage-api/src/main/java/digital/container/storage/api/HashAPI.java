@@ -13,7 +13,7 @@ import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.util.IntegrationTokenUtil;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
-import digital.container.util.TokenUtil;
+import digital.container.storage.domain.model.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;

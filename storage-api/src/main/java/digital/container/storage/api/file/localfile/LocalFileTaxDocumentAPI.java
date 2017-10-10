@@ -8,7 +8,7 @@ import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.service.file.localfile.LocalFileTaxDocumentService;
-import digital.container.util.TokenUtil;
+import digital.container.storage.domain.model.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

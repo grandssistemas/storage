@@ -1,6 +1,8 @@
 package digital.container.storage.domain.model.file;
 
 import digital.container.storage.domain.model.util.LocalFileUtil;
+import digital.container.storage.domain.model.util.TokenResultProxy;
+import digital.container.storage.domain.model.util.TokenUtil;
 import io.gumga.domain.GumgaSharedModelUUID;
 
 import javax.persistence.*;
@@ -177,7 +179,7 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
         this.relativePath = relativePath;
     }
 
-    public AbstractFile buildAnything(String fileName, String contentType, Long size, Boolean shared, String containerKey) {
+    public AbstractFile buildAnything(String fileName, String contentType, Long size, Boolean shared, String containerKey, TokenResultProxy tokenResultProxy) {
         setName(fileName);
         setFileStatus(FileStatus.DO_NOT_SYNC);
         setFileType(FileType.ANYTHING);
@@ -190,6 +192,14 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
         setHash(getHashFile());
         setRelativePath(LocalFileUtil.getRelativePathFileANYTHING(containerKey) + '/' + getName());
         setContainerKey(containerKey);
+
+        if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
+            addOrganization(tokenResultProxy.accountantOi);
+        }
+
+        if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
+            addOrganization(tokenResultProxy.softwareHouseOi);
+        }
 
         return this;
     }

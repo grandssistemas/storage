@@ -4,13 +4,13 @@ import digital.container.exception.FileNotFoundException;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
-import digital.container.storage.domain.model.file.*;
+import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.database.DatabaseFilePart;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.repository.file.DatabaseFileRepository;
-import digital.container.storage.domain.model.util.GenerateHash;
-import digital.container.util.TokenUtil;
+import digital.container.storage.domain.model.util.TokenResultProxy;
+import digital.container.storage.domain.model.util.TokenUtil;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.hibernate.Hibernate;
@@ -23,51 +23,62 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 
 @Service
+@Transactional
 public class DatabaseFileService extends GumgaService<DatabaseFile, String> {
 
-    @Autowired
-    private DatabaseFileRepository databaseFileRepository;
+    private final DatabaseFileRepository databaseFileRepository;
+    private final DatabaseFilePartService databaseFilePartService;
+    private final LimitFileService limitFileService;
+    private final SecurityTokenService securityTokenService;
+
 
     @Autowired
-    private DatabaseFilePartService databaseFilePartService;
-
-    @Autowired
-    private PermissionContainerService permissionContainerService;
-
-    @Autowired
-    private LimitFileService limitFileService;
-
-    @Autowired
-    public DatabaseFileService(GumgaCrudRepository<DatabaseFile, String> repository) {
+    public DatabaseFileService(GumgaCrudRepository<DatabaseFile, String> repository,
+                               DatabaseFilePartService databaseFilePartService,
+                               LimitFileService limitFileService,
+                               SecurityTokenService securityTokenService) {
         super(repository);
+        this.databaseFileRepository = DatabaseFileRepository.class.cast(repository);
+        this.databaseFilePartService = databaseFilePartService;
+        this.limitFileService = limitFileService;
+        this.securityTokenService = securityTokenService;
     }
 
     @Transactional
-    public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared) {
+    public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared, String tokenSoftwareHouse, String tokenAccountant) {
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
+        return this.save(containerKey, multipartFile, shared, tokenResultProxy);
+    }
+
+    @Transactional
+    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, boolean shared, String tokenSoftwareHouse, String tokenAccountant) {
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
+
+        this.limitFileService.limitMaximumExceeded(multipartFiles);
+
+        List<FileProcessed> result = new ArrayList<>();
+        for(MultipartFile multipartFile : multipartFiles) {
+            result.add(this.save(containerKey, multipartFile, shared, tokenResultProxy));
+        }
+
+        return result;
+    }
+
+    @Transactional
+    private FileProcessed save(String containerKey, MultipartFile multipartFile, Boolean shared, TokenResultProxy tokenResultProxy){
         DatabaseFile databaseFile = (DatabaseFile) new DatabaseFile()
                 .buildAnything(
-                multipartFile.getOriginalFilename(),
-                multipartFile.getContentType(),
-                multipartFile.getSize(),
-                shared,
-                containerKey);
+                        multipartFile.getOriginalFilename(),
+                        multipartFile.getContentType(),
+                        multipartFile.getSize(),
+                        shared,
+                        containerKey,
+                        tokenResultProxy);
 
         DatabaseFile newDatabaseFile = this.databaseFileRepository.saveAndFlush(databaseFile);
 
         this.databaseFilePartService.saveFile(newDatabaseFile, multipartFile);
         return new FileProcessed(this.databaseFileRepository.saveAndFlush(newDatabaseFile), Collections.emptyList());
-    }
-
-    @Transactional
-    public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, boolean shared) {
-        this.limitFileService.limitMaximumExceeded(multipartFiles);
-
-        List<FileProcessed> result = new ArrayList<>();
-        for(MultipartFile multipartFile : multipartFiles) {
-            result.add(this.upload(containerKey, multipartFile, shared));
-        }
-
-        return result;
     }
 
 
