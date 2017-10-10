@@ -14,14 +14,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @Service
-public class DatabaseFilePartService extends GumgaService<DatabaseFilePart, Long> {
+public class DatabaseFilePartService extends GumgaService<DatabaseFilePart, String> {
+
+    private final DatabaseFilePartRepository databaseFilePartRepository;
 
     @Autowired
-    private DatabaseFilePartRepository databaseFilePartRepository;
-
-    @Autowired
-    public DatabaseFilePartService(GumgaCrudRepository<DatabaseFilePart, Long> repository) {
+    public DatabaseFilePartService(GumgaCrudRepository<DatabaseFilePart, String> repository) {
         super(repository);
+        this.databaseFilePartRepository = DatabaseFilePartRepository.class.cast(repository);
     }
 
     @Transactional

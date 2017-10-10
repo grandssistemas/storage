@@ -26,7 +26,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class LocalFileTaxDocumentLetterCorrectionService extends GumgaService<LocalFile, Long> {
+public class LocalFileTaxDocumentLetterCorrectionService extends GumgaService<LocalFile, String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileTaxDocumentLetterCorrectionService.class);
     private LocalFileRepository localFileRepository;
@@ -41,7 +41,7 @@ public class LocalFileTaxDocumentLetterCorrectionService extends GumgaService<Lo
     private SecurityTokenService securityTokenService;
 
     @Autowired
-    public LocalFileTaxDocumentLetterCorrectionService(GumgaCrudRepository<LocalFile, Long> repository) {
+    public LocalFileTaxDocumentLetterCorrectionService(GumgaCrudRepository<LocalFile, String> repository) {
         super(repository);
         this.localFileRepository = LocalFileRepository.class.cast(repository);
     }

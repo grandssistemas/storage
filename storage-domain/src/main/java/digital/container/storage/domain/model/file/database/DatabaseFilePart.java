@@ -1,6 +1,7 @@
 package digital.container.storage.domain.model.file.database;
 
 import io.gumga.domain.GumgaMultitenancy;
+import io.gumga.domain.GumgaSharedModelUUID;
 import io.gumga.domain.shared.GumgaSharedModel;
 
 import javax.persistence.*;
@@ -8,8 +9,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "database_file_part")
 @GumgaMultitenancy
-@SequenceGenerator(name = GumgaSharedModel.SEQ_NAME, sequenceName = "seq_database_file_part")
-public class DatabaseFilePart extends GumgaSharedModel<Long> {
+public class DatabaseFilePart extends GumgaSharedModelUUID {
 
     public final static int PART_SIZE = 4096;
 

@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 
 @Service
-public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
+public class DatabaseFileService extends GumgaService<DatabaseFile, String> {
 
     @Autowired
     private DatabaseFileRepository databaseFileRepository;
@@ -38,7 +38,7 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
     private LimitFileService limitFileService;
 
     @Autowired
-    public DatabaseFileService(GumgaCrudRepository<DatabaseFile, Long> repository) {
+    public DatabaseFileService(GumgaCrudRepository<DatabaseFile, String> repository) {
         super(repository);
     }
 
@@ -114,7 +114,7 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
     }
 
     @Transactional
-    public Boolean deleteFileById(Long id) {
+    public Boolean deleteFileById(String id) {
         DatabaseFile view = view(id);
         delete(view);
         return Boolean.FALSE;

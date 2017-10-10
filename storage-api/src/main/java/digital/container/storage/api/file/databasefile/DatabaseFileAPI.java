@@ -111,7 +111,7 @@ public class DatabaseFileAPI {
             @ApiResponse(code = 204, message = ""),
             @ApiResponse(code = 404, message = "")
     })
-    public ResponseEntity<Void> delete(@ApiParam(name = "hash", required = true) @PathVariable String hash) {
+    public ResponseEntity<Void> deleteByHash(@ApiParam(name = "hash", required = true) @PathVariable String hash) {
         if(this.databaseFileService.deleteFileByHash(hash)) {
             return ResponseEntity.noContent().build();
         }
@@ -128,7 +128,7 @@ public class DatabaseFileAPI {
             @ApiResponse(code = 204, message = ""),
             @ApiResponse(code = 404, message = "")
     })
-    public ResponseEntity<Void> delete(@ApiParam(name = "id", required = true) @PathVariable Long id) {
+    public ResponseEntity<Void> delete(@ApiParam(name = "id", required = true) @PathVariable String id) {
         if(this.databaseFileService.deleteFileById(id)) {
             return ResponseEntity.noContent().build();
         }

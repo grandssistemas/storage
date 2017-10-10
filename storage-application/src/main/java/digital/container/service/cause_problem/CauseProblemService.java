@@ -11,10 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class CauseProblemService extends GumgaService<CauseProblem, Long> {
+public class CauseProblemService extends GumgaService<CauseProblem, String> {
 
     @Autowired
-    public CauseProblemService(GumgaCrudRepository<CauseProblem, Long> repository) {
+    public CauseProblemService(GumgaCrudRepository<CauseProblem, String> repository) {
         super(repository);
     }
 

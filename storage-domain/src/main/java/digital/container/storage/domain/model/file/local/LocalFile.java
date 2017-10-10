@@ -15,7 +15,6 @@ import javax.persistence.*;
             @Index(name = "local_file_index_oi_detailone_filetype", columnList = "oi, detail_one, file_type")
         })
 @GumgaMultitenancy
-@SequenceGenerator(name = GumgaSharedModel.SEQ_NAME, sequenceName = "seq_local_file")
 public class LocalFile extends AbstractFile {
     public static final int BUFFER_SIZE = 4096;
 

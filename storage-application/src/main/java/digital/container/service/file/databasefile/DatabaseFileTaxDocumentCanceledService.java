@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class DatabaseFileTaxDocumentCanceledService extends GumgaService<DatabaseFile, Long> {
+public class DatabaseFileTaxDocumentCanceledService extends GumgaService<DatabaseFile, String> {
 
     @Autowired
     private CommonTaxDocumentEventCanceledService commonTaxCocumentEventService;
@@ -36,7 +36,7 @@ public class DatabaseFileTaxDocumentCanceledService extends GumgaService<Databas
     private SecurityTokenService securityTokenService;
 
     @Autowired
-    public DatabaseFileTaxDocumentCanceledService(GumgaCrudRepository<DatabaseFile, Long> repository) {
+    public DatabaseFileTaxDocumentCanceledService(GumgaCrudRepository<DatabaseFile, String> repository) {
         super(repository);
         this.databaseFileRepository = DatabaseFileRepository.class.cast(repository);
     }

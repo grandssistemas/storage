@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class DatabaseFileTaxDocumentLetterCorrectionService extends GumgaService<DatabaseFile, Long> {
+public class DatabaseFileTaxDocumentLetterCorrectionService extends GumgaService<DatabaseFile, String> {
 
     private DatabaseFileRepository databaseFileRepository;
 
@@ -37,7 +37,7 @@ public class DatabaseFileTaxDocumentLetterCorrectionService extends GumgaService
     private SecurityTokenService securityTokenService;
 
     @Autowired
-    public DatabaseFileTaxDocumentLetterCorrectionService(GumgaCrudRepository<DatabaseFile, Long> repository) {
+    public DatabaseFileTaxDocumentLetterCorrectionService(GumgaCrudRepository<DatabaseFile, String> repository) {
         super(repository);
         this.databaseFileRepository = DatabaseFileRepository.class.cast(repository);
     }

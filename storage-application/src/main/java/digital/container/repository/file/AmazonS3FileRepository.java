@@ -5,5 +5,5 @@ import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AmazonS3FileRepository extends GumgaCrudRepository<AmazonS3File, Long> {
+public interface AmazonS3FileRepository extends GumgaCrudRepository<AmazonS3File, String> {
 }

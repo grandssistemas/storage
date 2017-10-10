@@ -26,7 +26,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class LocalFileTaxDocumentDisableService extends GumgaService<LocalFile, Long> {
+public class LocalFileTaxDocumentDisableService extends GumgaService<LocalFile, String> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalFileTaxDocumentDisableService.class);
     private LocalFileRepository localFileRepository;
@@ -40,7 +40,7 @@ public class LocalFileTaxDocumentDisableService extends GumgaService<LocalFile, 
     private SecurityTokenService securityTokenService;
 
     @Autowired
-    public LocalFileTaxDocumentDisableService(GumgaCrudRepository<LocalFile, Long> repository) {
+    public LocalFileTaxDocumentDisableService(GumgaCrudRepository<LocalFile, String> repository) {
         super(repository);
         this.localFileRepository = LocalFileRepository.class.cast(repository);
     }

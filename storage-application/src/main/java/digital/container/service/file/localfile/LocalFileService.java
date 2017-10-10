@@ -23,14 +23,14 @@ import java.io.*;
 import java.util.*;
 
 @Service
-public class LocalFileService extends GumgaService<LocalFile, Long> {
+public class LocalFileService extends GumgaService<LocalFile, String> {
     private static final Logger LOG = LoggerFactory.getLogger(LocalFileService.class);
 
     private final LocalFileRepository localFileRepository;
     private final LimitFileService limitFileService;
 
     @Autowired
-    public LocalFileService(GumgaCrudRepository<LocalFile, Long> repository,
+    public LocalFileService(GumgaCrudRepository<LocalFile, String> repository,
                             LimitFileService limitFileService) {
         super(repository);
         this.localFileRepository = LocalFileRepository.class.cast(repository);
@@ -100,7 +100,7 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
     }
 
     @Transactional
-    public Boolean deleteFileById(Long id) {
+    public Boolean deleteFileById(String id) {
         LocalFile view = view(id);
         delete(view);
         return Boolean.FALSE;

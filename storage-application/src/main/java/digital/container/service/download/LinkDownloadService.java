@@ -10,12 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class LinkDownloadService extends GumgaService<LinkDownload, Long> {
+public class LinkDownloadService extends GumgaService<LinkDownload, String> {
 
     private LinkDownloadRepository linkDownloadRepository;
 
     @Autowired
-    public LinkDownloadService(GumgaCrudRepository<LinkDownload, Long> repository) {
+    public LinkDownloadService(GumgaCrudRepository<LinkDownload, String> repository) {
         super(repository);
         this.linkDownloadRepository = LinkDownloadRepository.class.cast(repository);
     }

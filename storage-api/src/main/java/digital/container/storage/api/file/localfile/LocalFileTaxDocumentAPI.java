@@ -103,7 +103,7 @@ public class LocalFileTaxDocumentAPI {
             method = RequestMethod.DELETE
     )
     @ApiOperation(value = "local-file-remove-hash", notes = "Remover o arquivo salvo no storage pelo hash.")
-    public ResponseEntity<Void> delete(@ApiParam(name = "hash", required = true) @PathVariable String hash) {
+    public ResponseEntity<Void> deleteByHash(@ApiParam(name = "hash", required = true) @PathVariable String hash) {
         if(this.localFileService.deleteFileByHash(hash)) {
             return ResponseEntity.noContent().build();
         }
@@ -116,7 +116,7 @@ public class LocalFileTaxDocumentAPI {
             method = RequestMethod.DELETE
     )
     @ApiOperation(value = "local-file-remove-hash", notes = "Remover o arquivo salvo no storage pelo id.")
-    public ResponseEntity<Void> delete(@ApiParam(name = "id", required = true) @PathVariable Long id) {
+    public ResponseEntity<Void> delete(@ApiParam(name = "id", required = true) @PathVariable String id) {
         if(this.localFileService.deleteFileById(id)) {
             return ResponseEntity.noContent().build();
         }

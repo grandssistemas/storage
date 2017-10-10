@@ -5,5 +5,5 @@ import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FileRepository extends GumgaCrudRepository<AbstractFile, Long> {
+public interface FileRepository extends GumgaCrudRepository<AbstractFile, String> {
 }

@@ -25,7 +25,7 @@ import java.io.*;
 import java.util.*;
 
 @Service
-public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
+public class LocalFileTaxDocumentService extends GumgaService<LocalFile, String> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalFileTaxDocumentService.class);
 
@@ -44,7 +44,7 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
     private SecurityTokenService securityTokenService;
 
     @Autowired
-    public LocalFileTaxDocumentService(GumgaCrudRepository<LocalFile, Long> repository) {
+    public LocalFileTaxDocumentService(GumgaCrudRepository<LocalFile, String> repository) {
         super(repository);
     }
 
@@ -150,7 +150,7 @@ public class LocalFileTaxDocumentService extends GumgaService<LocalFile, Long> {
     }
 
     @Transactional
-    public Boolean deleteFileById(Long id) {
+    public Boolean deleteFileById(String id) {
         LocalFile view = view(id);
         delete(view);
         return Boolean.FALSE;

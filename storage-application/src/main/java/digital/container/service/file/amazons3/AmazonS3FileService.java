@@ -13,12 +13,12 @@ import java.util.Collections;
 
 @Service
 @Transactional
-public class AmazonS3FileService extends GumgaService<AmazonS3File, Long> {
+public class AmazonS3FileService extends GumgaService<AmazonS3File, String> {
 
     private final SendFileAmazonS3Service sendFileAmazonS3Service;
 
     @Autowired
-    public AmazonS3FileService(GumgaCrudRepository<AmazonS3File, Long> repository,
+    public AmazonS3FileService(GumgaCrudRepository<AmazonS3File, String> repository,
                                SendFileAmazonS3Service sendFileAmazonS3Service) {
         super(repository);
         this.sendFileAmazonS3Service = sendFileAmazonS3Service;
@@ -38,7 +38,7 @@ public class AmazonS3FileService extends GumgaService<AmazonS3File, Long> {
                 shared,
                 containerKey);
 
-        this.sendFileAmazonS3Service.send();
+//        this.sendFileAmazonS3Service.send();
 
         return new FileProcessed(this.repository.saveAndFlush(file), Collections.emptyList());
     }

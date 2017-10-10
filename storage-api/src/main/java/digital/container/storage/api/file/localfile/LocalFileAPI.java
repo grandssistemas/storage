@@ -116,7 +116,7 @@ public class LocalFileAPI {
             @ApiResponse(code = 204, message = ""),
             @ApiResponse(code = 404, message = "")
     })
-    public ResponseEntity<Void> delete(@ApiParam(name = "id", required = true) @PathVariable String hash) {
+    public ResponseEntity<Void> deleteByHash(@ApiParam(name = "id", required = true) @PathVariable String hash) {
         if(this.localFileService.deleteFileByHash(hash)) {
             return ResponseEntity.noContent().build();
         }
@@ -133,7 +133,7 @@ public class LocalFileAPI {
             @ApiResponse(code = 204, message = ""),
             @ApiResponse(code = 404, message = "")
     })
-    public ResponseEntity<Void> delete(@ApiParam(name = "id", required = true) @PathVariable Long id) {
+    public ResponseEntity<Void> delete(@ApiParam(name = "id", required = true) @PathVariable String id) {
         if(this.localFileService.deleteFileById(id)) {
             return ResponseEntity.noContent().build();
         }

@@ -10,12 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PermissionContainerService extends GumgaService<PermissionContainer, Long> {
+public class PermissionContainerService extends GumgaService<PermissionContainer, String> {
 
     private PermissionContainerRepository permissionContainerRepository;
 
     @Autowired
-    public PermissionContainerService(GumgaCrudRepository<PermissionContainer, Long> repository) {
+    public PermissionContainerService(GumgaCrudRepository<PermissionContainer, String> repository) {
         super(repository);
         this.permissionContainerRepository = PermissionContainerRepository.class.cast(repository);
     }

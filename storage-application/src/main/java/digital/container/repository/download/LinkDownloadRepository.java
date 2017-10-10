@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface LinkDownloadRepository extends GumgaCrudRepository<LinkDownload, Long> {
+public interface LinkDownloadRepository extends GumgaCrudRepository<LinkDownload, String> {
 
     @Query("from LinkDownload ld where ld.hash = :hash")
     LinkDownload getLinkDownloadByHash(@Param("hash") String hash);

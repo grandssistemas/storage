@@ -3,6 +3,7 @@ package digital.container.storage.domain.model.download;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import digital.container.storage.domain.model.util.SearchScheduling;
 import io.gumga.domain.GumgaMultitenancy;
+import io.gumga.domain.GumgaSharedModelUUID;
 import io.gumga.domain.shared.GumgaSharedModel;
 
 import javax.persistence.*;
@@ -14,8 +15,7 @@ import java.util.Date;
                 @Index(name = "link_download_index_oi", columnList = "oi"),
         })
 @GumgaMultitenancy
-@SequenceGenerator(name = GumgaSharedModel.SEQ_NAME, sequenceName = "seq_link_download")
-public class LinkDownload extends GumgaSharedModel<Long> {
+public class LinkDownload extends GumgaSharedModelUUID {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "ld_created")

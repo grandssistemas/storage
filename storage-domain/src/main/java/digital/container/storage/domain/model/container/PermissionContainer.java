@@ -2,6 +2,7 @@ package digital.container.storage.domain.model.container;
 
 import io.gumga.domain.GumgaModel;
 import io.gumga.domain.GumgaMultitenancy;
+import io.gumga.domain.GumgaSharedModelUUID;
 import io.gumga.domain.shared.GumgaSharedModel;
 
 import javax.persistence.*;
@@ -12,8 +13,7 @@ import javax.persistence.*;
             @Index(name = "permission_container_index_oi", columnList = "oi")
         })
 @GumgaMultitenancy
-@SequenceGenerator(name = GumgaSharedModel.SEQ_NAME, sequenceName = "seq_permission_container")
-public class PermissionContainer extends GumgaSharedModel<Long> {
+public class PermissionContainer extends GumgaSharedModelUUID{
 
     @Column(name = "container_key")
     private String containerKey;

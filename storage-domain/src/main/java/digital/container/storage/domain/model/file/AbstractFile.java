@@ -1,13 +1,13 @@
 package digital.container.storage.domain.model.file;
 
 import digital.container.storage.domain.model.util.LocalFileUtil;
-import io.gumga.domain.shared.GumgaSharedModel;
+import io.gumga.domain.GumgaSharedModelUUID;
 
 import javax.persistence.*;
 import java.util.Calendar;
 
 @MappedSuperclass
-public abstract class AbstractFile extends GumgaSharedModel<Long> {
+public abstract class AbstractFile extends GumgaSharedModelUUID {
 
     @Column(name = "name")
     private String name;

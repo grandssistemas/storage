@@ -19,7 +19,6 @@ import java.util.List;
             @Index(name = "database_file_index_oi_detailone_filetype", columnList = "oi, detail_one, file_type")
         })
 @GumgaMultitenancy
-@SequenceGenerator(name = GumgaSharedModel.SEQ_NAME, sequenceName = "seq_database_file")
 public class DatabaseFile extends AbstractFile {
 
     @JsonIgnore

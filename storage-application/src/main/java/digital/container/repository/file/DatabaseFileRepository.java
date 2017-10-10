@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface DatabaseFileRepository extends GumgaCrudRepository<DatabaseFile, Long> {
+public interface DatabaseFileRepository extends GumgaCrudRepository<DatabaseFile, String> {
 
     @Query(value = "from DatabaseFile df where df.hash = :hash and df.filePublic = :shared")
     Optional<DatabaseFile> getByHash(@Param("hash") String hash, @Param("shared") Boolean shared);
