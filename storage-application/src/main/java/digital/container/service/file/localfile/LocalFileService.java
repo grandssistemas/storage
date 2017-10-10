@@ -1,7 +1,6 @@
 package digital.container.service.file.localfile;
 
 import digital.container.exception.FileNotFoundException;
-import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.local.LocalFile;
@@ -28,23 +27,21 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
     private static final Logger LOG = LoggerFactory.getLogger(LocalFileService.class);
 
     private final LocalFileRepository localFileRepository;
-    private final PermissionContainerService permissionContainerService;
     private final LimitFileService limitFileService;
 
     @Autowired
     public LocalFileService(GumgaCrudRepository<LocalFile, Long> repository,
-                            PermissionContainerService permissionContainerService,
                             LimitFileService limitFileService) {
         super(repository);
         this.localFileRepository = LocalFileRepository.class.cast(repository);
-        this.permissionContainerService = permissionContainerService;
         this.limitFileService = limitFileService;
     }
 
     @Transactional
     public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared) {
-        LocalFile localFile = LocalFile.buildAnything(
-                multipartFile.getName(),
+        LocalFile localFile = (LocalFile) new LocalFile()
+                .buildAnything(
+                multipartFile.getOriginalFilename(),
                 multipartFile.getContentType(),
                 multipartFile.getSize(),
                 shared,
@@ -59,7 +56,7 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
             LOG.error(e.getMessage());
         }
 
-        return new FileProcessed(this.localFileRepository.saveAndFlush(localFile), Collections.EMPTY_LIST);
+        return new FileProcessed(this.localFileRepository.saveAndFlush(localFile), Collections.emptyList());
     }
 
     @Transactional
@@ -113,6 +110,9 @@ public class LocalFileService extends GumgaService<LocalFile, Long> {
     @Transactional
     public void delete(LocalFile resource) {
         super.delete(resource);
-        new File(LocalFileUtil.DIRECTORY_PATH + "/" + resource.getRelativePath()).delete();
+        boolean deleted = new File(LocalFileUtil.DIRECTORY_PATH.concat("/").concat(resource.getRelativePath())).delete();
+        if(!deleted) {
+            LOG.error("Arquivo não foi removido");
+        }
     }
 }

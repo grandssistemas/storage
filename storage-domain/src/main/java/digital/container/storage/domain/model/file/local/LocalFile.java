@@ -1,17 +1,10 @@
 package digital.container.storage.domain.model.file.local;
 
 import digital.container.storage.domain.model.file.AbstractFile;
-import digital.container.storage.domain.model.file.FileStatus;
-import digital.container.storage.domain.model.file.FileType;
 import digital.container.storage.domain.model.util.GenerateHash;
-import digital.container.storage.domain.model.util.LocalFileUtil;
 import io.gumga.domain.GumgaMultitenancy;
 import io.gumga.domain.shared.GumgaSharedModel;
-import net.sf.cglib.core.Local;
-
 import javax.persistence.*;
-import java.io.File;
-import java.util.Calendar;
 
 @Entity
 @Table(name = "local_file",
@@ -24,17 +17,11 @@ import java.util.Calendar;
 @GumgaMultitenancy
 @SequenceGenerator(name = GumgaSharedModel.SEQ_NAME, sequenceName = "seq_local_file")
 public class LocalFile extends AbstractFile {
-    public static int BUFFER_SIZE = 4096;
+    public static final int BUFFER_SIZE = 4096;
 
-    @Column(name = "relative_path")
-    private String relativePath;
-
-    public String getRelativePath() {
-        return relativePath;
-    }
-
-    public void setRelativePath(String relativePath) {
-        this.relativePath = relativePath;
+    @Override
+    protected String getHashFile() {
+        return GenerateHash.generateLocalFile();
     }
 
 }

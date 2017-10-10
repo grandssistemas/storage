@@ -10,7 +10,9 @@ public class GenerateHash {
     public static String generateLocalFile() {
         return generateHash() + "LF";
     }
-
+    public static String generateAmazonS3() {
+        return generateHash() + "S3";
+    }
     public static String generateDatabaseFile() {
         return generateHash() + "DF";
     }

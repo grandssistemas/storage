@@ -2,6 +2,7 @@ package digital.container.storage.domain.model.file.database;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import digital.container.storage.domain.model.file.AbstractFile;
+import digital.container.storage.domain.model.util.GenerateHash;
 import io.gumga.domain.GumgaMultitenancy;
 import io.gumga.domain.shared.GumgaSharedModel;
 
@@ -26,9 +27,6 @@ public class DatabaseFile extends AbstractFile {
     @OrderBy("id")
     private List<DatabaseFilePart> parts;
 
-    @Column(name = "relative_path")
-    private String relativePath;
-
     public DatabaseFile() {
         this.parts = new ArrayList<>();
     }
@@ -45,11 +43,8 @@ public class DatabaseFile extends AbstractFile {
         this.parts = parts;
     }
 
-    public String getRelativePath() {
-        return relativePath;
-    }
-
-    public void setRelativePath(String relativePath) {
-        this.relativePath = relativePath;
+    @Override
+    protected String getHashFile() {
+        return GenerateHash.generateDatabaseFile();
     }
 }

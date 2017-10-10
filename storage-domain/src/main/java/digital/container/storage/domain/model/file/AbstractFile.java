@@ -1,7 +1,5 @@
 package digital.container.storage.domain.model.file;
 
-import digital.container.storage.domain.model.file.local.LocalFile;
-import digital.container.storage.domain.model.util.GenerateHash;
 import digital.container.storage.domain.model.util.LocalFileUtil;
 import io.gumga.domain.shared.GumgaSharedModel;
 
@@ -55,6 +53,9 @@ public abstract class AbstractFile extends GumgaSharedModel<Long> {
 
     @Column(name = "detail_four")
     private String detailFour;
+
+    @Column(name = "relative_path")
+    private String relativePath;
 
     public String getName() {
         return name;
@@ -168,19 +169,30 @@ public abstract class AbstractFile extends GumgaSharedModel<Long> {
         this.filePublic = filePublic;
     }
 
-    public static LocalFile buildAnything(String fileName, String contentType, Long size, Boolean shared, String containerKey) {
-        LocalFile file = new LocalFile();
-        file.setName(fileName);
-        file.setFileStatus(FileStatus.DO_NOT_SYNC);
-        file.setFileType(FileType.ANYTHING);
-
-        file.setContentType(contentType);
-        file.setSize(size);
-        file.setFilePublic(shared);
-        file.setCreateDate(Calendar.getInstance());
-        file.setHash(GenerateHash.generateLocalFile());
-        file.setRelativePath(LocalFileUtil.getRelativePathFileANYTHING(containerKey) + '/' + file.getName());
-        file.setContainerKey(containerKey);
-        return file;
+    public String getRelativePath() {
+        return relativePath;
     }
+
+    public void setRelativePath(String relativePath) {
+        this.relativePath = relativePath;
+    }
+
+    public AbstractFile buildAnything(String fileName, String contentType, Long size, Boolean shared, String containerKey) {
+        setName(fileName);
+        setFileStatus(FileStatus.DO_NOT_SYNC);
+        setFileType(FileType.ANYTHING);
+
+        setContentType(contentType);
+        setSize(size);
+        setFilePublic(shared);
+        setCreateDate(Calendar.getInstance());
+
+        setHash(getHashFile());
+        setRelativePath(LocalFileUtil.getRelativePathFileANYTHING(containerKey) + '/' + getName());
+        setContainerKey(containerKey);
+
+        return this;
+    }
+
+    protected abstract String getHashFile();
 }

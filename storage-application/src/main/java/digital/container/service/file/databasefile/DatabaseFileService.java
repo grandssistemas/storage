@@ -44,24 +44,18 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, Long> {
 
     @Transactional
     public FileProcessed upload(String containerKey, MultipartFile multipartFile, boolean shared) {
-        DatabaseFile databaseFile = new DatabaseFile();
-        databaseFile.setName(multipartFile.getOriginalFilename());
+        DatabaseFile databaseFile = (DatabaseFile) new DatabaseFile()
+                .buildAnything(
+                multipartFile.getOriginalFilename(),
+                multipartFile.getContentType(),
+                multipartFile.getSize(),
+                shared,
+                containerKey);
 
-        databaseFile.setFileType(FileType.ANYTHING);
-        databaseFile.setFileStatus(FileStatus.DO_NOT_SYNC);
-        databaseFile.setFilePublic(shared);
-
-
-        databaseFile.setName(multipartFile.getOriginalFilename());
-        databaseFile.setContainerKey(containerKey);
-        databaseFile.setCreateDate(Calendar.getInstance());
-        databaseFile.setHash(GenerateHash.generateDatabaseFile());
-        databaseFile.setContentType(multipartFile.getContentType());
-        databaseFile.setSize(multipartFile.getSize());
         DatabaseFile newDatabaseFile = this.databaseFileRepository.saveAndFlush(databaseFile);
 
         this.databaseFilePartService.saveFile(newDatabaseFile, multipartFile);
-        return new FileProcessed(this.databaseFileRepository.saveAndFlush(newDatabaseFile), Collections.EMPTY_LIST);
+        return new FileProcessed(this.databaseFileRepository.saveAndFlush(newDatabaseFile), Collections.emptyList());
     }
 
     @Transactional
