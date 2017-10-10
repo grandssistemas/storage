@@ -8,6 +8,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import digital.container.storage.domain.model.util.AmazonS3Util;
 import io.gumga.core.GumgaValues;
 
 import io.gumga.application.GumgaRepositoryFactoryBean;
@@ -150,6 +151,8 @@ public class Application {
 
         System.setProperty("amazon.s3.access_key_id", getProperties().getProperty("amazon.s3.access_key_id"));
         System.setProperty("amazon.s3.secret_access_key", getProperties().getProperty("amazon.s3.secret_access_key"));
+        System.setProperty("amazon.s3.anything_bucket", getProperties().getProperty("amazon.s3.anything_bucket"));
+        System.setProperty("amazon.s3.tax_document_bucket", getProperties().getProperty("amazon.s3.tax_document_bucket"));
     }
 
     @Bean
@@ -177,7 +180,7 @@ public class Application {
 
     @Bean
     public BasicAWSCredentials basicAWSCredentials() {
-        return new BasicAWSCredentials(System.getProperty("amazon.s3.access_key_id"), System.getProperty("amazon.s3.secret_access_key"));
+        return new BasicAWSCredentials(AmazonS3Util.ACCESS_KEY_ID, AmazonS3Util.SECRET_ACCESS_KEY);
     }
 
     @Bean

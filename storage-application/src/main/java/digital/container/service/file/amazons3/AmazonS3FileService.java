@@ -2,6 +2,7 @@ package digital.container.service.file.amazons3;
 
 import digital.container.storage.domain.model.file.amazon.AmazonS3File;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.storage.domain.model.util.AmazonS3Util;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class AmazonS3FileService extends GumgaService<AmazonS3File, String> {
                 shared,
                 containerKey);
 
-//        this.sendFileAmazonS3Service.send();
+        this.sendFileAmazonS3Service.send(file, multipartFile, shared, AmazonS3Util.ANYTHING_BUCKET);
 
         return new FileProcessed(this.repository.saveAndFlush(file), Collections.emptyList());
     }

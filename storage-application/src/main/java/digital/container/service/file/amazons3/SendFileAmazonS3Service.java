@@ -5,6 +5,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
+import digital.container.storage.domain.model.file.AbstractFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,13 +23,12 @@ public class SendFileAmazonS3Service {
         this.amazonS3 = amazonS3;
     }
 
-
-    public void send(MultipartFile multipartFile, Boolean shared, String bucketName) {
+    public void send(AbstractFile abstractFile, MultipartFile multipartFile, Boolean shared, String bucketName) {
         try {
             File file = new File(multipartFile.getOriginalFilename());
             multipartFile.transferTo(file);
             try {
-                amazonS3.putObject(new PutObjectRequest(bucketName,"a" ,file));
+                amazonS3.putObject(new PutObjectRequest(bucketName, abstractFile.getRelativePath(), file));
             } catch (AmazonServiceException ase) {
                 System.out.println("Caught an AmazonServiceException, which " +
                         "means your request made it " +
@@ -50,8 +50,5 @@ public class SendFileAmazonS3Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        S3Object s3Object = new S3Object();
-//        s3Object.setBucketName(bucketName);
-//        s3Object.set
     }
 }
