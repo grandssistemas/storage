@@ -1,6 +1,13 @@
 package digital.container.infrastructure.config;
 
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import io.gumga.core.GumgaValues;
 
 import io.gumga.application.GumgaRepositoryFactoryBean;
@@ -141,6 +148,8 @@ public class Application {
 
         System.setProperty("public.token.integration", getProperties().getProperty("public.token.integration", "3cb73f59eb02-479b-b859-797e29eb8256-90703973edf5aa2d"));
 
+        System.setProperty("amazon.s3.access_key_id", getProperties().getProperty("amazon.s3.access_key_id"));
+        System.setProperty("amazon.s3.secret_access_key", getProperties().getProperty("amazon.s3.secret_access_key"));
     }
 
     @Bean
@@ -158,14 +167,29 @@ public class Application {
     }
 
     @Bean
-    public JmsTemplate jmsTemplate(){
+    public JmsTemplate jmsTemplate() {
         JmsTemplate template = new JmsTemplate();
         template.setConnectionFactory(connectionFactory());
         template.setDefaultDestinationName(System.getProperty("mom.queue"));
 
         return template;
     }
+
+    @Bean
+    public BasicAWSCredentials basicAWSCredentials() {
+        return new BasicAWSCredentials(System.getProperty("amazon.s3.access_key_id"), System.getProperty("amazon.s3.secret_access_key"));
+    }
+
+    @Bean
+    public AmazonS3 amazonS3(BasicAWSCredentials basicAWSCredentials) {
+        return AmazonS3ClientBuilder
+                .standard()
+                .withRegion(Regions.SA_EAST_1)
+                .withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials))
+                .build();
+    }
 }
+
 enum Database {
     POSTGRES, MYSQL, ORACLE, H2;
 }
