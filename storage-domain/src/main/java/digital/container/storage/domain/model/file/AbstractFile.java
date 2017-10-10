@@ -6,6 +6,7 @@ import digital.container.storage.domain.model.util.TokenUtil;
 import io.gumga.domain.GumgaSharedModelUUID;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Calendar;
 
 @MappedSuperclass
@@ -200,6 +201,34 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
         if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
             addOrganization(tokenResultProxy.softwareHouseOi);
         }
+
+        return this;
+    }
+
+    public AbstractFile buildTaxDocument(String contentType, Long size, Boolean shared, String containerKey, TokenResultProxy tokenResultProxy, LocalDate ld, FileType type) {
+        if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
+            addOrganization(tokenResultProxy.accountantOi);
+        }
+
+        if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
+            addOrganization(tokenResultProxy.softwareHouseOi);
+        }
+
+        setFilePublic(shared);
+        setFileType(type);
+
+        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENT(containerKey,
+                ld.getYear(),
+                ld.getMonth().toString(),
+                getFileType(),
+                getDetailThree());
+
+        setRelativePath(path.concat("/").concat(getName()));
+        setHash(getHashFile());
+        setContainerKey(containerKey);
+        setCreateDate(Calendar.getInstance());
+        setContentType(contentType);
+        setSize(size);
 
         return this;
     }

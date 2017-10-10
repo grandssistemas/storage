@@ -9,8 +9,9 @@ import digital.container.vo.TaxDocumentModel;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.domains.GumgaOi;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +28,7 @@ public class ValidateNfXML {
 
     @Autowired
     private SearchTaxDocumentService searchTaxDocumentService;
+    private static final Logger LOG = LoggerFactory.getLogger(ValidateNfXML.class);
 
     private ValidateNfXML() {}
 
@@ -59,7 +61,7 @@ public class ValidateNfXML {
             String dhEmi = SearchXMLUtil.getIdeDhEmi(xml);
             String version = SearchXMLUtil.getVersion(xml);
 
-            if(errors.size() > 0) {
+            if(!errors.isEmpty()) {
                 return new FileProcessed(file, errors);
             }
 
@@ -69,7 +71,7 @@ public class ValidateNfXML {
             file.setDetailFour(version);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("validação");
         }
 
         return null;
@@ -86,7 +88,7 @@ public class ValidateNfXML {
             try {
                 parse = format.parse(data);
             } catch (ParseException e1) {
-                e1.printStackTrace();
+                LOG.error("converter data");
             }
         }
 

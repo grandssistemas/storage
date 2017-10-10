@@ -24,38 +24,39 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 
 @Service
+@Transactional
 public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, String> {
 
-    @Autowired
-    private DatabaseFileRepository databaseFileRepository;
+    private final DatabaseFileRepository databaseFileRepository;
+    private final DatabaseFilePartService databaseFilePartService;
+    private final LimitFileService limitFileService;
+    private final CommonTaxDocumentService commonTaxDocumentService;
+    private final SendMessageMOMService sendMessageMOMService;
+    private final SecurityTokenService securityTokenService;
 
     @Autowired
-    private DatabaseFilePartService databaseFilePartService;
-
-    @Autowired
-    private LimitFileService limitFileService;
-
-    @Autowired
-    private CommonTaxDocumentService commonTaxDocumentService;
-
-    @Autowired
-    private SendMessageMOMService sendMessageMOMService;
-
-    @Autowired
-    private SecurityTokenService securityTokenService;
-
-    @Autowired
-    public DatabaseFileTaxDocumentService(GumgaCrudRepository<DatabaseFile, String> repository) {
+    public DatabaseFileTaxDocumentService(GumgaCrudRepository<DatabaseFile, String> repository,
+                                          DatabaseFilePartService databaseFilePartService,
+                                          LimitFileService limitFileService,
+                                          CommonTaxDocumentService commonTaxDocumentService,
+                                          SendMessageMOMService sendMessageMOMService,
+                                          SecurityTokenService securityTokenService) {
         super(repository);
+        this.databaseFileRepository = DatabaseFileRepository.class.cast(repository);
+        this.databaseFilePartService = databaseFilePartService;
+        this.limitFileService = limitFileService;
+        this.commonTaxDocumentService = commonTaxDocumentService;
+        this.sendMessageMOMService = sendMessageMOMService;
+        this.securityTokenService = securityTokenService;
     }
 
     @Transactional
-    private FileProcessed saveFile(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
+    public FileProcessed saveFile(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
 
         DatabaseFile databaseFile = new DatabaseFile();
 
         FileProcessed data = this.commonTaxDocumentService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
-        if(data.getErrors().size() > 0) {
+        if(!data.getErrors().isEmpty()) {
             return data;
         }
 
@@ -63,7 +64,7 @@ public class DatabaseFileTaxDocumentService extends GumgaService<DatabaseFile, S
         this.databaseFilePartService.saveFile(databaseFile, multipartFile);
         this.sendMessageMOMService.send(databaseFile, containerKey);
 
-        return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.EMPTY_LIST);
+        return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.emptyList());
     }
 
     @Transactional
