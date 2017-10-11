@@ -10,6 +10,11 @@ public final class MessageStorage {
     public static final String FILE_ISNT_CANCELLATION_EVENT_TAX_DOCUMENT = "This file is not a cancellation event for a tax document.";
     public static final String CANCEL_EVENT_ALREADY_EXISTIS_THIS_ACCESS_KEY = "A cancel event already exists with this access key.";
     public static final String THERE_ISNT_TAX_DOCUMENT_THIS_ACCESS_KEY = "There is no tax document with this access key.";
+    public static final String DISABLING_EVENT_MUST_HAVE_THE_RECEIVING_DATE_TIME = "The disabling event must have the receiving date and time.";
+    public static final String DISABLE_EVENT_MUST_HAVE_PROTOCOL_NUMBER = "The disable event must have a protocol number.";
+    public static final String DISABLE_EVENT_ALREADY_EXISTS = "This disable event already exists.";
+    public static final String ISNT_DISABLING_EVENT = "It is not a disabling event.";
+
 
     protected MessageStorage() {}
 }

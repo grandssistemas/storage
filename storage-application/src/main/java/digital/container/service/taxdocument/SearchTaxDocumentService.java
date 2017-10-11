@@ -1,14 +1,22 @@
 package digital.container.service.taxdocument;
 
 import digital.container.repository.file.DatabaseFileRepository;
+import digital.container.repository.file.FileRepository;
 import digital.container.repository.file.LocalFileRepository;
+import digital.container.service.file.amazons3.AmazonS3FileService;
 import digital.container.storage.domain.model.file.AbstractFile;
+import digital.container.storage.domain.model.file.amazon.AmazonS3File;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.FileType;
 import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.util.SearchScheduling;
 import digital.container.storage.domain.model.util.TaxDocumentScheduling;
 import io.gumga.core.GumgaThreadScope;
+import io.gumga.core.QueryObject;
+import io.gumga.core.SearchResult;
+import io.gumga.core.gquery.ComparisonOperator;
+import io.gumga.core.gquery.Criteria;
+import io.gumga.core.gquery.GQuery;
 import io.gumga.domain.domains.GumgaOi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -27,12 +32,18 @@ public class SearchTaxDocumentService {
 
     private final LocalFileRepository localFileRepository;
     private final DatabaseFileRepository databaseFileRepository;
+    private final FileRepository fileRepository;
+    private final AmazonS3FileService amazonS3FileService;
 
     @Autowired
     public SearchTaxDocumentService(LocalFileRepository localFileRepository,
-                                    DatabaseFileRepository databaseFileRepository) {
+                                    DatabaseFileRepository databaseFileRepository,
+                                    FileRepository fileRepository,
+                                    AmazonS3FileService amazonS3FileService) {
         this.localFileRepository = localFileRepository;
         this.databaseFileRepository = databaseFileRepository;
+        this.fileRepository = fileRepository;
+        this.amazonS3FileService = amazonS3FileService;
     }
 
 
@@ -66,15 +77,26 @@ public class SearchTaxDocumentService {
     }
 
     public AbstractFile getFileByGumgaOIAndNProtAndNFDisable(GumgaOi oi, String nprot) {
-        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getFileByGumgaOIAndNProtAndNFDisable(oi, nprot);
-        if(dbDocument.isPresent()) {
-            return dbDocument.get();
+        GQuery where = new GQuery(new Criteria("obj.detailOne", ComparisonOperator.EQUAL, nprot))
+                .and(new Criteria("obj.fileType", ComparisonOperator.IN, Arrays.asList(FileType.NFCE_DISABLE, FileType.NFE_DISABLE)));
+
+        QueryObject queryObject = new QueryObject();
+        queryObject.setgQuery(where);
+
+        SearchResult<AmazonS3File> pesquisa = this.amazonS3FileService.pesquisa(queryObject);
+        if(!pesquisa.getValues().isEmpty()) {
+            return pesquisa.getValues().get(0);
         }
 
-        Optional<LocalFile> lfDocument = this.localFileRepository.getFileByGumgaOIAndNProtAndNFDisable(oi, nprot);
-        if(lfDocument.isPresent()) {
-            return lfDocument.get();
-        }
+//        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getFileByGumgaOIAndNProtAndNFDisable(oi, nprot);
+//        if(dbDocument.isPresent()) {
+//            return dbDocument.get();
+//        }
+//
+//        Optional<LocalFile> lfDocument = this.localFileRepository.getFileByGumgaOIAndNProtAndNFDisable(oi, nprot);
+//        if(lfDocument.isPresent()) {
+//            return lfDocument.get();
+//        }
 
         return null;
 

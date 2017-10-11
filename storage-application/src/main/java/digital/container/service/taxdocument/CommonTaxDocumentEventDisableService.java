@@ -1,18 +1,12 @@
 package digital.container.service.taxdocument;
 
+import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.*;
-import digital.container.storage.domain.model.file.database.DatabaseFile;
-import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.storage.domain.model.util.GenerateHash;
-import digital.container.storage.domain.model.util.LocalFileUtil;
 import digital.container.storage.domain.model.util.TokenResultProxy;
-import digital.container.storage.domain.model.util.TokenUtil;
 import digital.container.util.*;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.domains.GumgaOi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,14 +14,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 @Service
 public class CommonTaxDocumentEventDisableService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonTaxDocumentEventDisableService.class);
 
     @Autowired
     private SearchTaxDocumentService searchTaxDocumentService;
@@ -43,92 +34,53 @@ public class CommonTaxDocumentEventDisableService {
         String xml = XMLUtil.getXml(multipartFile);
 
         FileProcessed fileProcessed = validateDisableEvent(file, xml);
-        if(fileProcessed.getErrors().size() > 0) {
+        if(!fileProcessed.getErrors().isEmpty()) {
             return fileProcessed;
         }
 
         String infInutCNPJ = SearchXMLUtil.getInfInutCNPJ(xml);
         if(!containerKey.equals(infInutCNPJ)) {
-            errors.add("O CNPJ do evento de inutização é diferente da chave do container.");
+            errors.add(MessageStorage.CNPJ_OF_XML_IS_DIFFERENT_CONTAINER_KEY);
             return new FileProcessed(file, errors);
         }
 
         String infInutDhRecbto = SearchXMLUtil.getInfInutDhRecbto(xml);
         if(infInutDhRecbto.isEmpty()) {
-            errors.add("O evento de inutização precisa ter data e hora do recebimento.");
+            errors.add(MessageStorage.DISABLING_EVENT_MUST_HAVE_THE_RECEIVING_DATE_TIME);
             return new FileProcessed(file, errors);
         }
 
         String infInutNProt = SearchXMLUtil.getInfInutNProt(xml);
         if(infInutDhRecbto.isEmpty()) {
-            errors.add("O evento de inutização precisa ter numero do protocolo.");
+            errors.add(MessageStorage.DISABLE_EVENT_MUST_HAVE_PROTOCOL_NUMBER);
             return new FileProcessed(file, errors);
         }
 
         AbstractFile fileFromDB = this.searchTaxDocumentService.getFileByGumgaOIAndNProtAndNFDisable(getGumgaOiToHQL(), infInutNProt);
         if(fileFromDB != null) {
-            errors.add("Esse evento de inutização já existe.");
+            errors.add(MessageStorage.DISABLE_EVENT_ALREADY_EXISTS);
             return new FileProcessed(file, errors);
         }
-        file.setDetailOne(infInutNProt);
-
-        if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
-            file.addOrganization(tokenResultProxy.accountantOi);
-        }
-
-        if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
-            file.addOrganization(tokenResultProxy.softwareHouseOi);
-        }
-
 
         String mod = SearchXMLUtil.getInfInutMod(xml);
+        FileType fileType = null;
+
         switch (mod) {
             case "55":
-                file.setFileType(FileType.NFE_DISABLE);
+                fileType = FileType.NFE_DISABLE;
                 break;
             case "65":
-                file.setFileType(FileType.NFCE_DISABLE);
+                fileType = FileType.NFCE_DISABLE;
                 break;
             default:
-                errors.add("Tipo de documento invalido.");
+                errors.add(MessageStorage.WE_DONT_SUPPORT_TEMPLATE_REPORTED_IN_YOUR_XML);
                 return new FileProcessed(file, errors);
         }
-
-        file.setDetailTwo(infInutDhRecbto);
-
-        Date date = validateNfXML.stringToDate(file.getDetailTwo());
+        Date date = validateNfXML.stringToDate(infInutDhRecbto);
         LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTDisable(containerKey,
-                ld.getYear(),
-                ld.getMonth().toString(),
-                mod.equals("55") ? FileType.NFE : FileType.NFCE);
 
-        if(file instanceof LocalFile) {
-            ((LocalFile)file).setRelativePath(path + '/' + file.getName());
-            file.setHash(GenerateHash.generateLocalFile());
-        } else {
-            ((DatabaseFile)file).setRelativePath(path + '/' + file.getName());
-            file.setHash(GenerateHash.generateDatabaseFile());
-        }
-
-
-        file.setContainerKey(containerKey);
-        file.setCreateDate(Calendar.getInstance());
-        file.setContentType(multipartFile.getContentType());
-        file.setSize(multipartFile.getSize());
-
-        return new FileProcessed(file, errors);
-    }
-
-    private FileProcessed validateDisableEvent(AbstractFile file, String xml) {
-        List<String> errors = new ArrayList<>();
-        String xServ = SearchXMLUtil.getInfInutXServ(xml);
-        String xMotivo = SearchXMLUtil.getInfInutXMotivo(xml);
-
-        if((!xMotivo.isEmpty() && !xMotivo.toLowerCase().contains("inutilizacao")) || (!xServ.isEmpty() && !"INUTILIZAR".equalsIgnoreCase(xServ))) {
-            errors.add("Não é um evento de inutilização.");
-        }
+        file.buildTaxDocumentDisable(infInutNProt, infInutDhRecbto, multipartFile.getContentType(), multipartFile.getSize(), Boolean.FALSE, containerKey, tokenResultProxy, ld, fileType);
 
         return new FileProcessed(file, errors);
     }
@@ -142,6 +94,18 @@ public class CommonTaxDocumentEventDisableService {
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
+    }
+
+    private FileProcessed validateDisableEvent(AbstractFile file, String xml) {
+        List<String> errors = new ArrayList<>();
+        String xServ = SearchXMLUtil.getInfInutXServ(xml);
+        String xMotivo = SearchXMLUtil.getInfInutXMotivo(xml);
+
+        if((!xMotivo.isEmpty() && !xMotivo.toLowerCase().contains("inutilizacao")) || (!xServ.isEmpty() && !"INUTILIZAR".equalsIgnoreCase(xServ))) {
+            errors.add(MessageStorage.ISNT_DISABLING_EVENT);
+        }
+
+        return new FileProcessed(file, errors);
     }
 
     private GumgaOi getGumgaOiToHQL() {

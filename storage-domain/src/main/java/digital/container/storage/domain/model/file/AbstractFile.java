@@ -194,25 +194,13 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
         setRelativePath(LocalFileUtil.getRelativePathFileANYTHING(containerKey) + '/' + getName());
         setContainerKey(containerKey);
 
-        if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
-            addOrganization(tokenResultProxy.accountantOi);
-        }
-
-        if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
-            addOrganization(tokenResultProxy.softwareHouseOi);
-        }
+        addSharing(tokenResultProxy);
 
         return this;
     }
 
     public AbstractFile buildTaxDocument(String contentType, Long size, Boolean shared, String containerKey, TokenResultProxy tokenResultProxy, LocalDate ld, FileType type) {
-        if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
-            addOrganization(tokenResultProxy.accountantOi);
-        }
-
-        if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
-            addOrganization(tokenResultProxy.softwareHouseOi);
-        }
+        addSharing(tokenResultProxy);
 
         setFilePublic(shared);
         setFileType(type);
@@ -231,6 +219,38 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
         setSize(size);
 
         return this;
+    }
+
+    public AbstractFile buildTaxDocumentDisable(String infInutNProt, String infInutDhRecbto, String contentType, Long size, Boolean shared, String containerKey, TokenResultProxy tokenResultProxy, LocalDate ld, FileType type) {
+        addSharing(tokenResultProxy);
+        setFilePublic(shared);
+        setFileType(type);
+        setHash(getHashFile());
+        setContainerKey(containerKey);
+        setCreateDate(Calendar.getInstance());
+        setContentType(contentType);
+        setSize(size);
+        setDetailOne(infInutNProt);
+        setDetailTwo(infInutDhRecbto);
+
+        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTDisable(containerKey,
+                ld.getYear(),
+                ld.getMonth().toString(),
+                FileType.NFCE_DISABLE.equals(getFileType()) ? FileType.NFE : FileType.NFCE);
+
+        setRelativePath(path.concat("/").concat(getName()));
+
+        return this;
+    }
+
+    private void addSharing(TokenResultProxy  tokenResultProxy) {
+        if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
+            addOrganization(tokenResultProxy.accountantOi);
+        }
+
+        if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
+            addOrganization(tokenResultProxy.softwareHouseOi);
+        }
     }
 
     protected abstract String getHashFile();

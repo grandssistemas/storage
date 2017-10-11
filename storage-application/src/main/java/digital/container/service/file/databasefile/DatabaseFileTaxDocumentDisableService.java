@@ -22,30 +22,31 @@ import java.util.List;
 @Transactional
 public class DatabaseFileTaxDocumentDisableService extends GumgaService<DatabaseFile, String> {
 
-    private DatabaseFileRepository databaseFileRepository;
+    private final DatabaseFileRepository databaseFileRepository;
+    private final CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService;
+    private final DatabaseFilePartService databaseFilePartService;
+    private final SendMessageMOMService sendMessageMOMService;
+    private final SecurityTokenService securityTokenService;
 
     @Autowired
-    private CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService;
-
-    @Autowired
-    private DatabaseFilePartService databaseFilePartService;
-    @Autowired
-    private SendMessageMOMService sendMessageMOMService;
-
-    @Autowired
-    private SecurityTokenService securityTokenService;
-
-    @Autowired
-    public DatabaseFileTaxDocumentDisableService(GumgaCrudRepository<DatabaseFile, String> repository) {
+    public DatabaseFileTaxDocumentDisableService(GumgaCrudRepository<DatabaseFile, String> repository,
+                                                 CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService,
+                                                 DatabaseFilePartService databaseFilePartService,
+                                                 SendMessageMOMService sendMessageMOMService,
+                                                 SecurityTokenService securityTokenService) {
         super(repository);
         this.databaseFileRepository = DatabaseFileRepository.class.cast(repository);
+        this.commonTaxDocumentEventDisableService = commonTaxDocumentEventDisableService;
+        this.databaseFilePartService = databaseFilePartService;
+        this.sendMessageMOMService = sendMessageMOMService;
+        this.securityTokenService = securityTokenService;
     }
 
     private FileProcessed saveFile(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
         DatabaseFile databaseFile = new DatabaseFile();
         FileProcessed data = this.commonTaxDocumentEventDisableService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
 
-        if(data.getErrors().size() > 0) {
+        if(!data.getErrors().isEmpty()) {
             return data;
         }
 
@@ -53,7 +54,7 @@ public class DatabaseFileTaxDocumentDisableService extends GumgaService<Database
         this.databaseFilePartService.saveFile(databaseFile, multipartFile);
         this.sendMessageMOMService.send(databaseFile, containerKey);
 
-        return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.EMPTY_LIST);
+        return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.emptyList());
     }
 
     public FileProcessed upload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {
@@ -63,7 +64,7 @@ public class DatabaseFileTaxDocumentDisableService extends GumgaService<Database
 
 
     public List<FileProcessed> upload(String containerKey, List<MultipartFile> multipartFiles, String tokenSoftwareHouse, String tokenAccountant) {
-            TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
+        TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
         List<FileProcessed> result = new ArrayList<>();
         for(MultipartFile multipartFile : multipartFiles) {
             result.add(this.saveFile(containerKey,multipartFile, tokenResultProxy));
