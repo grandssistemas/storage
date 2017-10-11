@@ -22,31 +22,31 @@ import java.util.List;
 @Transactional
 public class DatabaseFileTaxDocumentLetterCorrectionService extends GumgaService<DatabaseFile, String> {
 
-    private DatabaseFileRepository databaseFileRepository;
+    private final DatabaseFileRepository databaseFileRepository;
+    private final CommonTaxDocumentEventLetterCorrectionService service;
+    private final DatabaseFilePartService databaseFilePartService;
+    private final SendMessageMOMService sendMessageMOMService;
+    private final SecurityTokenService securityTokenService;
 
     @Autowired
-    private CommonTaxDocumentEventLetterCorrectionService service;
-
-    @Autowired
-    private DatabaseFilePartService databaseFilePartService;
-
-    @Autowired
-    private SendMessageMOMService sendMessageMOMService;
-
-    @Autowired
-    private SecurityTokenService securityTokenService;
-
-    @Autowired
-    public DatabaseFileTaxDocumentLetterCorrectionService(GumgaCrudRepository<DatabaseFile, String> repository) {
+    public DatabaseFileTaxDocumentLetterCorrectionService(GumgaCrudRepository<DatabaseFile, String> repository,
+                                                          CommonTaxDocumentEventLetterCorrectionService service,
+                                                          DatabaseFilePartService databaseFilePartService,
+                                                          SendMessageMOMService sendMessageMOMService,
+                                                          SecurityTokenService securityTokenService) {
         super(repository);
         this.databaseFileRepository = DatabaseFileRepository.class.cast(repository);
+        this.service = service;
+        this.databaseFilePartService = databaseFilePartService;
+        this.sendMessageMOMService = sendMessageMOMService;
+        this.securityTokenService = securityTokenService;
     }
 
-    private FileProcessed saveFile(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
+    public FileProcessed saveFile(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
         DatabaseFile databaseFile = new DatabaseFile();
         FileProcessed data = this.service.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
 
-        if(data.getErrors().size() > 0) {
+        if(!data.getErrors().isEmpty()) {
             return data;
         }
 
@@ -54,7 +54,7 @@ public class DatabaseFileTaxDocumentLetterCorrectionService extends GumgaService
         this.databaseFilePartService.saveFile(databaseFile, multipartFile);
         this.sendMessageMOMService.send(databaseFile, containerKey);
 
-        return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.EMPTY_LIST);
+        return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.emptyList());
     }
 
     public FileProcessed upload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {

@@ -236,9 +236,37 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
         String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTDisable(containerKey,
                 ld.getYear(),
                 ld.getMonth().toString(),
-                FileType.NFCE_DISABLE.equals(getFileType()) ? FileType.NFE : FileType.NFCE);
+                FileType.NFE_DISABLE.equals(getFileType()) ? FileType.NFE : FileType.NFCE);
 
         setRelativePath(path.concat("/").concat(getName()));
+
+        return this;
+    }
+
+    public AbstractFile buildTaxDocumentLetterCorrection(String infInutDhRecbto, String chNFe, String containerKey, String contentType, Long size,  LocalDate ld, TokenResultProxy tokenResultProxy) {
+
+        addSharing(tokenResultProxy);
+
+        setDetailOne(chNFe);
+
+        setFileType(FileType.NFE_LETTER_CORRECTION);
+
+        setDetailTwo(infInutDhRecbto);
+
+        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTLetterCorrection(containerKey,
+                ld.getYear(),
+                ld.getMonth().toString(),
+                FileType.NFE);
+
+        setHash(getHashFile());
+        setRelativePath(path + "/" + getName());
+
+
+        setContainerKey(containerKey);
+        setCreateDate(Calendar.getInstance());
+        setContentType(contentType);
+        setSize(size);
+
 
         return this;
     }

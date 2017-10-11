@@ -1,5 +1,6 @@
 package digital.container.service.taxdocument;
 
+import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.*;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.local.LocalFile;
@@ -43,7 +44,7 @@ public class CommonTaxDocumentEventLetterCorrectionService {
         String xml = XMLUtil.getXml(multipartFile);
 
         FileProcessed fileProcessed = validateLetterCorrectionEvent(file, xml);
-        if(fileProcessed.getErrors().size() > 0) {
+        if(!fileProcessed.getErrors().isEmpty()) {
             return fileProcessed;
         }
 
@@ -57,13 +58,13 @@ public class CommonTaxDocumentEventLetterCorrectionService {
         }
 
         if(!containerKey.equals(infInutCNPJ)) {
-            errors.add("O CNPJ do evento da carta de correção é diferente da chave do container.");
+            errors.add(MessageStorage.CNPJ_OF_XML_IS_DIFFERENT_CONTAINER_KEY);
             return new FileProcessed(file, errors);
         }
 
         String infInutDhRecbto = SearchXMLUtil.getInfEventoDhEvento(xml);
         if(infInutDhRecbto.isEmpty()) {
-            errors.add("O evento de inutização precisa ter data e hora do recebimento.");
+            errors.add(MessageStorage.CORRECTION_LETTER_EVENT_HAVE_RECEIPT_DATE_TIME);
             return new FileProcessed(file, errors);
         }
 
@@ -71,54 +72,20 @@ public class CommonTaxDocumentEventLetterCorrectionService {
 
         AbstractFile fileFromDB = this.searchTaxDocumentService.getFileByGumgaOIAndNProtAndNFLetterCorrection(getGumgaOiToHQL(), chNFe);
         if(fileFromDB != null) {
-            errors.add("Esse evento de carta de correção já existe.");
+            errors.add(MessageStorage.CORRECTION_LETTER_EVENT_ALREADY_EXISTS);
             return new FileProcessed(file, errors);
         }
 
         AbstractFile taxDocument = this.searchTaxDocumentService.getFileByGumgaOIAndChNFeAndNF(getGumgaOiToHQL(), chNFe);
         if(taxDocument == null) {
-            errors.add("Não existe documento fiscal com essa chave de acesso.");
+            errors.add(MessageStorage.THERE_ISNT_TAX_DOCUMENT_THIS_ACCESS_KEY);
             return new FileProcessed(file, errors);
         }
 
-
-        if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
-            file.addOrganization(tokenResultProxy.accountantOi);
-        }
-
-        if(!TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN.equals(tokenResultProxy.softwareHouseOi)) {
-            file.addOrganization(tokenResultProxy.softwareHouseOi);
-        }
-
-
-        file.setDetailOne(chNFe);
-
-        file.setFileType(FileType.NFE_LETTER_CORRECTION);
-
-        file.setDetailTwo(infInutDhRecbto);
-
-        Date date = validateNfXML.stringToDate(file.getDetailTwo());
+        Date date = validateNfXML.stringToDate(infInutDhRecbto);
         LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTLetterCorrection(containerKey,
-                ld.getYear(),
-                ld.getMonth().toString(),
-                FileType.NFE);
-
-        ((LocalFile)file).setRelativePath(path + '/' + file.getName());
-
-        if(file instanceof LocalFile) {
-            file.setHash(GenerateHash.generateLocalFile());
-        } else {
-            file.setHash(GenerateHash.generateDatabaseFile());
-            ((DatabaseFile)file).setRelativePath(path + '/' + file.getName());
-        }
-
-
-        file.setContainerKey(containerKey);
-        file.setCreateDate(Calendar.getInstance());
-        file.setContentType(multipartFile.getContentType());
-        file.setSize(multipartFile.getSize());
+        file.buildTaxDocumentLetterCorrection(infInutDhRecbto, chNFe, containerKey, multipartFile.getContentType(), multipartFile.getSize(), ld, tokenResultProxy);
 
         return new FileProcessed(file, errors);
     }
@@ -127,7 +94,7 @@ public class CommonTaxDocumentEventLetterCorrectionService {
         List<String> errors = new ArrayList<>();
 
         if(!isLetterCorrectionEvent(xml)) {
-            errors.add("Não é um evento de carta de correção.");
+            errors.add(MessageStorage.ISNT_LETTER_CORRECTION_EVENT);
         }
 
         return new FileProcessed(file, errors);

@@ -14,6 +14,9 @@ public final class MessageStorage {
     public static final String DISABLE_EVENT_MUST_HAVE_PROTOCOL_NUMBER = "The disable event must have a protocol number.";
     public static final String DISABLE_EVENT_ALREADY_EXISTS = "This disable event already exists.";
     public static final String ISNT_DISABLING_EVENT = "It is not a disabling event.";
+    public static final String CORRECTION_LETTER_EVENT_HAVE_RECEIPT_DATE_TIME = "The correction letter event must have a receipt date and time.";
+    public static final String CORRECTION_LETTER_EVENT_ALREADY_EXISTS = "This correction letter event already exists.";
+    public static final String ISNT_LETTER_CORRECTION_EVENT = "It's not a letter-of-correction event.";
 
 
     protected MessageStorage() {}
