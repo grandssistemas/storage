@@ -5,6 +5,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.MessageStorage;
+import digital.container.storage.api.ApiDocumentation;
 import digital.container.storage.domain.model.container.PermissionContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class PermissionContainerAPI {
     private PermissionContainerService permissionContainerService;
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation(value = "permission-container", notes = "Cadastrar uma chave para permitir gravar dados no storage.")
+    @ApiOperation(value = "permission-container", notes = ApiDocumentation.POST_PERMISSION_CONTAINER)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = PermissionContainer.class),
             @ApiResponse(code = 400, message = MessageStorage.YOU_ALREADY_HAVE_ACCESS_TO_THE_CONTAINER)

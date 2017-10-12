@@ -2,6 +2,7 @@ package digital.container.storage.api.file.localfile;
 
 import com.wordnik.swagger.annotations.*;
 import digital.container.service.file.localfile.LocalFileService;
+import digital.container.storage.api.ApiDocumentation;
 import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.storage.domain.model.util.TokenUtil;
@@ -35,16 +36,16 @@ public class LocalFileAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "local-file-upload", notes = "Upload de arquivo que será salvo localmente.")
+    @ApiOperation(value = "local-file-upload", notes = ApiDocumentation.POST_LOCAL_FILE_UPLOAD)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = FileProcessed.class),
             @ApiResponse(code = 400, message = "", response = FileProcessed.class)
     })
-    public ResponseEntity<FileProcessed> upload(@ApiParam(name = "containerKey", value = "A chave cadastrada no storage no endpoint: /api/permission-container", required = true) @PathVariable String containerKey,
-                                                @ApiParam(name = "shared", value = "Para enviar o arquivo como publico setar esse parametro como true", defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
-                                                @ApiParam(name = "file", value = "O arquivo que será salvo no storage", required = true) @RequestPart(name = "file") MultipartFile multipartFile,
-                                                @ApiParam(name = "tokenSoftwareHouse", required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
-                                                @ApiParam(name = "tokenAccountant", required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
+    public ResponseEntity<FileProcessed> upload(@ApiParam(name = "containerKey", value = ApiDocumentation.PARAM_CONTAINER_KEY, required = true) @PathVariable String containerKey,
+                                                @ApiParam(name = "shared", value = ApiDocumentation.PARAM_SHARED, defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
+                                                @ApiParam(name = "file", value = ApiDocumentation.PARAM_FILE, required = true) @RequestPart(name = "file") MultipartFile multipartFile,
+                                                @ApiParam(name = "tokenSoftwareHouse", value = ApiDocumentation.PARAM_TOKEN_SOFTWARE_HOUSE, required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
+                                                @ApiParam(name = "tokenAccountant", value = ApiDocumentation.PARAM_TOKEN_ACCOUNTANT, required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
         FileProcessed fileProcessed = this.localFileService.upload(containerKey, multipartFile, shared, tokenSoftwareHouse, tokenAccountant);
 
         if(fileProcessed.getErrors().size() > 0) {
@@ -61,16 +62,16 @@ public class LocalFileAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "local-file-uploads", notes = "Uploads de arquivos que serão salvos localmente. Limite maximo de 500.")
+    @ApiOperation(value = "local-file-uploads", notes = ApiDocumentation.POST_LOCAL_FILE_UPLOAD)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = List.class),
             @ApiResponse(code = 400, message = "", response = List.class)
     })
-    public ResponseEntity<List<FileProcessed>> upload(@ApiParam(name = "containerKey", value = "A chave cadastrada no storage no endpoint: /api/permission-container", required = true) @PathVariable String containerKey,
-                                                      @ApiParam(name = "shared", value = "Para enviar o arquivo como publico setar esse parametro como true", defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
-                                                      @ApiParam(name = "files", value = "Os arquivos que serão salvos no storage", required = true) @RequestPart(name = "files") List<MultipartFile> multipartFiles,
-                                                      @ApiParam(name = "tokenSoftwareHouse", required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
-                                                      @ApiParam(name = "tokenAccountant", required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
+    public ResponseEntity<List<FileProcessed>> upload(@ApiParam(name = "containerKey", value = ApiDocumentation.PARAM_CONTAINER_KEY, required = true) @PathVariable String containerKey,
+                                                      @ApiParam(name = "shared", value = ApiDocumentation.PARAM_SHARED, defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
+                                                      @ApiParam(name = "files", value = ApiDocumentation.PARAM_FILES, required = true) @RequestPart(name = "files") List<MultipartFile> multipartFiles,
+                                                      @ApiParam(name = "tokenSoftwareHouse", value = ApiDocumentation.PARAM_TOKEN_SOFTWARE_HOUSE, required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
+                                                      @ApiParam(name = "tokenAccountant", value = ApiDocumentation.PARAM_TOKEN_ACCOUNTANT, required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
         List<FileProcessed> filesProcessed = this.localFileService.upload(containerKey, multipartFiles, shared, tokenSoftwareHouse, tokenAccountant);
         return ResponseEntity.status(HttpStatus.CREATED).body(filesProcessed);
     }
@@ -81,7 +82,7 @@ public class LocalFileAPI {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
-    @ApiOperation(value = "local-file-hash", notes = "Visualizar o arquivo salvo no storage pelo hash.")
+    @ApiOperation(value = "local-file-hash", notes = ApiDocumentation.GET_HASH_LOCAL_FILE)
     public void view(@ApiParam(name = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
         LocalFile result = this.localFileService.getFileHash(hash);
         SendDataLocalFileHttpServlet.send(result, httpServletResponse, Boolean.FALSE);
@@ -93,7 +94,7 @@ public class LocalFileAPI {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
-    @ApiOperation(value = "download-local-file-hash", notes = "Download o arquivo salvo no storage pelo hash.")
+    @ApiOperation(value = "download-local-file-hash", notes = ApiDocumentation.GET_DOWNLOAD_LOCAL_FILE)
     public void download(@ApiParam(name = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
         LocalFile result = this.localFileService.getFileHash(hash);
         SendDataLocalFileHttpServlet.send(result, httpServletResponse, Boolean.TRUE);
@@ -105,7 +106,7 @@ public class LocalFileAPI {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
-    @ApiOperation(value = "local-file-public-hash", notes = "Visualizar o arquivo publico salvo no storage pelo hash.")
+    @ApiOperation(value = "local-file-public-hash", notes = ApiDocumentation.GET_PUBLIC_HASH_LOCAL_FILE)
     public void downloadShared(@ApiParam(name = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
         LocalFile result = this.localFileService.getFileHash(hash, Boolean.TRUE);
         SendDataLocalFileHttpServlet.send(result, httpServletResponse, Boolean.FALSE);
@@ -116,7 +117,7 @@ public class LocalFileAPI {
             path = "/hash/{hash}",
             method = RequestMethod.DELETE
     )
-    @ApiOperation(value = "local-file-remove-hash", notes = "Remover o arquivo salvo no storage pelo hash.")
+    @ApiOperation(value = "local-file-remove-hash", notes = ApiDocumentation.DELETE_HASH_LOCAL_FILE)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = ""),
             @ApiResponse(code = 404, message = "")
@@ -133,7 +134,7 @@ public class LocalFileAPI {
             path = "/{id}",
             method = RequestMethod.DELETE
     )
-    @ApiOperation(value = "local-file-remove-id", notes = "Remover o arquivo salvo no storage pelo id.")
+    @ApiOperation(value = "local-file-remove-id", notes = ApiDocumentation.DELETE_ID_LOCAL_FILE)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = ""),
             @ApiResponse(code = 404, message = "")
