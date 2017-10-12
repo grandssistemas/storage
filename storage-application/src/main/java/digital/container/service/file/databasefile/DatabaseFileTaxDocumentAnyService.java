@@ -26,33 +26,34 @@ import java.util.List;
 @Transactional
 public class DatabaseFileTaxDocumentAnyService extends GumgaService<DatabaseFile, String> {
 
-    @Autowired
-    private CommonTaxDocumentEventCanceledService commonTaxCocumentEventService;
+    private final CommonTaxDocumentEventCanceledService commonTaxCocumentEventService;
+    private final CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService;
+    private final CommonTaxDocumentEventLetterCorrectionService commonTaxDocumentEventLetterCorrectionService;
+    private final CommonTaxDocumentService commonTaxDocumentService;
+    private final DatabaseFilePartService databaseFilePartService;
+    private final SendMessageMOMService sendMessageMOMService;
+    private final SecurityTokenService securityTokenService;
+
+    private final DatabaseFileRepository databaseFileRepository;
 
     @Autowired
-    private CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService;
-
-    @Autowired
-    private CommonTaxDocumentEventLetterCorrectionService commonTaxDocumentEventLetterCorrectionService;
-
-    @Autowired
-    private CommonTaxDocumentService commonTaxDocumentService;
-
-    @Autowired
-    private DatabaseFilePartService databaseFilePartService;
-
-    @Autowired
-    private SendMessageMOMService sendMessageMOMService;
-
-    @Autowired
-    private SecurityTokenService securityTokenService;
-
-    private DatabaseFileRepository databaseFileRepository;
-
-    @Autowired
-    public DatabaseFileTaxDocumentAnyService(GumgaCrudRepository<DatabaseFile, String> repository) {
+    public DatabaseFileTaxDocumentAnyService(GumgaCrudRepository<DatabaseFile, String> repository,
+                                             CommonTaxDocumentEventCanceledService commonTaxCocumentEventService,
+                                             CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService,
+                                             CommonTaxDocumentEventLetterCorrectionService commonTaxDocumentEventLetterCorrectionService,
+                                             CommonTaxDocumentService commonTaxDocumentService,
+                                             DatabaseFilePartService databaseFilePartService,
+                                             SendMessageMOMService sendMessageMOMService,
+                                             SecurityTokenService securityTokenService) {
         super(repository);
         this.databaseFileRepository = DatabaseFileRepository.class.cast(repository);
+        this.commonTaxCocumentEventService = commonTaxCocumentEventService;
+        this.commonTaxDocumentEventDisableService = commonTaxDocumentEventDisableService;
+        this.commonTaxDocumentEventLetterCorrectionService = commonTaxDocumentEventLetterCorrectionService;
+        this.commonTaxDocumentService = commonTaxDocumentService;
+        this.databaseFilePartService = databaseFilePartService;
+        this.sendMessageMOMService = sendMessageMOMService;
+        this.securityTokenService = securityTokenService;
     }
 
 
@@ -81,7 +82,7 @@ public class DatabaseFileTaxDocumentAnyService extends GumgaService<DatabaseFile
             fileProcessed = this.commonTaxDocumentService.getData(databaseFile, multipartFile, containerKey, tokenResultProxy);
         }
 
-        if(fileProcessed.getErrors().size() > 0) {
+        if(!fileProcessed.getErrors().isEmpty()) {
             return  fileProcessed;
         }
 
@@ -89,7 +90,7 @@ public class DatabaseFileTaxDocumentAnyService extends GumgaService<DatabaseFile
         this.databaseFilePartService.saveFile(databaseFile, multipartFile);
         this.sendMessageMOMService.send(databaseFile, containerKey);
 
-        return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.EMPTY_LIST);
+        return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.emptyList());
     }
 
     public FileProcessed upload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {

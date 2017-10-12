@@ -1,11 +1,11 @@
-package digital.container.service.file.databasefile;
+package digital.container.service.file.amazons3;
 
-import digital.container.repository.file.DatabaseFileRepository;
 import digital.container.service.message.SendMessageMOMService;
 import digital.container.service.taxdocument.CommonTaxDocumentEventCanceledService;
 import digital.container.service.token.SecurityTokenService;
-import digital.container.storage.domain.model.file.database.DatabaseFile;
+import digital.container.storage.domain.model.file.amazon.AmazonS3File;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.storage.domain.model.util.AmazonS3Util;
 import digital.container.storage.domain.model.util.TokenResultProxy;
 import io.gumga.application.GumgaService;
 import io.gumga.domain.repository.GumgaCrudRepository;
@@ -20,47 +20,44 @@ import java.util.List;
 
 @Service
 @Transactional
-public class DatabaseFileTaxDocumentCanceledService extends GumgaService<DatabaseFile, String> {
+public class AmazonS3FileTaxDocumentCanceledService extends GumgaService<AmazonS3File, String> {
 
-    private final DatabaseFileRepository databaseFileRepository;
     private final CommonTaxDocumentEventCanceledService commonTaxCocumentEventService;
-    private final DatabaseFilePartService databaseFilePartService;
     private final SendMessageMOMService sendMessageMOMService;
     private final SecurityTokenService securityTokenService;
+    private final SendFileAmazonS3Service sendFileAmazonS3Service;
 
     @Autowired
-    public DatabaseFileTaxDocumentCanceledService(GumgaCrudRepository<DatabaseFile, String> repository,
+    public AmazonS3FileTaxDocumentCanceledService(GumgaCrudRepository<AmazonS3File, String> repository,
                                                   CommonTaxDocumentEventCanceledService commonTaxCocumentEventService,
-                                                  DatabaseFilePartService databaseFilePartService,
                                                   SendMessageMOMService sendMessageMOMService,
-                                                  SecurityTokenService securityTokenService) {
+                                                  SecurityTokenService securityTokenService,
+                                                  SendFileAmazonS3Service sendFileAmazonS3Service) {
         super(repository);
-        this.databaseFileRepository = DatabaseFileRepository.class.cast(repository);
         this.commonTaxCocumentEventService = commonTaxCocumentEventService;
-        this.databaseFilePartService = databaseFilePartService;
         this.sendMessageMOMService = sendMessageMOMService;
         this.securityTokenService = securityTokenService;
+        this.sendFileAmazonS3Service = sendFileAmazonS3Service;
     }
 
     private FileProcessed saveFile(String containerKey,
                                    MultipartFile multipartFile,
                                    TokenResultProxy tokenResultProxy) {
-        DatabaseFile databaseFile = new DatabaseFile();
-        FileProcessed data = this.commonTaxCocumentEventService.getData(databaseFile,
+        AmazonS3File amazonS3File = new AmazonS3File();
+        FileProcessed data = this.commonTaxCocumentEventService.getData(amazonS3File,
                 multipartFile, containerKey, tokenResultProxy);
 
         if(!data.getErrors().isEmpty()) {
             return data;
         }
-        this.databaseFileRepository.saveAndFlush(databaseFile);
-        this.databaseFilePartService.saveFile(databaseFile, multipartFile);
 
-        this.sendMessageMOMService.send(databaseFile, containerKey);
+        this.sendFileAmazonS3Service.send(amazonS3File, multipartFile, Boolean.FALSE, AmazonS3Util.TAX_DOCUMENT_BUCKET);
+        this.sendMessageMOMService.send(amazonS3File, containerKey);
 
-        return new FileProcessed(this.databaseFileRepository.saveAndFlush(databaseFile), Collections.emptyList());
+        return new FileProcessed(this.repository.saveAndFlush(amazonS3File), Collections.emptyList());
     }
 
-    public FileProcessed upload(String containerKey,
+    public FileProcessed processUpload(String containerKey,
                                 MultipartFile multipartFile,
                                 String tokenSoftwareHouse,
                                 String tokenAccountant) {
@@ -68,7 +65,7 @@ public class DatabaseFileTaxDocumentCanceledService extends GumgaService<Databas
         return this.saveFile(containerKey, multipartFile, tokenResultProxy);
     }
 
-    public List<FileProcessed> upload(String containerKey,
+    public List<FileProcessed> processUpload(String containerKey,
                                       List<MultipartFile> multipartFiles,
                                       String tokenSoftwareHouse,
                                       String tokenAccountant) {

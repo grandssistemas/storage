@@ -26,7 +26,7 @@ import java.util.*;
 @Transactional
 public class LocalFileTaxDocumentCanceledService extends GumgaService<LocalFile, String> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileTaxDocumentCanceledService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LocalFileTaxDocumentCanceledService.class);
     private LocalFileRepository localFileRepository;
 
     @Autowired
@@ -57,7 +57,7 @@ public class LocalFileTaxDocumentCanceledService extends GumgaService<LocalFile,
         try {
             SaveLocalFile.saveFile(folder, localFile.getName(), multipartFile.getInputStream());
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
 
         this.sendMessageMOMService.send(localFile, containerKey);

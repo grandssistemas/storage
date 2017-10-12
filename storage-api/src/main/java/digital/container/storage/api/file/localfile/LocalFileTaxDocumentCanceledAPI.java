@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping
-public class LocalFileTaxDocumentoCanceledAPI {
+public class LocalFileTaxDocumentCanceledAPI {
     private static final String URI_BASE = "/api/local-file/tax-document-canceled";
 
     @Autowired

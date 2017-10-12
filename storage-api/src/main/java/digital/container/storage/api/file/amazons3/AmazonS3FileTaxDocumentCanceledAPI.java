@@ -1,10 +1,10 @@
-package digital.container.storage.api.file.databasefile;
+package digital.container.storage.api.file.amazons3;
 
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-import digital.container.service.file.databasefile.DatabaseFileTaxDocumentCanceledService;
+import digital.container.service.file.amazons3.AmazonS3FileTaxDocumentCanceledService;
 import digital.container.storage.api.ApiDocumentation;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.storage.domain.model.util.TokenUtil;
@@ -18,13 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@RestController
 @RequestMapping
-public class DatabaseFileTaxDocumentoCanceledAPI {
-    private static final String URI_BASE = "/api/database-file/tax-document-canceled";
+@RestController
+public class AmazonS3FileTaxDocumentCanceledAPI {
+    private static final String URI_BASE = "/api/amazons3-file/tax-document-canceled";
 
     @Autowired
-    private DatabaseFileTaxDocumentCanceledService service;
+    private AmazonS3FileTaxDocumentCanceledService service;
 
     @Transactional
     @RequestMapping(
@@ -33,7 +33,7 @@ public class DatabaseFileTaxDocumentoCanceledAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "database-file-tax-document-canceled-upload", notes = ApiDocumentation.POST_EVENT_CANCELLATION_DATABASE_FILE_UPLOAD)
+    @ApiOperation(value = "amazons3-file-tax-document-canceled-upload", notes = ApiDocumentation.POST_EVENT_CANCELLATION_AMAZONS3_UPLOAD)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = FileProcessed.class),
             @ApiResponse(code = 400, message = "", response = FileProcessed.class)
@@ -42,7 +42,7 @@ public class DatabaseFileTaxDocumentoCanceledAPI {
                                                 @ApiParam(name = "file", value = ApiDocumentation.PARAM_FILE, required = true) @RequestPart(name = "file") MultipartFile multipartFile,
                                                 @ApiParam(name = "tokenSoftwareHouse", value = ApiDocumentation.PARAM_TOKEN_SOFTWARE_HOUSE, required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
                                                 @ApiParam(name = "tokenAccountant", value = ApiDocumentation.PARAM_TOKEN_ACCOUNTANT, required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
-        FileProcessed fileProcessed = this.service.upload(containerKey, multipartFile, tokenSoftwareHouse, tokenAccountant);
+        FileProcessed fileProcessed = this.service.processUpload(containerKey, multipartFile, tokenSoftwareHouse, tokenAccountant);
         if(!fileProcessed.getErrors().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(fileProcessed);
         }
@@ -57,7 +57,7 @@ public class DatabaseFileTaxDocumentoCanceledAPI {
             consumes = MediaType.ALL_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    @ApiOperation(value = "database-file-tax-document-canceled-uploads", notes = ApiDocumentation.POST_EVENT_CANCELLATION_DATABASE_FILE_UPLOAD)
+    @ApiOperation(value = "amazons3-file-tax-document-canceled-uploads", notes = ApiDocumentation.POST_EVENT_CANCELLATION_AMAZONS3_UPLOAD)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "", response = List.class),
             @ApiResponse(code = 400, message = "", response = List.class)
@@ -66,7 +66,7 @@ public class DatabaseFileTaxDocumentoCanceledAPI {
                                                       @ApiParam(name = "files", value = ApiDocumentation.PARAM_FILES, required = true)@RequestPart(name = "files") List<MultipartFile> multipartFiles,
                                                       @ApiParam(name = "tokenSoftwareHouse", value = ApiDocumentation.PARAM_TOKEN_SOFTWARE_HOUSE, required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
                                                       @ApiParam(name = "tokenAccountant", value = ApiDocumentation.PARAM_TOKEN_ACCOUNTANT, required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
-        List<FileProcessed> filesProcessed = this.service.upload(containerKey, multipartFiles, tokenSoftwareHouse, tokenAccountant);
+        List<FileProcessed> filesProcessed = this.service.processUpload(containerKey, multipartFiles, tokenSoftwareHouse, tokenAccountant);
         return ResponseEntity.status(HttpStatus.CREATED).body(filesProcessed);
     }
 }

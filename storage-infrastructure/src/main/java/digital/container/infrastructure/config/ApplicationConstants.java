@@ -21,7 +21,7 @@ public class ApplicationConstants implements GumgaValues {
 
     @Override
     public boolean isLogActive() {
-        return Boolean.valueOf(this.properties.getProperty("gumgalog.ativo", "true"));
+        return Boolean.valueOf(this.properties.getProperty("gumgalog.ativo", "false"));
     }
 
     @Override

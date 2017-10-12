@@ -22,6 +22,7 @@ public final class ApiDocumentation {
 
     public static final String POST_AMAZONS3_UPLOAD = "Upload anything that will be saved in Amazon S3.";
 
+    public static final String POST_EVENT_CANCELLATION_AMAZONS3_UPLOAD = "Save event of cancellation of tax documents in Amazon S3.";
 
 
     protected ApiDocumentation() {}

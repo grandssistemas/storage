@@ -41,30 +41,43 @@ public class AmazonS3FileTaxDocumentDisableService extends GumgaService<AmazonS3
     }
 
     @Transactional
-    public FileProcessed processUpload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {
+    public FileProcessed processUpload(String containerKey,
+                                       MultipartFile multipartFile,
+                                       String tokenSoftwareHouse,
+                                       String tokenAccountant) {
         TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
         return this.save(containerKey, multipartFile, tokenResultProxy);
     }
 
     @Transactional
-    public List<FileProcessed> processUpload(String containerKey, List<MultipartFile> multipartFiles, String tokenSoftwareHouse, String tokenAccountant) {
+    public List<FileProcessed> processUpload(String containerKey,
+                                             List<MultipartFile> multipartFiles,
+                                             String tokenSoftwareHouse,
+                                             String tokenAccountant) {
         TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
         List<FileProcessed> result = new ArrayList<>();
+
         for(MultipartFile multipartFile : multipartFiles) {
             result.add(this.save(containerKey,multipartFile, tokenResultProxy));
         }
+
         return result;
     }
 
-    public FileProcessed save(String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
+    public FileProcessed save(String containerKey,
+                              MultipartFile multipartFile,
+                              TokenResultProxy tokenResultProxy) {
         AmazonS3File amazonS3File = new AmazonS3File();
-        FileProcessed data = this.commonTaxDocumentEventDisableService.getData(amazonS3File, multipartFile, containerKey, tokenResultProxy);
+        FileProcessed data = this.commonTaxDocumentEventDisableService.getData(amazonS3File,
+                multipartFile, containerKey, tokenResultProxy);
 
         if(!data.getErrors().isEmpty()) {
             return data;
         }
+
         this.sendFileAmazonS3Service.send(amazonS3File, multipartFile, Boolean.FALSE, AmazonS3Util.TAX_DOCUMENT_BUCKET);
         this.sendMessageMOMService.send(amazonS3File, containerKey);
+
         return new FileProcessed(this.repository.saveAndFlush(amazonS3File), Collections.emptyList());
     }
 }

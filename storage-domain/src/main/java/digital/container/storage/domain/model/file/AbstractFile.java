@@ -270,6 +270,29 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
 
         return this;
     }
+    public AbstractFile buildTaxDocumentCanceled(String chNFe, String infEventochDhRegEvento, String movement, String containerKey, String contentType, Long size, LocalDate ld,  TokenResultProxy tokenResultProxy) {
+
+        addSharing(tokenResultProxy);
+        setDetailOne(chNFe);
+        setDetailTwo(infEventochDhRegEvento);
+
+        String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTCanceled(containerKey,
+                ld.getYear(),
+                ld.getMonth().toString(),
+                getFileType(),
+                movement);
+
+        setHash(getHashFile());
+        setRelativePath(path.concat("/").concat(getName()));
+        setContainerKey(containerKey);
+        setCreateDate(Calendar.getInstance());
+
+
+        setContentType(contentType);
+        setSize(size);
+
+        return this;
+    }
 
     private void addSharing(TokenResultProxy  tokenResultProxy) {
         if(!TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN.equals(tokenResultProxy.accountantOi)) {
