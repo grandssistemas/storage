@@ -17,6 +17,7 @@ import io.gumga.core.QueryObject;
 import io.gumga.core.SearchResult;
 import io.gumga.core.gquery.ComparisonOperator;
 import io.gumga.core.gquery.Criteria;
+import io.gumga.core.gquery.CriteriaField;
 import io.gumga.core.gquery.GQuery;
 import io.gumga.domain.domains.GumgaOi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,22 +219,37 @@ public class SearchTaxDocumentService {
             }
         });
 
-        if(searchScheduling.getCnpjs().size() > 0) {
-            List<DatabaseFile> taxDocumentBySearchScheduling = this.databaseFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs(), startDate, endDate);
-            files.addAll(taxDocumentBySearchScheduling);
+//        if(searchScheduling.getCnpjs().size() > 0) {
+//            List<DatabaseFile> taxDocumentBySearchScheduling = this.databaseFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs(), startDate, endDate);
+//            files.addAll(taxDocumentBySearchScheduling);
+//
+//            List<LocalFile> lfs = this.localFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs(), startDate, endDate);
+//            files.addAll(lfs);
+//        }
 
-            List<LocalFile> lfs = this.localFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs(), startDate, endDate);
-            files.addAll(lfs);
-        } else {
 
-        }
+        QueryObject queryObject = new QueryObject();
+        queryObject.setPageSize(Integer.MAX_VALUE);
 
+        GQuery where = new GQuery(new Criteria("obj.fileType", ComparisonOperator.IN, fileTypes))
+                .and(new Criteria("obj.containerKey", ComparisonOperator.IN, searchScheduling.getCnpjs()))
+                .and(new Criteria("obj.detailTwo", ComparisonOperator.NOT_EQUAL, ""))
+                .and(new Criteria("to_date(obj.detailTwo, 'YYYY-MM-DD')", ComparisonOperator.GREATER_EQUAL, new CriteriaField("to_date('" + startDate + "', 'YYYY-MM-DD')")))
+                .and(new Criteria("to_date(obj.detailTwo, 'YYYY-MM-DD')", ComparisonOperator.LOWER_EQUAL, new CriteriaField("to_date('" + endDate + "', 'YYYY-MM-DD')")));
+
+
+        queryObject.setgQuery(where);
+
+        SearchResult<AmazonS3File> pesquisa = this.amazonS3FileService.pesquisa(queryObject);
+        files.addAll(pesquisa.getValues());
+        SearchResult<DatabaseFile> pesquisa1 = this.databaseFileService.pesquisa(queryObject);
+        files.addAll(pesquisa1.getValues());
+        SearchResult<LocalFile> pesquisa2 = this.localFileService.pesquisa(queryObject);
+        files.addAll(pesquisa2.getValues());
 
 
         return files;
     }
-
-
 
     private AbstractFile findOneAbstractFile(GQuery where) {
         QueryObject queryObject = new QueryObject();
@@ -261,6 +277,7 @@ public class SearchTaxDocumentService {
         List<AbstractFile> files = new ArrayList<>();
         QueryObject queryObject = new QueryObject();
         queryObject.setgQuery(where);
+
 
         SearchResult<AmazonS3File> pesquisaAmazonS3 = this.amazonS3FileService.pesquisa(queryObject);
         if(!pesquisaAmazonS3.getValues().isEmpty()) {

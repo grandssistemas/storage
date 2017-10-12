@@ -25,19 +25,19 @@ public class AmazonS3FileTaxDocumentDisableService extends GumgaService<AmazonS3
     private final CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService;
     private final SendMessageMOMService sendMessageMOMService;
     private final SecurityTokenService securityTokenService;
-    private final SendFileAmazonS3Service sendFileAmazonS3Service;
+    private final AmazonS3Service amazonS3Service;
 
     @Autowired
     public AmazonS3FileTaxDocumentDisableService(GumgaCrudRepository<AmazonS3File, String> repository,
                                                  CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService,
                                                  SendMessageMOMService sendMessageMOMService,
                                                  SecurityTokenService securityTokenService,
-                                                 SendFileAmazonS3Service sendFileAmazonS3Service) {
+                                                 AmazonS3Service amazonS3Service) {
         super(repository);
         this.commonTaxDocumentEventDisableService = commonTaxDocumentEventDisableService;
         this.sendMessageMOMService = sendMessageMOMService;
         this.securityTokenService = securityTokenService;
-        this.sendFileAmazonS3Service = sendFileAmazonS3Service;
+        this.amazonS3Service = amazonS3Service;
     }
 
     @Transactional
@@ -75,7 +75,7 @@ public class AmazonS3FileTaxDocumentDisableService extends GumgaService<AmazonS3
             return data;
         }
 
-        this.sendFileAmazonS3Service.send(amazonS3File, multipartFile, Boolean.FALSE, AmazonS3Util.TAX_DOCUMENT_BUCKET);
+        this.amazonS3Service.send(amazonS3File, multipartFile, Boolean.FALSE, AmazonS3Util.TAX_DOCUMENT_BUCKET);
         this.sendMessageMOMService.send(amazonS3File, containerKey);
 
         return new FileProcessed(this.repository.saveAndFlush(amazonS3File), Collections.emptyList());

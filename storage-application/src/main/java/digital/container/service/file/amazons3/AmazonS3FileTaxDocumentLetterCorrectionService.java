@@ -25,7 +25,7 @@ public class AmazonS3FileTaxDocumentLetterCorrectionService extends GumgaService
     private final SendMessageMOMService sendMessageMOMService;
     private final SecurityTokenService securityTokenService;
     private final CommonTaxDocumentEventLetterCorrectionService service;
-    private final SendFileAmazonS3Service sendFileAmazonS3Service;
+    private final AmazonS3Service amazonS3Service;
 
 
     @Autowired
@@ -33,12 +33,12 @@ public class AmazonS3FileTaxDocumentLetterCorrectionService extends GumgaService
                                                           SendMessageMOMService sendMessageMOMService,
                                                           SecurityTokenService securityTokenService,
                                                           CommonTaxDocumentEventLetterCorrectionService service,
-                                                          SendFileAmazonS3Service sendFileAmazonS3Service) {
+                                                          AmazonS3Service amazonS3Service) {
         super(repository);
         this.sendMessageMOMService = sendMessageMOMService;
         this.securityTokenService = securityTokenService;
         this.service = service;
-        this.sendFileAmazonS3Service = sendFileAmazonS3Service;
+        this.amazonS3Service = amazonS3Service;
     }
 
     public FileProcessed processUpload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {
@@ -63,7 +63,7 @@ public class AmazonS3FileTaxDocumentLetterCorrectionService extends GumgaService
             return data;
         }
 
-        this.sendFileAmazonS3Service.send(amazonS3File, multipartFile, Boolean.FALSE, AmazonS3Util.TAX_DOCUMENT_BUCKET);
+        this.amazonS3Service.send(amazonS3File, multipartFile, Boolean.FALSE, AmazonS3Util.TAX_DOCUMENT_BUCKET);
         this.sendMessageMOMService.send(amazonS3File, containerKey);
 
         return new FileProcessed(this.repository.saveAndFlush(amazonS3File), Collections.emptyList());

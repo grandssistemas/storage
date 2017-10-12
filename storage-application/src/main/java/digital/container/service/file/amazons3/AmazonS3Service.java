@@ -4,6 +4,7 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import digital.container.storage.domain.model.file.AbstractFile;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +15,12 @@ import java.io.File;
 import java.io.IOException;
 
 @Service
-public class SendFileAmazonS3Service {
+public class AmazonS3Service {
 
     private final AmazonS3 amazonS3;
 
     @Autowired
-    public SendFileAmazonS3Service(AmazonS3 amazonS3) {
+    public AmazonS3Service(AmazonS3 amazonS3) {
         this.amazonS3 = amazonS3;
     }
 
@@ -54,5 +55,11 @@ public class SendFileAmazonS3Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public File getFile(String bucketName, String path, String relativePath) {
+        File file = new File(path.concat("/").concat(relativePath));
+        amazonS3.getObject(new GetObjectRequest(bucketName, relativePath), file);
+        return file;
     }
 }

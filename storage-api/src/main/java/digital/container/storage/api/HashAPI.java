@@ -8,6 +8,7 @@ import digital.container.service.download.LinkDownloadService;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
 import digital.container.storage.domain.model.download.LinkDownload;
 import digital.container.storage.domain.model.file.*;
+import digital.container.storage.domain.model.file.amazon.AmazonS3File;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.util.IntegrationTokenUtil;
@@ -128,8 +129,10 @@ public class HashAPI {
                 DatabaseFile df = (DatabaseFile) taxDocumentByDetailOneAndGumgaOI;
                 SendDataDatabaseFileHttpServlet.send(df, httpServletResponse, Boolean.FALSE);
             } else {
-                LocalFile lf = (LocalFile) taxDocumentByDetailOneAndGumgaOI;
-                SendDataLocalFileHttpServlet.send(lf, httpServletResponse, Boolean.FALSE);
+                if(taxDocumentByDetailOneAndGumgaOI instanceof DatabaseFile) {
+                    LocalFile lf = (LocalFile) taxDocumentByDetailOneAndGumgaOI;
+                    SendDataLocalFileHttpServlet.send(lf, httpServletResponse, Boolean.FALSE);
+                }
             }
         }
     }

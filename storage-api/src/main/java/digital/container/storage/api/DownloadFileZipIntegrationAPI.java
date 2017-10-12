@@ -24,7 +24,8 @@ public class DownloadFileZipIntegrationAPI {
 
     @RequestMapping(method = RequestMethod.POST)
     @Transactional
-    public ResponseEntity<Object> generateLinkToDownload(@RequestBody SearchScheduling searchScheduling, @RequestParam(name = "integrationToken", defaultValue = "NO_TOKEN") String integrationToken){
+    public ResponseEntity<Object> generateLinkToDownload(@RequestBody SearchScheduling searchScheduling,
+                                                         @RequestParam(name = "integrationToken", defaultValue = "NO_TOKEN") String integrationToken){
         if(StringUtils.isEmpty(searchScheduling.getOrganizationCode())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O organization token não está preenchido.");
         }

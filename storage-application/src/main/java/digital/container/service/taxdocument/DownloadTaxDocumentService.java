@@ -1,11 +1,14 @@
 package digital.container.service.taxdocument;
 
 import digital.container.service.download.LinkDownloadService;
+import digital.container.service.file.amazons3.AmazonS3Service;
 import digital.container.storage.domain.model.download.LinkDownload;
 import digital.container.storage.domain.model.file.*;
+import digital.container.storage.domain.model.file.amazon.AmazonS3File;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.database.DatabaseFilePart;
 import digital.container.storage.domain.model.file.local.LocalFile;
+import digital.container.storage.domain.model.util.AmazonS3Util;
 import digital.container.storage.domain.model.util.GenerateHash;
 import digital.container.storage.domain.model.util.SearchScheduling;
 import digital.container.storage.domain.model.util.LocalFileUtil;
@@ -32,11 +35,18 @@ public class DownloadTaxDocumentService {
     public static final String DIRECTORY_PATH = System.getProperty("storage.foldertemp");
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadTaxDocumentService.class);
 
-    @Autowired
-    private SearchTaxDocumentService searchTaxDocumentService;
+    private final SearchTaxDocumentService searchTaxDocumentService;
+    private final LinkDownloadService linkDownloadService;
+    private final AmazonS3Service amazonS3Service;
 
     @Autowired
-    private LinkDownloadService linkDownloadService;
+    public DownloadTaxDocumentService(SearchTaxDocumentService searchTaxDocumentService,
+                                      LinkDownloadService linkDownloadService,
+                                      AmazonS3Service amazonS3Service) {
+        this.searchTaxDocumentService = searchTaxDocumentService;
+        this.linkDownloadService = linkDownloadService;
+        this.amazonS3Service = amazonS3Service;
+    }
 
     public LinkDownload generateLinkToDownload(SearchScheduling searchScheduling) {
         String nameZip = "download";
@@ -91,12 +101,17 @@ public class DownloadTaxDocumentService {
                         }
 
                     } else {
-                        LocalFile lf = (LocalFile) file;
-                        try {
-                            FileUtils.copyFile(new File(LocalFileUtil.DIRECTORY_PATH + "/" + lf.getRelativePath()), new File(path + lf.getRelativePath()));
-                        } catch (IOException e) {
-                            LOGGER.error("Erro ao tentar copiar o arquivo para a pasta de download." + e.getMessage());
-                            e.printStackTrace();
+                        if(file instanceof LocalFile) {
+                            LocalFile lf = (LocalFile) file;
+                            try {
+                                FileUtils.copyFile(new File(LocalFileUtil.DIRECTORY_PATH + "/" + lf.getRelativePath()), new File(path + lf.getRelativePath()));
+                            } catch (IOException e) {
+                                LOGGER.error("Erro ao tentar copiar o arquivo para a pasta de download." + e.getMessage());
+                                e.printStackTrace();
+                            }
+                        } else {
+                            AmazonS3File amazonS3File = (AmazonS3File) file;
+                            amazonS3Service.getFile(AmazonS3Util.TAX_DOCUMENT_BUCKET, path, amazonS3File.getRelativePath());
                         }
                     }
                 });

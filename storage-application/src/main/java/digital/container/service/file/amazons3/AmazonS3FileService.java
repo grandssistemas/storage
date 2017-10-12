@@ -21,16 +21,16 @@ import java.util.List;
 @Transactional
 public class AmazonS3FileService extends GumgaService<AmazonS3File, String> {
 
-    private final SendFileAmazonS3Service sendFileAmazonS3Service;
+    private final AmazonS3Service amazonS3Service;
     private final LimitFileService limitFileService;
     private final SecurityTokenService securityTokenService;
 
     @Autowired
     public AmazonS3FileService(GumgaCrudRepository<AmazonS3File, String> repository,
-                               SendFileAmazonS3Service sendFileAmazonS3Service,
+                               AmazonS3Service amazonS3Service,
                                LimitFileService limitFileService, SecurityTokenService securityTokenService) {
         super(repository);
-        this.sendFileAmazonS3Service = sendFileAmazonS3Service;
+        this.amazonS3Service = amazonS3Service;
         this.limitFileService = limitFileService;
         this.securityTokenService = securityTokenService;
     }
@@ -65,7 +65,7 @@ public class AmazonS3FileService extends GumgaService<AmazonS3File, String> {
                 containerKey,
                 tokenResultProxy);
 
-        this.sendFileAmazonS3Service.send(file, multipartFile, shared, AmazonS3Util.ANYTHING_BUCKET);
+        this.amazonS3Service.send(file, multipartFile, shared, AmazonS3Util.ANYTHING_BUCKET);
         return new FileProcessed(this.repository.saveAndFlush(file), Collections.emptyList());
     }
 }
