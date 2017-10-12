@@ -279,7 +279,7 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
         String path = LocalFileUtil.getRelativePathFileTAXDOCUMENTCanceled(containerKey,
                 ld.getYear(),
                 ld.getMonth().toString(),
-                getFileType(),
+                FileType.NFE_CANCELED.equals(getFileType()) ? FileType.NFE : FileType.NFCE,
                 movement);
 
         setHash(getHashFile());
