@@ -1,6 +1,7 @@
 package digital.container.storage.api.file.databasefile;
 
 import com.wordnik.swagger.annotations.*;
+import digital.container.storage.api.ApiDocumentation;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.storage.domain.model.util.TokenUtil;
@@ -36,11 +37,11 @@ public class DatabaseFileAPI {
             @ApiResponse(code = 201, message = "", response = FileProcessed.class),
             @ApiResponse(code = 400, message = "", response = FileProcessed.class)
     })
-    public ResponseEntity<FileProcessed> upload(@ApiParam(name = "containerKey", value = "A chave cadastrada no storage no endpoint: /api/permission-container", required = true) @PathVariable String containerKey,
-                                                @ApiParam(name = "shared", value = "Para enviar o arquivo como publico setar esse parametro como true", defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
-                                                @ApiParam(name = "file", value = "O arquivo que será salvo no storage", required = true) @RequestPart(name = "file") MultipartFile multipartFile,
-                                                @ApiParam(name = "tokenSoftwareHouse", required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
-                                                @ApiParam(name = "tokenAccountant", required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
+    public ResponseEntity<FileProcessed> upload(@ApiParam(name = "containerKey", value = ApiDocumentation.PARAM_CONTAINER_KEY, required = true) @PathVariable String containerKey,
+                                                @ApiParam(name = "shared", value = ApiDocumentation.PARAM_SHARED, defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
+                                                @ApiParam(name = "file", value = ApiDocumentation.PARAM_FILE, required = true) @RequestPart(name = "file") MultipartFile multipartFile,
+                                                @ApiParam(name = "tokenSoftwareHouse", value = ApiDocumentation.PARAM_TOKEN_SOFTWARE_HOUSE, required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
+                                                @ApiParam(name = "tokenAccountant", value = ApiDocumentation.PARAM_TOKEN_ACCOUNTANT,required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
         FileProcessed fileProcessed = this.databaseFileService.upload(containerKey, multipartFile, shared, tokenSoftwareHouse, tokenAccountant);
         if(fileProcessed.getErrors().size() > 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(fileProcessed);
@@ -61,11 +62,11 @@ public class DatabaseFileAPI {
             @ApiResponse(code = 201, message = "", response = List.class),
             @ApiResponse(code = 400, message = "", response = List.class)
     })
-    public ResponseEntity<List<FileProcessed>> upload(@ApiParam(name = "containerKey", value = "A chave cadastrada no storage no endpoint: /api/permission-container", required = true) @PathVariable String containerKey,
-                                                      @ApiParam(name = "shared", value = "Para enviar o arquivo como publico setar esse parametro como true", defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
-                                                      @ApiParam(name = "files", value = "Os arquivo que serão salvos no storage", required = true) @RequestPart(name = "files") List<MultipartFile> multipartFiles,
-                                                      @ApiParam(name = "tokenSoftwareHouse", required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
-                                                      @ApiParam(name = "tokenAccountant", required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
+    public ResponseEntity<List<FileProcessed>> upload(@ApiParam(name = "containerKey", value = ApiDocumentation.PARAM_CONTAINER_KEY, required = true) @PathVariable String containerKey,
+                                                      @ApiParam(name = "shared", value = ApiDocumentation.PARAM_SHARED, defaultValue = "false") @RequestParam(name = "shared", defaultValue = "false") boolean shared,
+                                                      @ApiParam(name = "files", value = ApiDocumentation.PARAM_FILES, required = true) @RequestPart(name = "files") List<MultipartFile> multipartFiles,
+                                                      @ApiParam(name = "tokenSoftwareHouse", value = ApiDocumentation.PARAM_TOKEN_SOFTWARE_HOUSE,required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
+                                                      @ApiParam(name = "tokenAccountant", value = ApiDocumentation.PARAM_TOKEN_ACCOUNTANT, required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
         List<FileProcessed> filesProcessed = this.databaseFileService.upload(containerKey, multipartFiles, shared, tokenSoftwareHouse, tokenAccountant);
         return ResponseEntity.status(HttpStatus.CREATED).body(filesProcessed);
     }

@@ -48,7 +48,7 @@ public class LocalFileAPI {
                                                 @ApiParam(name = "tokenAccountant", value = ApiDocumentation.PARAM_TOKEN_ACCOUNTANT, required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
         FileProcessed fileProcessed = this.localFileService.upload(containerKey, multipartFile, shared, tokenSoftwareHouse, tokenAccountant);
 
-        if(fileProcessed.getErrors().size() > 0) {
+        if(!fileProcessed.getErrors().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(fileProcessed);
         }
 

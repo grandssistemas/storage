@@ -2,8 +2,6 @@ package digital.container.storage.api;
 
 
 public final class ApiDocumentation {
-    protected ApiDocumentation() {}
-
     public static final String POST_PERMISSION_CONTAINER = "Register a key to allow you to write data to storage.";
 
     public static final String PARAM_CONTAINER_KEY = "The key registered in the storage in the endpoint: /api/permission-container";
@@ -19,4 +17,13 @@ public final class ApiDocumentation {
     public static final String GET_PUBLIC_HASH_LOCAL_FILE = "View the public file saved in storage by the hash.";
     public static final String DELETE_HASH_LOCAL_FILE = "Remove the file saved in storage by the hash.";
     public static final String DELETE_ID_LOCAL_FILE = "Remove the file saved in storage by id.";
+
+    public static final String POST_EVENT_CANCELLATION_DATABASE_FILE_UPLOAD = "Save event of cancellation of tax documents in the database.";
+
+    public static final String POST_AMAZONS3_UPLOAD = "Upload anything that will be saved in Amazon S3.";
+
+
+
+    protected ApiDocumentation() {}
+
 }
