@@ -157,10 +157,10 @@ public class SearchTaxDocumentService {
 //        return null;
     }
 
-    public AbstractFile getTaxDocumentByDetailOneAndGumgaOI(String detailOne) {
+    public AbstractFile getTaxDocumentByDetailOneAndFileTypes(String detailOne, List<FileType> fileTypes) {
 //        @Query(value = "from DatabaseFile df where df.detailOne = :detailOne and df.oi like :gumgaOi and df.fileType != 'ANYTHING'")
         GQuery where = new GQuery(new Criteria("obj.detailOne", ComparisonOperator.EQUAL, detailOne))
-                .and(new Criteria("obj.fileType", ComparisonOperator.NOT_EQUAL, FileType.ANYTHING));
+                .and(new Criteria("obj.fileType", ComparisonOperator.IN, fileTypes));
 
         return findOneAbstractFile(where);
 

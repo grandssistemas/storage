@@ -123,7 +123,7 @@ public class HashAPI {
     )
     @ApiOperation(value = "file-detailOne", notes = "Visualizar qualquer tipo de arquivo pelo detailOne")
     public void searchDetailOne(@ApiParam(value = "detailOne", required = true) @PathVariable String detailOne, HttpServletResponse httpServletResponse) {
-        AbstractFile taxDocumentByDetailOneAndGumgaOI = this.searchTaxDocumentService.getTaxDocumentByDetailOneAndGumgaOI(detailOne);
+        AbstractFile taxDocumentByDetailOneAndGumgaOI = this.searchTaxDocumentService.getTaxDocumentByDetailOneAndFileTypes(detailOne, Arrays.asList(FileType.NFE, FileType.NFCE));
         if(taxDocumentByDetailOneAndGumgaOI != null) {
             if(taxDocumentByDetailOneAndGumgaOI instanceof DatabaseFile) {
                 DatabaseFile df = (DatabaseFile) taxDocumentByDetailOneAndGumgaOI;
@@ -136,6 +136,7 @@ public class HashAPI {
             }
         }
     }
+
 
     @Transactional
     @RequestMapping(

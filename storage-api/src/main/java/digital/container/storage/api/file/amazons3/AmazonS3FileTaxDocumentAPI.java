@@ -5,9 +5,12 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import digital.container.service.file.amazons3.AmazonS3FileTaxDocumentService;
+import digital.container.service.taxdocument.SearchTaxDocumentService;
 import digital.container.storage.api.ApiDocumentation;
+import digital.container.storage.domain.model.file.FileType;
 import digital.container.storage.domain.model.file.vo.FileProcessed;
 import digital.container.storage.domain.model.util.TokenUtil;
+import digital.container.storage.util.SendDataFileHttpServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -27,10 +32,16 @@ public class AmazonS3FileTaxDocumentAPI {
 
 
     private final AmazonS3FileTaxDocumentService amazonS3FileTaxDocumentService;
+    private final SearchTaxDocumentService  searchTaxDocumentService;
+    private final SendDataFileHttpServlet sendDataFileHttpServlet;
 
     @Autowired
-    public AmazonS3FileTaxDocumentAPI(AmazonS3FileTaxDocumentService amazonS3FileTaxDocumentService) {
+    public AmazonS3FileTaxDocumentAPI(AmazonS3FileTaxDocumentService amazonS3FileTaxDocumentService,
+                                      SearchTaxDocumentService searchTaxDocumentService,
+                                      SendDataFileHttpServlet sendDataFileHttpServlet) {
         this.amazonS3FileTaxDocumentService = amazonS3FileTaxDocumentService;
+        this.searchTaxDocumentService = searchTaxDocumentService;
+        this.sendDataFileHttpServlet = sendDataFileHttpServlet;
     }
 
 
@@ -76,5 +87,30 @@ public class AmazonS3FileTaxDocumentAPI {
                                                       @ApiParam(name = "tokenAccountant", value = ApiDocumentation.PARAM_TOKEN_ACCOUNTANT, required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
         List<FileProcessed> filesProcessed = this.amazonS3FileTaxDocumentService.processUpload(containerKey, multipartFiles, tokenSoftwareHouse, tokenAccountant);
         return ResponseEntity.status(HttpStatus.CREATED).body(filesProcessed);
+    }
+
+    @Transactional(readOnly = true)
+    @RequestMapping(
+            path = URI_BASE + "/detail-one/{detailOne}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    @ApiOperation(value = "file-detailOne", notes = "Visualizar qualquer tipo de arquivo pelo detailOne")
+    public void searchDetailOne(@ApiParam(value = "detailOne", required = true) @PathVariable String detailOne, HttpServletResponse httpServletResponse) {
+
+        sendDataFileHttpServlet.send(this.searchTaxDocumentService.getTaxDocumentByDetailOneAndFileTypes(detailOne, Arrays.asList(FileType.NFE, FileType.NFCE)),
+                httpServletResponse);
+//        AbstractFile taxDocumentByDetailOneAndGumgaOI = this.searchTaxDocumentService.getTaxDocumentByDetailOneAndGumgaOI(detailOne);
+//        if(taxDocumentByDetailOneAndGumgaOI != null) {
+//            if(taxDocumentByDetailOneAndGumgaOI instanceof DatabaseFile) {
+//                DatabaseFile df = (DatabaseFile) taxDocumentByDetailOneAndGumgaOI;
+//                SendDataDatabaseFileHttpServlet.send(df, httpServletResponse, Boolean.FALSE);
+//            } else {
+//                if(taxDocumentByDetailOneAndGumgaOI instanceof DatabaseFile) {
+//                    LocalFile lf = (LocalFile) taxDocumentByDetailOneAndGumgaOI;
+//                    SendDataLocalFileHttpServlet.send(lf, httpServletResponse, Boolean.FALSE);
+//                }
+//            }
+//        }
     }
 }
