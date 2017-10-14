@@ -1,9 +1,11 @@
 package digital.container.service.status;
 
+import digital.container.repository.file.AmazonS3FileRepository;
 import digital.container.repository.file.DatabaseFileRepository;
 import digital.container.repository.file.LocalFileRepository;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
 import digital.container.storage.domain.model.file.AbstractFile;
+import digital.container.storage.domain.model.file.amazon.AmazonS3File;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.local.LocalFile;
@@ -15,13 +17,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ChangeIntegrationStatusTaxDocumentService {
 
-    @Autowired
-    private SearchTaxDocumentService searchTaxDocumentService;
+    private final SearchTaxDocumentService searchTaxDocumentService;
+    private final LocalFileRepository localFileRepository;
+    private final DatabaseFileRepository databaseFile;
+    private final AmazonS3FileRepository amazonS3FileRepository;
 
     @Autowired
-    private LocalFileRepository localFileRepository;
-    @Autowired
-    private DatabaseFileRepository databaseFile;
+    public ChangeIntegrationStatusTaxDocumentService(SearchTaxDocumentService searchTaxDocumentService, LocalFileRepository localFileRepository, DatabaseFileRepository databaseFile, AmazonS3FileRepository amazonS3FileRepository) {
+        this.searchTaxDocumentService = searchTaxDocumentService;
+        this.localFileRepository = localFileRepository;
+        this.databaseFile = databaseFile;
+        this.amazonS3FileRepository = amazonS3FileRepository;
+    }
 
 
     public Boolean changeStatusTaxDocumentByHash(String hash, FileStatus status) {
@@ -37,8 +44,13 @@ public class ChangeIntegrationStatusTaxDocumentService {
             DatabaseFile db = (DatabaseFile) taxDocumentByHash;
             this.databaseFile.saveAndFlush(db);
         } else {
-            LocalFile lf = (LocalFile) taxDocumentByHash;
-            this.localFileRepository.saveAndFlush(lf);
+            if(taxDocumentByHash instanceof LocalFile) {
+                LocalFile lf = (LocalFile) taxDocumentByHash;
+                this.localFileRepository.saveAndFlush(lf);
+            } else {
+                AmazonS3File amazonS3File = (AmazonS3File) taxDocumentByHash;
+                this.amazonS3FileRepository.saveAndFlush(amazonS3File);
+            }
         }
 
 

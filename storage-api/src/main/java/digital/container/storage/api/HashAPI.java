@@ -8,10 +8,7 @@ import digital.container.service.download.LinkDownloadService;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
 import digital.container.storage.domain.model.download.LinkDownload;
 import digital.container.storage.domain.model.file.*;
-import digital.container.storage.domain.model.file.database.DatabaseFile;
-import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.util.IntegrationTokenUtil;
-import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
 import digital.container.storage.util.SendDataFileHttpServlet;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
 import io.gumga.core.GumgaThreadScope;
@@ -32,8 +29,6 @@ import java.util.*;
 @RequestMapping(path = "/api/file-hash")
 public class HashAPI {
 
-    private final DatabaseFileRepository databaseFileRepository;
-    private final LocalFileRepository localFileRepository;
     private final SearchTaxDocumentService searchTaxDocumentService;
     private final LinkDownloadService linkDownloadService;
     private final SendDataFileHttpServlet sendDataFileHttpServlet;
@@ -46,8 +41,6 @@ public class HashAPI {
                    SendDataFileHttpServlet sendDataFileHttpServlet) {
         this.linkDownloadService = linkDownloadService;
         this.searchTaxDocumentService = searchTaxDocumentService;
-        this.localFileRepository = localFileRepository;
-        this.databaseFileRepository = databaseFileRepository;
         this.sendDataFileHttpServlet = sendDataFileHttpServlet;
     }
 
@@ -111,17 +104,17 @@ public class HashAPI {
         }
     }
 
-    @Transactional(readOnly = true)
-    @RequestMapping(
-            path = "/detail-one/{detailOne}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
-    )
-    @ApiOperation(value = "file-detailOne", notes = "Visualizar qualquer tipo de arquivo pelo detailOne")
-    public void searchDetailOne(@ApiParam(value = "detailOne", required = true) @PathVariable String detailOne, HttpServletResponse httpServletResponse) {
-        AbstractFile taxDocumentByDetailOneAndGumgaOI = this.searchTaxDocumentService.getTaxDocumentByDetailOneAndFileTypes(detailOne, Arrays.asList(FileType.NFE, FileType.NFCE));
-        this.sendDataFileHttpServlet.send(taxDocumentByDetailOneAndGumgaOI,  httpServletResponse);
-    }
+//    @Transactional(readOnly = true)
+//    @RequestMapping(
+//            path = "/detail-one/{detailOne}",
+//            method = RequestMethod.GET,
+//            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+//    )
+//    @ApiOperation(value = "file-detailOne", notes = "Visualizar qualquer tipo de arquivo pelo detailOne")
+//    public void searchDetailOne(@ApiParam(value = "detailOne", required = true) @PathVariable String detailOne, HttpServletResponse httpServletResponse) {
+//        AbstractFile taxDocumentByDetailOneAndGumgaOI = this.searchTaxDocumentService.getTaxDocumentByDetailOneAndFileTypes(detailOne, Arrays.asList(FileType.NFE, FileType.NFCE));
+//        this.sendDataFileHttpServlet.send(taxDocumentByDetailOneAndGumgaOI,  httpServletResponse);
+//    }
 
 
     @Transactional
