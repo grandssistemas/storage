@@ -8,14 +8,16 @@ import digital.container.service.download.LinkDownloadService;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
 import digital.container.storage.domain.model.download.LinkDownload;
 import digital.container.storage.domain.model.file.*;
-import digital.container.storage.domain.model.file.amazon.AmazonS3File;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.local.LocalFile;
 import digital.container.storage.domain.model.util.IntegrationTokenUtil;
 import digital.container.storage.util.SendDataDatabaseFileHttpServlet;
+import digital.container.storage.util.SendDataFileHttpServlet;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
-import digital.container.storage.domain.model.util.TokenUtil;
+import io.gumga.core.GumgaThreadScope;
+import io.gumga.presentation.exceptionhandler.GumgaRunTimeException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,16 +36,19 @@ public class HashAPI {
     private final LocalFileRepository localFileRepository;
     private final SearchTaxDocumentService searchTaxDocumentService;
     private final LinkDownloadService linkDownloadService;
+    private final SendDataFileHttpServlet sendDataFileHttpServlet;
 
     @Autowired
     public HashAPI(LinkDownloadService linkDownloadService,
                    SearchTaxDocumentService searchTaxDocumentService,
                    LocalFileRepository localFileRepository,
-                   DatabaseFileRepository databaseFileRepository) {
+                   DatabaseFileRepository databaseFileRepository,
+                   SendDataFileHttpServlet sendDataFileHttpServlet) {
         this.linkDownloadService = linkDownloadService;
         this.searchTaxDocumentService = searchTaxDocumentService;
         this.localFileRepository = localFileRepository;
         this.databaseFileRepository = databaseFileRepository;
+        this.sendDataFileHttpServlet = sendDataFileHttpServlet;
     }
 
 
@@ -77,15 +82,8 @@ public class HashAPI {
     )
     @ApiOperation(value = "file-hash-public", notes = "Visualizar qualquer tipo de arquivo publico pelo hash")
     public void downloadPublic(@ApiParam(value = "hash", required = true) @PathVariable String hash, HttpServletResponse httpServletResponse) {
-        Optional<DatabaseFile> df = this.databaseFileRepository.getByHash(hash, Boolean.TRUE);
-        if(df.isPresent()) {
-            SendDataDatabaseFileHttpServlet.send(df.get(), httpServletResponse, Boolean.FALSE);
-        } else {
-            Optional<LocalFile> lf = this.localFileRepository.getByHash(hash, Boolean.TRUE);
-            if(lf.isPresent()){
-                SendDataLocalFileHttpServlet.send(lf.get(), httpServletResponse, Boolean.FALSE);
-            }
-        }
+        AbstractFile fileByHashAndPublic = this.searchTaxDocumentService.getFileByHashAndPublic(hash);
+        sendDataFileHttpServlet.send(fileByHashAndPublic, httpServletResponse);
     }
 
     @Transactional(readOnly = true)
@@ -99,19 +97,17 @@ public class HashAPI {
         if(!IntegrationTokenUtil.PUBLIC_TOKEN_INTEGRATION.equals(token)) {
             throw new RuntimeException("Token invalido.");
         }
-
+        GumgaThreadScope.ignoreCheckOwnership.set(Boolean.TRUE);
         sendFile(hash, httpServletResponse, Boolean.FALSE);
+        GumgaThreadScope.ignoreCheckOwnership.set(Boolean.FALSE);
     }
 
     private void sendFile(String hash, HttpServletResponse httpServletResponse, Boolean download) {
-        Optional<DatabaseFile> df = this.databaseFileRepository.getByHash(hash, TokenUtil.getEndWithOi(), TokenUtil.getContainsSharedOi());
-        if(df.isPresent()) {
-            SendDataDatabaseFileHttpServlet.send(df.get(), httpServletResponse, download);
+        AbstractFile fileByHash = searchTaxDocumentService.getFileByHash(hash);
+        if(fileByHash != null) {
+            this.sendDataFileHttpServlet.send(fileByHash, httpServletResponse);
         } else {
-            Optional<LocalFile> lf = this.localFileRepository.getByHash(hash, TokenUtil.getEndWithOi(), TokenUtil.getContainsSharedOi());
-            if(lf.isPresent()){
-                SendDataLocalFileHttpServlet.send(lf.get(), httpServletResponse, download);
-            }
+            throw new GumgaRunTimeException("File not found with this hash: " + hash, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -124,17 +120,7 @@ public class HashAPI {
     @ApiOperation(value = "file-detailOne", notes = "Visualizar qualquer tipo de arquivo pelo detailOne")
     public void searchDetailOne(@ApiParam(value = "detailOne", required = true) @PathVariable String detailOne, HttpServletResponse httpServletResponse) {
         AbstractFile taxDocumentByDetailOneAndGumgaOI = this.searchTaxDocumentService.getTaxDocumentByDetailOneAndFileTypes(detailOne, Arrays.asList(FileType.NFE, FileType.NFCE));
-        if(taxDocumentByDetailOneAndGumgaOI != null) {
-            if(taxDocumentByDetailOneAndGumgaOI instanceof DatabaseFile) {
-                DatabaseFile df = (DatabaseFile) taxDocumentByDetailOneAndGumgaOI;
-                SendDataDatabaseFileHttpServlet.send(df, httpServletResponse, Boolean.FALSE);
-            } else {
-                if(taxDocumentByDetailOneAndGumgaOI instanceof DatabaseFile) {
-                    LocalFile lf = (LocalFile) taxDocumentByDetailOneAndGumgaOI;
-                    SendDataLocalFileHttpServlet.send(lf, httpServletResponse, Boolean.FALSE);
-                }
-            }
-        }
+        this.sendDataFileHttpServlet.send(taxDocumentByDetailOneAndGumgaOI,  httpServletResponse);
     }
 
 

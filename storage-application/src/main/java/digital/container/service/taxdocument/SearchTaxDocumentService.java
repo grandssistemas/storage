@@ -60,123 +60,46 @@ public class SearchTaxDocumentService {
 
 
     public AbstractFile getFileByGumgaOIAndChNFeAndNF(GumgaOi oi, String chNFe) {
-        //@Query(value = "from DatabaseFile df where df.oi like :oi and df.detailOne = :chNFe and (df.fileType = 'NFE' or df.fileType = 'NFCE')")
         GQuery where = new GQuery(new Criteria("obj.detailOne", ComparisonOperator.EQUAL, chNFe))
                 .and(new Criteria("obj.fileType", ComparisonOperator.IN, Arrays.asList(FileType.NFE, FileType.NFCE)));
 
         return findOneAbstractFile(where);
-//        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getFileByGumgaOIAndChNFeAndNF(new GumgaOi(oi), chNFe);
-//        if(dbDocument.isPresent()) {
-//            return dbDocument.get();
-//        }
-//
-//        Optional<LocalFile> lfDocument = this.localFileRepository.getFileByGumgaOIAndChNFeAndNF(new GumgaOi(oi), chNFe);
-//        if(lfDocument.isPresent()) {
-//            return lfDocument.get();
-//        }
-//
-//        return null;
     }
 
 
     public AbstractFile getFileByGumgaOIAndChNFeAndNFCanceled(GumgaOi oi, String chNFe) {
-        //@Query(value = "from DatabaseFile df where df.oi like :oi and df.detailOne = :chNFe and (df.fileType = 'NFE_CANCELED' or df.fileType = 'NFCE_CANCELED')")
         GQuery where = new GQuery(new Criteria("obj.detailOne", ComparisonOperator.EQUAL, chNFe))
                 .and(new Criteria("obj.fileType", ComparisonOperator.IN, Arrays.asList(FileType.NFE_CANCELED, FileType.NFCE_CANCELED)));
 
         return findOneAbstractFile(where);
-//        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getFileByGumgaOIAndChNFeAndNFCanceled(oi, chNFe);
-//        if(dbDocument.isPresent()) {
-//            return dbDocument.get();
-//        }
-//
-//        Optional<LocalFile> lfDocument = this.localFileRepository.getFileByGumgaOIAndChNFeAndNFCanceled(oi, chNFe);
-//        if(lfDocument.isPresent()) {
-//            return lfDocument.get();
-//        }
-//
-//        return null;
     }
 
     public AbstractFile getFileByGumgaOIAndNProtAndNFDisable(GumgaOi oi, String nprot) {
-        //@Query(value = "from DatabaseFile df where df.oi like :oi and df.detailOne = :nprot and (df.fileType = 'NFE_DISABLE' or df.fileType = 'NFCE_DISABLE')")
         GQuery where = new GQuery(new Criteria("obj.detailOne", ComparisonOperator.EQUAL, nprot))
                 .and(new Criteria("obj.fileType", ComparisonOperator.IN, Arrays.asList(FileType.NFCE_DISABLE, FileType.NFE_DISABLE)));
 
         return findOneAbstractFile(where);
-
-//        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getFileByGumgaOIAndNProtAndNFDisable(oi, nprot);
-//        if(dbDocument.isPresent()) {
-//            return dbDocument.get();
-//        }
-//
-//        Optional<LocalFile> lfDocument = this.localFileRepository.getFileByGumgaOIAndNProtAndNFDisable(oi, nprot);
-//        if(lfDocument.isPresent()) {
-//            return lfDocument.get();
-//        }
-
-
     }
 
     public AbstractFile getFileByGumgaOIAndNProtAndNFLetterCorrection(GumgaOi oi, String chNFe) {
-        //from DatabaseFile df where df.oi like :oi and df.detailOne = :chNFe and (df.fileType = 'NFE_LETTER_CORRECTION' or df.fileType = 'NFCE_LETTER_CORRECTION')
         GQuery where = new GQuery(new Criteria("obj.detailOne", ComparisonOperator.EQUAL, chNFe))
                 .and(new Criteria("obj.fileType", ComparisonOperator.IN, Arrays.asList(FileType.NFE_LETTER_CORRECTION, FileType.NFCE_LETTER_CORRECTION)));
 
         return findOneAbstractFile(where);
-
-//        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getFileByGumgaOIAndNProtAndNFLetterCorrection(oi, chNFe);
-//        if(dbDocument.isPresent()) {
-//            return dbDocument.get();
-//        }
-//
-//        Optional<LocalFile> lfDocument = this.localFileRepository.getFileByGumgaOIAndNProtAndNFLetterCorrection(oi, chNFe);
-//        if(lfDocument.isPresent()) {
-//            return lfDocument.get();
-//        }
-//
-//        return null;
     }
 
     public AbstractFile getTaxDocumentByHash(String hash) {
-//        @Query(value = "from DatabaseFile df where df.hash = :hash and df.fileType != 'ANYTHING'")
         GQuery where = new GQuery(new Criteria("obj.hash", ComparisonOperator.EQUAL, hash))
                 .and(new Criteria("obj.fileType", ComparisonOperator.NOT_EQUAL, FileType.ANYTHING));
 
         return findOneAbstractFile(where);
-//        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getTaxDocumentByHash(hash);
-//        if(dbDocument.isPresent()) {
-//            return dbDocument.get();
-//        }
-//
-//        Optional<LocalFile> lfDocument = this.localFileRepository.getTaxDocumentByHash(hash);
-//        if(lfDocument.isPresent()) {
-//            return lfDocument.get();
-//        }
-//
-//        return null;
     }
 
     public AbstractFile getTaxDocumentByDetailOneAndFileTypes(String detailOne, List<FileType> fileTypes) {
-//        @Query(value = "from DatabaseFile df where df.detailOne = :detailOne and df.oi like :gumgaOi and df.fileType != 'ANYTHING'")
         GQuery where = new GQuery(new Criteria("obj.detailOne", ComparisonOperator.EQUAL, detailOne))
                 .and(new Criteria("obj.fileType", ComparisonOperator.IN, fileTypes));
 
         return findOneAbstractFile(where);
-
-//        String oi = GumgaThreadScope.organizationCode.get();
-//        GumgaOi gumgaOi = new GumgaOi(oi + "%");
-//        Optional<DatabaseFile> dbDocument = this.databaseFileRepository.getTaxDocumentByDetailOneAndGumgaOI(detailOne, gumgaOi);
-//        if(dbDocument.isPresent()) {
-//            return dbDocument.get();
-//        }
-//
-//        Optional<LocalFile> lfDocument = this.localFileRepository.getTaxDocumentByDetailOneAndGumgaOI(detailOne, gumgaOi);
-//        if(lfDocument.isPresent()) {
-//            return lfDocument.get();
-//        }
-//
-//        return null;
     }
 
     public List<AbstractFile> getTaxDocumentBySearchScheduling(SearchScheduling searchScheduling) {
@@ -218,14 +141,6 @@ public class SearchTaxDocumentService {
                 fileTypes.add(FileType.NFE_LETTER_CORRECTION);
             }
         });
-
-//        if(searchScheduling.getCnpjs().size() > 0) {
-//            List<DatabaseFile> taxDocumentBySearchScheduling = this.databaseFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs(), startDate, endDate);
-//            files.addAll(taxDocumentBySearchScheduling);
-//
-//            List<LocalFile> lfs = this.localFileRepository.getTaxDocumentBySearchScheduling(gumgaOi, fileTypes, searchScheduling.getCnpjs(), startDate, endDate);
-//            files.addAll(lfs);
-//        }
 
 
         QueryObject queryObject = new QueryObject();
@@ -295,5 +210,13 @@ public class SearchTaxDocumentService {
         }
 
         return files;
+    }
+
+    public AbstractFile getFileByHash(String hash) {
+        return findOneAbstractFile(new GQuery(new Criteria("obj.hash", ComparisonOperator.EQUAL, hash)));
+    }
+
+    public AbstractFile getFileByHashAndPublic(String hash) {
+        return findOneAbstractFile(new GQuery(new Criteria("obj.hash", ComparisonOperator.EQUAL, hash)).and(new Criteria("obj.filePublic", ComparisonOperator.EQUAL, Boolean.TRUE)));
     }
 }

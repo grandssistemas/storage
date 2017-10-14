@@ -35,7 +35,7 @@ public class SendDataFileHttpServlet {
                     SendDataLocalFileHttpServlet.send(lf, httpServletResponse, Boolean.FALSE);
                 } else {
                     AmazonS3File s3File = (AmazonS3File) file;
-                    File amazonFile = amazonS3Service.getFile(AmazonS3Util.TAX_DOCUMENT_BUCKET, System.getProperty("storage.foldertemp"), file.getRelativePath());
+                    File amazonFile = amazonS3Service.getFile(AmazonS3Util.TAX_DOCUMENT_BUCKET, System.getProperty("storage.foldertemp"), file.getRelativePath(), file.getName());
                     SendDataAmazonS3FileHttpServlet.send(s3File, amazonFile, httpServletResponse, Boolean.FALSE);
                 }
             }

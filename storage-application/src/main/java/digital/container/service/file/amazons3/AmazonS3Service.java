@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 @Service
 public class AmazonS3Service {
@@ -59,6 +60,12 @@ public class AmazonS3Service {
 
     public File getFile(String bucketName, String path, String relativePath) {
         File file = new File(path.concat("/").concat(relativePath));
+        amazonS3.getObject(new GetObjectRequest(bucketName, relativePath), file);
+        return file;
+    }
+
+    public File getFile(String bucketName, String path, String relativePath, String fileName) {
+        File file = new File(path.concat("/").concat(UUID.randomUUID().toString()).concat("/").concat(fileName));
         amazonS3.getObject(new GetObjectRequest(bucketName, relativePath), file);
         return file;
     }

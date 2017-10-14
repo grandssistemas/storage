@@ -3,6 +3,7 @@ package digital.container.storage.util;
 
 import digital.container.storage.domain.model.file.amazon.AmazonS3File;
 import digital.container.storage.domain.model.file.local.LocalFile;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -13,6 +14,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class SendDataAmazonS3FileHttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(SendDataAmazonS3FileHttpServlet.class);
@@ -42,7 +45,13 @@ public class SendDataAmazonS3FileHttpServlet {
         } catch (IOException e) {
             LOG.error(e.getMessage());
         } finally {
-            file.delete();
+            try {
+                FileUtils.deleteDirectory(new File(file.getParent()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+//            Paths.get(file.getPath()).toFile().delete();
+//            file.delete();
         }
 
     }

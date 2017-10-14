@@ -47,7 +47,7 @@ public class ValidateNfXML {
             }
 
             String tpNF = SearchXMLUtil.getIdeTpNF(xml);
-            tpNF = tpNF.equals("1") ? "SAIDA" : "ENTRADA";
+            tpNF = "1".equals(tpNF) ? "SAIDA" : "ENTRADA";
             String emitCNPJ = SearchXMLUtil.getEmitCNPJ(xml);
             if(!emitCNPJ.equals(containerKey) && tpNF.equals("SAIDA")) {
                 errors.add(MessageStorage.CNPJ_OF_XML_IS_DIFFERENT_CONTAINER_KEY);
