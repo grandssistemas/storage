@@ -26,8 +26,9 @@ public class AmazonS3Service {
     }
 
     public void send(AbstractFile abstractFile, MultipartFile multipartFile, Boolean shared, String bucketName) {
+        File file = null;
         try {
-            File file = new File(multipartFile.getOriginalFilename());
+            file = new File(multipartFile.getOriginalFilename());
             multipartFile.transferTo(file);
             try {
                 PutObjectRequest objectRequest = new PutObjectRequest(bucketName, abstractFile.getRelativePath(), file);
@@ -55,6 +56,10 @@ public class AmazonS3Service {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if(file != null && file.exists()) {
+                file.delete();
+            }
         }
     }
 
