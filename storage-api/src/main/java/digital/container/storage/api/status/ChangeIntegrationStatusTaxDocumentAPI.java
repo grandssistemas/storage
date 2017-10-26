@@ -30,7 +30,7 @@ public class ChangeIntegrationStatusTaxDocumentAPI {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body("Alterado com sucesso.");
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Arquivo não encontrado.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Arquivo não encontrado.");
 
     }
 
@@ -45,7 +45,7 @@ public class ChangeIntegrationStatusTaxDocumentAPI {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body("Alterado com sucesso.");
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Arquivo não encontrado.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Arquivo não encontrado.");
 
     }
 

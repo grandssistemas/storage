@@ -4,7 +4,7 @@ import digital.container.service.message.SendMessageMOMService;
 import digital.container.service.taxdocument.CommonTaxDocumentEventLetterCorrectionService;
 import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.amazon.AmazonS3File;
-import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.vo.FileProcessed;
 import digital.container.storage.domain.model.util.AmazonS3Util;
 import digital.container.storage.domain.model.util.TokenResultProxy;
 import io.gumga.application.GumgaService;

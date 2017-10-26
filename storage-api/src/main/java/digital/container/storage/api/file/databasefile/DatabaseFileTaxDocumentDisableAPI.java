@@ -3,7 +3,7 @@ package digital.container.storage.api.file.databasefile;
 import com.wordnik.swagger.annotations.*;
 import digital.container.service.file.databasefile.DatabaseFileTaxDocumentDisableService;
 import digital.container.storage.api.ApiDocumentation;
-import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.vo.FileProcessed;
 import digital.container.storage.domain.model.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -6,7 +6,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import digital.container.service.file.databasefile.DatabaseFileTaxDocumentAnyService;
 import digital.container.storage.api.ApiDocumentation;
-import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.vo.FileProcessed;
 import digital.container.storage.domain.model.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,7 +28,6 @@ public class DatabaseFileTaxDocumentAnyAPI {
     @Autowired
     private DatabaseFileTaxDocumentAnyService service;
 
-    @Transactional
     @RequestMapping(
             path = URI_BASE + "/upload/{containerKey}",
             method = RequestMethod.POST,
@@ -67,7 +67,12 @@ public class DatabaseFileTaxDocumentAnyAPI {
                                                       @ApiParam(name = "files", value = ApiDocumentation.PARAM_FILES, required = true)@RequestPart(name = "files") List<MultipartFile> multipartFiles,
                                                       @ApiParam(name = "tokenSoftwareHouse", value = ApiDocumentation.PARAM_TOKEN_SOFTWARE_HOUSE, required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
                                                       @ApiParam(name = "tokenAccountant", value = ApiDocumentation.PARAM_TOKEN_ACCOUNTANT, required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
+        System.out.println("Hora de entrada"+LocalDateTime.now());
+        long startTime = System.currentTimeMillis();
         List<FileProcessed> filesProcessed = this.service.upload(containerKey, multipartFiles, tokenSoftwareHouse, tokenAccountant);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Hora de Saida"+LocalDateTime.now());
+        System.out.println(containerKey+" That took " + (endTime - startTime) + " milliseconds");
         return ResponseEntity.status(HttpStatus.CREATED).body(filesProcessed);
     }
 }

@@ -2,13 +2,8 @@ package digital.container.service.taxdocument;
 
 import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.*;
-import digital.container.storage.domain.model.file.database.DatabaseFile;
-import digital.container.storage.domain.model.file.local.LocalFile;
-import digital.container.storage.domain.model.file.vo.FileProcessed;
-import digital.container.storage.domain.model.util.GenerateHash;
-import digital.container.storage.domain.model.util.LocalFileUtil;
+import digital.container.vo.FileProcessed;
 import digital.container.storage.domain.model.util.TokenResultProxy;
-import digital.container.storage.domain.model.util.TokenUtil;
 import digital.container.util.*;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.domains.GumgaOi;
@@ -21,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -37,11 +31,15 @@ public class CommonTaxDocumentEventLetterCorrectionService {
     private ValidateNfXML validateNfXML;
 
     public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey, TokenResultProxy tokenResultProxy) {
+        String xml = XMLUtil.getXml(multipartFile);
+
+        return getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+    }
+
+    public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey, TokenResultProxy tokenResultProxy, String xml) {
         List<String> errors = new ArrayList<>();
         file.setName(multipartFile.getOriginalFilename());
         file.setFileStatus(FileStatus.NOT_SYNC);
-
-        String xml = XMLUtil.getXml(multipartFile);
 
         FileProcessed fileProcessed = validateLetterCorrectionEvent(file, xml);
         if(!fileProcessed.getErrors().isEmpty()) {

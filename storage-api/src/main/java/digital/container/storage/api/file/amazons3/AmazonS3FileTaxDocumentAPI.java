@@ -8,7 +8,7 @@ import digital.container.service.file.amazons3.AmazonS3FileTaxDocumentService;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
 import digital.container.storage.api.ApiDocumentation;
 import digital.container.storage.domain.model.file.FileType;
-import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.vo.FileProcessed;
 import digital.container.storage.domain.model.util.TokenUtil;
 import digital.container.storage.util.SendDataFileHttpServlet;
 import org.springframework.beans.factory.annotation.Autowired;

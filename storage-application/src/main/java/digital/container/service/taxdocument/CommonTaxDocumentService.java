@@ -2,7 +2,7 @@ package digital.container.service.taxdocument;
 
 import digital.container.storage.domain.model.file.AbstractFile;
 import digital.container.storage.domain.model.file.FileStatus;
-import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.vo.FileProcessed;
 import digital.container.storage.domain.model.util.TokenResultProxy;
 import digital.container.util.*;
 import digital.container.vo.TaxDocumentModel;
@@ -20,8 +20,22 @@ import java.util.Date;
 @Transactional
 public class CommonTaxDocumentService {
 
+    private final CommonTaxDocumentEventCanceledService commonTaxCocumentEventService;
+    private final CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService;
+    private final CommonTaxDocumentEventLetterCorrectionService commonTaxDocumentEventLetterCorrectionService;
+    private final ValidateNfXML validateNfXML;
+
     @Autowired
-    private ValidateNfXML validateNfXML;
+    public CommonTaxDocumentService(CommonTaxDocumentEventCanceledService commonTaxCocumentEventService,
+                                    CommonTaxDocumentEventDisableService commonTaxDocumentEventDisableService,
+                                    CommonTaxDocumentEventLetterCorrectionService commonTaxDocumentEventLetterCorrectionService,
+                                    ValidateNfXML validateNfXML) {
+
+        this.commonTaxCocumentEventService = commonTaxCocumentEventService;
+        this.commonTaxDocumentEventDisableService = commonTaxDocumentEventDisableService;
+        this.commonTaxDocumentEventLetterCorrectionService = commonTaxDocumentEventLetterCorrectionService;
+        this.validateNfXML = validateNfXML;
+    }
 
     public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey, TokenResultProxy tokenResultProxy) {
         file.setName(multipartFile.getOriginalFilename());
@@ -39,5 +53,58 @@ public class CommonTaxDocumentService {
         file.buildTaxDocument(multipartFile.getContentType(), multipartFile.getSize(), Boolean.FALSE, containerKey, tokenResultProxy, ld, taxDocumentModel.getFileType());
 
         return new FileProcessed(file, Collections.emptyList());
+    }
+
+    public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey, TokenResultProxy tokenResultProxy, String xml) {
+        file.setName(multipartFile.getOriginalFilename());
+        file.setFileStatus(FileStatus.NOT_SYNC);
+
+        TaxDocumentModel taxDocumentModel = new TaxDocumentModel();
+        FileProcessed errors = validateNfXML.validate(containerKey, multipartFile, file, taxDocumentModel, xml);
+        if (errors != null) {
+            return errors;
+        }
+
+        Date date = validateNfXML.stringToDate(file.getDetailTwo());
+        LocalDate ld = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        file.buildTaxDocument(multipartFile.getContentType(), multipartFile.getSize(), Boolean.FALSE, containerKey, tokenResultProxy, ld, taxDocumentModel.getFileType());
+
+        return new FileProcessed(file, Collections.emptyList());
+    }
+
+    public FileProcessed identifyTaxDocument(AbstractFile file, String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy) {
+        String xml = XMLUtil.getXml(multipartFile);
+
+        return identifyTaxDocument(file, containerKey, multipartFile, tokenResultProxy, xml);
+    }
+
+    public FileProcessed identifyTaxDocument(AbstractFile file, String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy, String xml) {
+
+        Boolean cancellationEvent = this.commonTaxCocumentEventService.isCancellationEvent(xml);
+        Boolean letterCorrectionEvent = this.commonTaxDocumentEventLetterCorrectionService.isLetterCorrectionEvent(xml);
+
+
+        FileProcessed fileProcessed = null;
+//        fileProcessed = this.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+
+        if(!cancellationEvent && !letterCorrectionEvent) {
+            fileProcessed = this.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+        } else {
+            if(cancellationEvent) {
+                fileProcessed = this.commonTaxCocumentEventService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+            } else {
+                if(letterCorrectionEvent) {
+                    fileProcessed = this.commonTaxDocumentEventLetterCorrectionService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+                } else {
+                    Boolean disableEvent = this.commonTaxDocumentEventDisableService.isDisableEvent(xml);
+                    if(disableEvent) {
+                        fileProcessed = this.commonTaxDocumentEventDisableService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+                    }
+                }
+            }
+        }
+
+        return fileProcessed;
     }
 }

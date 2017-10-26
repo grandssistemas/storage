@@ -4,7 +4,7 @@ import com.wordnik.swagger.annotations.*;
 import digital.container.service.file.localfile.LocalFileService;
 import digital.container.storage.api.ApiDocumentation;
 import digital.container.storage.domain.model.file.local.LocalFile;
-import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.vo.FileProcessed;
 import digital.container.storage.domain.model.util.TokenUtil;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
 import org.springframework.beans.factory.annotation.Autowired;

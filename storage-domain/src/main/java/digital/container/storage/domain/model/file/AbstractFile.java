@@ -4,6 +4,8 @@ import digital.container.storage.domain.model.util.LocalFileUtil;
 import digital.container.storage.domain.model.util.TokenResultProxy;
 import digital.container.storage.domain.model.util.TokenUtil;
 import io.gumga.domain.GumgaSharedModelUUID;
+import io.gumga.domain.domains.GumgaOi;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -59,6 +61,9 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
 
     @Column(name = "relative_path")
     private String relativePath;
+
+    @Column(name = "id_file_backup")
+    private String idFileBackup;
 
     public String getName() {
         return name;
@@ -180,6 +185,10 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
         this.relativePath = relativePath;
     }
 
+    public void setGumgaOi(GumgaOi gumgaOi) {
+        this.oi = gumgaOi;
+    }
+
     public AbstractFile buildAnything(String fileName, String contentType, Long size, Boolean shared, String containerKey, TokenResultProxy tokenResultProxy) {
         setName(fileName);
         setFileStatus(FileStatus.DO_NOT_SYNC);
@@ -197,6 +206,14 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
         addSharing(tokenResultProxy);
 
         return this;
+    }
+
+    public String getIdFileBackup() {
+        return idFileBackup;
+    }
+
+    public void setIdFileBackup(String idFileBackup) {
+        this.idFileBackup = idFileBackup;
     }
 
     public AbstractFile buildTaxDocument(String contentType, Long size, Boolean shared, String containerKey, TokenResultProxy tokenResultProxy, LocalDate ld, FileType type) {

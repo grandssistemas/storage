@@ -2,7 +2,7 @@ package digital.container.service.taxdocument;
 
 import digital.container.service.storage.MessageStorage;
 import digital.container.storage.domain.model.file.*;
-import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.vo.FileProcessed;
 import digital.container.storage.domain.model.util.TokenResultProxy;
 import digital.container.util.*;
 import io.gumga.core.GumgaThreadScope;
@@ -27,11 +27,14 @@ public class CommonTaxDocumentEventDisableService {
     private ValidateNfXML validateNfXML;
 
     public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey, TokenResultProxy tokenResultProxy) {
+        String xml = XMLUtil.getXml(multipartFile);
+        return getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+    }
+
+    public FileProcessed getData(AbstractFile file, MultipartFile multipartFile, String containerKey, TokenResultProxy tokenResultProxy, String xml) {
         List<String> errors = new ArrayList<>();
         file.setName(multipartFile.getOriginalFilename());
         file.setFileStatus(FileStatus.NOT_SYNC);
-
-        String xml = XMLUtil.getXml(multipartFile);
 
         FileProcessed fileProcessed = validateDisableEvent(file, xml);
         if(!fileProcessed.getErrors().isEmpty()) {

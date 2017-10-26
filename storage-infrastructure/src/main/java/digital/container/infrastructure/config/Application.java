@@ -1,19 +1,23 @@
 package digital.container.infrastructure.config;
 
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazon.sqs.javamessaging.SQSConnectionFactory;
+import com.amazonaws.auth.*;
+import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClient;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import digital.container.storage.domain.model.util.AmazonS3Util;
 import io.gumga.core.GumgaValues;
 
 import io.gumga.application.GumgaRepositoryFactoryBean;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 import io.gumga.domain.CriterionParser;
 import io.gumga.domain.GumgaQueryParserProvider;
@@ -39,6 +43,8 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -49,6 +55,7 @@ import com.zaxxer.hikari.HikariDataSource;
 @ComponentScan(basePackages = {"digital.container", "io.gumga"})
 @EnableJpaRepositories(repositoryFactoryBeanClass = GumgaRepositoryFactoryBean.class, basePackages = {"digital.container", "io.gumga"})
 @EnableTransactionManagement(proxyTargetClass = true)
+@EnableAsync
 public class Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
@@ -92,9 +99,9 @@ public class Application {
     private HikariConfig commonConfig() {
         GumgaQueryParserProvider.defaultMap = gumgaQueryParseProviderFactory(getProperties().getProperty("name", "H2"));
         HikariConfig config = new HikariConfig();
-        config.setMinimumIdle(5);
-        config.setMaximumPoolSize(50);
-        config.setIdleTimeout(30000L);
+        config.setMaximumPoolSize(150);
+        config.setMinimumIdle(50);
+        config.setIdleTimeout(100000L);
         config.setInitializationFailFast(true);
         config.setDataSourceClassName(getProperties().getProperty("dataSource.className", "org.h2.jdbcx.JdbcDataSource"));
         config.addDataSourceProperty("url", getProperties().getProperty("dataSource.url", "jdbc:h2:mem:studio;MVCC=true"));
@@ -118,7 +125,7 @@ public class Application {
         properties.setProperty("hibernate.connection.charSet", getProperties().getProperty("hibernate.connection.charSet", "UTF-8"));
         properties.setProperty("hibernate.connection.characterEncoding", getProperties().getProperty("hibernate.connection.characterEncoding", "UTF-8"));
         properties.setProperty("hibernate.connection.useUnicode", getProperties().getProperty("hibernate.connection.useUnicode", "true"));
-        properties.setProperty("hibernate.jdbc.batch_size", getProperties().getProperty("hibernate.jdbc.batch_size", "50"));
+        properties.setProperty("hibernate.jdbc.batch_size", getProperties().getProperty("hibernate.jdbc.batch_size", "500"));
         properties.setProperty("hibernate.hbm2ddl.auto", getProperties().getProperty("hibernate.hbm2ddl.auto", "create-drop"));
         properties.setProperty("hibernate.dialect", getProperties().getProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect"));
         return properties;
@@ -153,6 +160,9 @@ public class Application {
         System.setProperty("amazon.s3.secret_access_key", getProperties().getProperty("amazon.s3.secret_access_key"));
         System.setProperty("amazon.s3.anything_bucket", getProperties().getProperty("amazon.s3.anything_bucket"));
         System.setProperty("amazon.s3.tax_document_bucket", getProperties().getProperty("amazon.s3.tax_document_bucket"));
+
+        System.setProperty("aws.accessKeyId", getProperties().getProperty("amazon.s3.access_key_id"));
+        System.setProperty("aws.secretKey", getProperties().getProperty("amazon.s3.secret_access_key"));
     }
 
     @Bean
@@ -161,21 +171,34 @@ public class Application {
         return new JpaTransactionManager(emf);
     }
 
+//    @Bean
+//    public ActiveMQConnectionFactory connectionFactory() {
+//        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+//        connectionFactory.setBrokerURL(System.getProperty("url.mom"));
+////        SQSConnectionFactory connectionFactory = SQSConnectionFactory
+////                .builder()
+////                .withRegion(Region.getRegion(Regions.US_WEST_2))
+////                .withAWSCredentialsProvider(new SystemPropertiesCredentialsProvider())
+////                .build();
+//
+//        return connectionFactory;
+//    }
+
+//    @Bean
+//    public JmsTemplate jmsTemplate() {
+//        JmsTemplate template = new JmsTemplate();
+//        template.setConnectionFactory(connectionFactory());
+//        template.setDefaultDestinationName(System.getProperty("mom.queue"));
+//
+//        return template;
+//    }
+
     @Bean
-    public ActiveMQConnectionFactory connectionFactory() {
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-        connectionFactory.setBrokerURL(System.getProperty("url.mom"));
-
-        return connectionFactory;
-    }
-
-    @Bean
-    public JmsTemplate jmsTemplate() {
-        JmsTemplate template = new JmsTemplate();
-        template.setConnectionFactory(connectionFactory());
-        template.setDefaultDestinationName(System.getProperty("mom.queue"));
-
-        return template;
+    public AmazonSQS amazonSQS() {
+        return AmazonSQSClientBuilder.standard()
+                .withRegion(Regions.US_WEST_2)
+                .withCredentials(new SystemPropertiesCredentialsProvider())
+                .build();
     }
 
     @Bean
@@ -191,6 +214,16 @@ public class Application {
                 .withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials))
                 .build();
     }
+
+    @Bean
+    public ThreadPoolTaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
+        pool.setCorePoolSize(15);
+        pool.setMaxPoolSize(20);
+        pool.setWaitForTasksToCompleteOnShutdown(true);
+        return pool;
+    }
+
 }
 
 enum Database {

@@ -4,7 +4,7 @@ package digital.container.util;
 import digital.container.service.storage.MessageStorage;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
 import digital.container.storage.domain.model.file.AbstractFile;
-import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.vo.FileProcessed;
 import digital.container.vo.TaxDocumentModel;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.domains.GumgaOi;
@@ -35,44 +35,51 @@ public class ValidateNfXML {
     public FileProcessed validate(String containerKey, MultipartFile multipartFile, AbstractFile file, TaxDocumentModel taxDocumentModel) {
         try(InputStream inputStream = multipartFile.getInputStream()) {
 
-            List<String> errors = new ArrayList<>();
+
             String xml = IOUtils.toString(inputStream, "UTF8");
 
-            String chNFe = SearchXMLUtil.getInfProtChNFe(xml);
-            AbstractFile fileFromDB = this.searchTaxDocumentService.getFileByGumgaOIAndChNFeAndNF(new GumgaOi(GumgaThreadScope.organizationCode.get() + "%"), chNFe);
-
-            if(fileFromDB != null) {
-                errors.add(MessageStorage.TAX_DOCUMENT_WITH_THIS_ACCESS_KEY_ALREADY_EXISTS);
-                return new FileProcessed(file, errors);
-            }
-
-            String tpNF = SearchXMLUtil.getIdeTpNF(xml);
-            tpNF = "1".equals(tpNF) ? "SAIDA" : "ENTRADA";
-            String emitCNPJ = SearchXMLUtil.getEmitCNPJ(xml);
-            if(!emitCNPJ.equals(containerKey) && tpNF.equals("SAIDA")) {
-                errors.add(MessageStorage.CNPJ_OF_XML_IS_DIFFERENT_CONTAINER_KEY);
-            }
-            taxDocumentModel.model = SearchXMLUtil.getIdeMod(xml);
-
-            if(!taxDocumentModel.isValid()) {
-                errors.add(MessageStorage.WE_DONT_SUPPORT_TEMPLATE_REPORTED_IN_YOUR_XML);
-            }
-
-            String dhEmi = SearchXMLUtil.getIdeDhEmi(xml);
-            String version = SearchXMLUtil.getVersion(xml);
-
-            if(!errors.isEmpty()) {
-                return new FileProcessed(file, errors);
-            }
-
-            file.setDetailOne(chNFe);
-            file.setDetailTwo(dhEmi);
-            file.setDetailThree(tpNF);
-            file.setDetailFour(version);
+            return validate(containerKey, multipartFile, file, taxDocumentModel, xml);
 
         } catch (IOException e) {
             LOG.error("validação");
         }
+
+        return null;
+    }
+
+    public FileProcessed validate(String containerKey, MultipartFile multipartFile, AbstractFile file, TaxDocumentModel taxDocumentModel, String xml) {
+        List<String> errors = new ArrayList<>();
+        String chNFe = SearchXMLUtil.getInfProtChNFe(xml);
+        AbstractFile fileFromDB = this.searchTaxDocumentService.getFileByGumgaOIAndChNFeAndNF(new GumgaOi(GumgaThreadScope.organizationCode.get() + "%"), chNFe);
+
+        if(fileFromDB != null) {
+            errors.add(MessageStorage.TAX_DOCUMENT_WITH_THIS_ACCESS_KEY_ALREADY_EXISTS);
+            return new FileProcessed(file, errors);
+        }
+
+        String tpNF = SearchXMLUtil.getIdeTpNF(xml);
+        tpNF = "1".equals(tpNF) ? "SAIDA" : "ENTRADA";
+        String emitCNPJ = SearchXMLUtil.getEmitCNPJ(xml);
+        if(!emitCNPJ.equals(containerKey) && tpNF.equals("SAIDA")) {
+            errors.add(MessageStorage.CNPJ_OF_XML_IS_DIFFERENT_CONTAINER_KEY);
+        }
+        taxDocumentModel.model = SearchXMLUtil.getIdeMod(xml);
+
+        if(!taxDocumentModel.isValid()) {
+            errors.add(MessageStorage.WE_DONT_SUPPORT_TEMPLATE_REPORTED_IN_YOUR_XML);
+        }
+
+        String dhEmi = SearchXMLUtil.getIdeDhEmi(xml);
+        String version = SearchXMLUtil.getVersion(xml);
+
+        if(!errors.isEmpty()) {
+            return new FileProcessed(file, errors);
+        }
+
+        file.setDetailOne(chNFe);
+        file.setDetailTwo(dhEmi);
+        file.setDetailThree(tpNF);
+        file.setDetailFour(version);
 
         return null;
     }

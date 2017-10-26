@@ -1,13 +1,12 @@
 package digital.container.service.file.databasefile;
 
 import digital.container.exception.FileNotFoundException;
-import digital.container.service.container.PermissionContainerService;
 import digital.container.service.storage.LimitFileService;
 import digital.container.service.storage.MessageStorage;
 import digital.container.service.token.SecurityTokenService;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.database.DatabaseFilePart;
-import digital.container.storage.domain.model.file.vo.FileProcessed;
+import digital.container.vo.FileProcessed;
 import digital.container.repository.file.DatabaseFileRepository;
 import digital.container.storage.domain.model.util.TokenResultProxy;
 import digital.container.storage.domain.model.util.TokenUtil;
