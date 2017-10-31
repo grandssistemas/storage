@@ -81,21 +81,16 @@ public class CommonTaxDocumentService {
 
     public FileProcessed identifyTaxDocument(AbstractFile file, String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy, String xml) {
 
-        Boolean cancellationEvent = this.commonTaxCocumentEventService.isCancellationEvent(xml);
-        Boolean letterCorrectionEvent = this.commonTaxDocumentEventLetterCorrectionService.isLetterCorrectionEvent(xml);
+        FileProcessed fileProcessed = this.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
 
-
-        FileProcessed fileProcessed = null;
-//        fileProcessed = this.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
-
-        if(!cancellationEvent && !letterCorrectionEvent) {
-            fileProcessed = this.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
-        } else {
+        if(!fileProcessed.getErrors().isEmpty()) {
+            Boolean cancellationEvent = this.commonTaxCocumentEventService.isCancellationEvent(xml);
             if(cancellationEvent) {
                 fileProcessed = this.commonTaxCocumentEventService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
             } else {
+                Boolean letterCorrectionEvent = this.commonTaxDocumentEventLetterCorrectionService.isLetterCorrectionEvent(xml);
                 if(letterCorrectionEvent) {
-                    fileProcessed = this.commonTaxDocumentEventLetterCorrectionService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+                fileProcessed = this.commonTaxDocumentEventLetterCorrectionService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
                 } else {
                     Boolean disableEvent = this.commonTaxDocumentEventDisableService.isDisableEvent(xml);
                     if(disableEvent) {
@@ -104,6 +99,24 @@ public class CommonTaxDocumentService {
                 }
             }
         }
+
+//        fileProcessed = this.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+
+//        if(!cancellationEvent && !letterCorrectionEvent && !disableEvent) {
+//            fileProcessed = this.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+//        } else {
+//            if(cancellationEvent) {
+//                fileProcessed = this.commonTaxCocumentEventService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+//            } else {
+//                if(letterCorrectionEvent) {
+//                    fileProcessed = this.commonTaxDocumentEventLetterCorrectionService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+//                } else {
+//                    if(disableEvent) {
+//                        fileProcessed = this.commonTaxDocumentEventDisableService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+//                    }
+//                }
+//            }
+//        }
 
         return fileProcessed;
     }

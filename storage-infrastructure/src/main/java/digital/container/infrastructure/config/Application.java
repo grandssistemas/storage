@@ -8,9 +8,8 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.AmazonSQSClient;
-import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.amazonaws.services.sqs.*;
+import com.amazonaws.services.sqs.buffered.AmazonSQSBufferedAsyncClient;
 import digital.container.storage.domain.model.util.AmazonS3Util;
 import io.gumga.core.GumgaValues;
 
@@ -193,13 +192,13 @@ public class Application {
 //        return template;
 //    }
 
-    @Bean
-    public AmazonSQS amazonSQS() {
-        return AmazonSQSClientBuilder.standard()
-                .withRegion(Regions.US_WEST_2)
-                .withCredentials(new SystemPropertiesCredentialsProvider())
-                .build();
-    }
+//    @Bean
+//    public AmazonSQS amazonSQS() {
+//        return AmazonSQSClientBuilder.standard()
+//                .withRegion(Regions.US_WEST_2)
+//                .withCredentials(new SystemPropertiesCredentialsProvider())
+//                .build();
+//    }
 
     @Bean
     public BasicAWSCredentials basicAWSCredentials() {
@@ -213,6 +212,15 @@ public class Application {
                 .withRegion(Regions.SA_EAST_1)
                 .withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials))
                 .build();
+    }
+
+    @Bean
+    public AmazonSQSAsync amazonSQS(BasicAWSCredentials basicAWSCredentials) {
+        return new AmazonSQSBufferedAsyncClient(AmazonSQSAsyncClientBuilder
+                .standard()
+                .withRegion(Regions.US_WEST_2)
+                .withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials))
+                .build());
     }
 
     @Bean

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -50,7 +51,7 @@ public class AmazonS3FileTaxDocumentAnyAPI {
         return ResponseEntity.status(HttpStatus.CREATED).body(fileProcessed);
     }
 
-    @Transactional
+//    @Transactional
     @RequestMapping(
             path = URI_BASE + "/uploads/{containerKey}",
             method = RequestMethod.POST,
@@ -66,7 +67,12 @@ public class AmazonS3FileTaxDocumentAnyAPI {
                                                       @ApiParam(name = "files", value = ApiDocumentation.PARAM_FILES, required = true)@RequestPart(name = "files") List<MultipartFile> multipartFiles,
                                                       @ApiParam(name = "tokenSoftwareHouse", value = ApiDocumentation.PARAM_TOKEN_SOFTWARE_HOUSE, required = false) @RequestParam(name = "tokenSoftwareHouse", required = false, defaultValue = TokenUtil.SOFTWARE_HOUSE_NO_HAVE_TOKEN) String tokenSoftwareHouse,
                                                       @ApiParam(name = "tokenAccountant", value = ApiDocumentation.PARAM_TOKEN_ACCOUNTANT, required = false) @RequestParam(name = "tokenAccountant", required = false, defaultValue = TokenUtil.ACCOUNTANT_NO_HAVE_TOKEN) String tokenAccountant) {
+        System.out.println("Hora de entrada S3:"+ LocalDateTime.now());
+        long startTime = System.currentTimeMillis();
         List<FileProcessed> filesProcessed = this.service.processUpload(containerKey, multipartFiles, tokenSoftwareHouse, tokenAccountant);
+        long endTime = System.currentTimeMillis();
+        System.out.println("Hora de Saida S3:"+LocalDateTime.now());
+        System.out.println(containerKey+" That took " + (endTime - startTime) + " milliseconds");
         return ResponseEntity.status(HttpStatus.CREATED).body(filesProcessed);
     }
 }

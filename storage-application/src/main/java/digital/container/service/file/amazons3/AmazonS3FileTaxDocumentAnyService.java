@@ -1,17 +1,18 @@
 package digital.container.service.file.amazons3;
 
+import com.amazonaws.services.sqs.model.SendMessageBatchRequestEntry;
+import digital.container.repository.file.FileRepository;
 import digital.container.service.message.SendMessageMOMService;
-import digital.container.service.taxdocument.CommonTaxDocumentEventCanceledService;
-import digital.container.service.taxdocument.CommonTaxDocumentEventDisableService;
-import digital.container.service.taxdocument.CommonTaxDocumentEventLetterCorrectionService;
 import digital.container.service.taxdocument.CommonTaxDocumentService;
 import digital.container.service.token.SecurityTokenService;
+import digital.container.storage.domain.model.file.AbstractFile;
 import digital.container.storage.domain.model.file.amazon.AmazonS3File;
 import digital.container.vo.FileProcessed;
 import digital.container.storage.domain.model.util.AmazonS3Util;
 import digital.container.storage.domain.model.util.TokenResultProxy;
 import digital.container.util.XMLUtil;
 import io.gumga.application.GumgaService;
+import io.gumga.core.GumgaThreadScope;
 import io.gumga.domain.repository.GumgaCrudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,19 +31,22 @@ public class AmazonS3FileTaxDocumentAnyService extends GumgaService<AmazonS3File
     private final SendMessageMOMService sendMessageMOMService;
     private final SecurityTokenService securityTokenService;
     private final AmazonS3Service amazonS3Service;
+    private final FileRepository fileRepository;
 
     @Autowired
     public AmazonS3FileTaxDocumentAnyService(GumgaCrudRepository<AmazonS3File, String> repository,
                                              CommonTaxDocumentService commonTaxDocumentService,
                                              SendMessageMOMService sendMessageMOMService,
                                              SecurityTokenService securityTokenService,
-                                             AmazonS3Service amazonS3Service) {
+                                             AmazonS3Service amazonS3Service,
+                                             FileRepository fileRepository) {
         super(repository);
         this.commonTaxDocumentService = commonTaxDocumentService;
         this.sendMessageMOMService = sendMessageMOMService;
         this.securityTokenService = securityTokenService;
 
         this.amazonS3Service = amazonS3Service;
+        this.fileRepository = fileRepository;
     }
 
     public FileProcessed processUpload(String containerKey, MultipartFile multipartFile, String tokenSoftwareHouse, String tokenAccountant) {
@@ -50,12 +54,58 @@ public class AmazonS3FileTaxDocumentAnyService extends GumgaService<AmazonS3File
         return this.identifyTaxDocument(containerKey, multipartFile, tokenResultProxy);
     }
 
+    @Transactional
     public List<FileProcessed> processUpload(String containerKey, List<MultipartFile> multipartFiles, String tokenSoftwareHouse, String tokenAccountant) {
         TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
         List<FileProcessed> result = new ArrayList<>();
-        for(MultipartFile multipartFile : multipartFiles) {
-            result.add(this.identifyTaxDocument(containerKey,multipartFile, tokenResultProxy));
+        List<AbstractFile> files = new ArrayList<>();
+        List<SendMessageBatchRequestEntry> sendMessageBatchRequestEntryList = new ArrayList<>();
+        String oi = GumgaThreadScope.organizationCode.get();
+
+        long startTime = System.currentTimeMillis();
+        multipartFiles.stream().parallel()
+                .forEach( multipartFile -> {
+                    GumgaThreadScope.organizationCode.set(oi);
+                    FileProcessed fileProcessed = this.identifyTaxDocument(containerKey, multipartFile, tokenResultProxy);
+                    result.add(fileProcessed);
+
+                    if(fileProcessed.getErrors().isEmpty()) {
+                        files.add(fileProcessed.getFile());
+                        SendMessageBatchRequestEntry sendMessageBatchRequestEntry = this.sendMessageMOMService.createSendMessageBatchRequestEntry(fileProcessed.getFile(), containerKey, fileProcessed.getXml());
+                        if(sendMessageBatchRequestEntry != null) {
+                            sendMessageBatchRequestEntryList.add(sendMessageBatchRequestEntry);
+                        }
+                    }
+                });
+            long endTime = System.currentTimeMillis();
+
+            System.out.println(containerKey+" Proccess files " + (endTime - startTime) + " milliseconds");
+
+//        for(MultipartFile multipartFile : multipartFiles) {
+//
+//            FileProcessed fileProcessed = this.identifyTaxDocument(containerKey, multipartFile, tokenResultProxy);
+//            result.add(fileProcessed);
+//
+//            if(fileProcessed.getErrors().isEmpty()) {
+//                files.add(fileProcessed.getFile());
+//                SendMessageBatchRequestEntry sendMessageBatchRequestEntry = this.sendMessageMOMService.createSendMessageBatchRequestEntry(fileProcessed.getFile(), containerKey, fileProcessed.getXml());
+//                if(sendMessageBatchRequestEntry != null) {
+//                    sendMessageBatchRequestEntryList.add(sendMessageBatchRequestEntry);
+//                }
+//            }
+//        }
+
+        startTime = System.currentTimeMillis();
+        if(!files.isEmpty()) {
+            this.fileRepository.save(files);
+    //        this.repository.flush();
+
+
+            this.sendMessageMOMService.sendInviteAmazon(sendMessageBatchRequestEntryList);
+
         }
+        endTime = System.currentTimeMillis();
+        System.out.println(containerKey+" Save/SEnd files " + (endTime - startTime) + " milliseconds");
         return result;
     }
 
@@ -65,18 +115,22 @@ public class AmazonS3FileTaxDocumentAnyService extends GumgaService<AmazonS3File
         FileProcessed fileProcessed = this.commonTaxDocumentService.identifyTaxDocument(amazonS3File, containerKey, multipartFile, tokenResultProxy, xml);
 
         if((fileProcessed != null && fileProcessed.getErrors() != null && !fileProcessed.getErrors().isEmpty())) {
+
             return  fileProcessed;
         }
 
-        return processToSaveAmazonS3(containerKey, multipartFile, amazonS3File, xml);
+        fileProcessed.setXml(xml);
+        return fileProcessed;
+//        return processToSaveAmazonS3(containerKey, multipartFile, amazonS3File, xml);
 //        return saveFile(containerKey, multipartFile, amazonS3File);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public FileProcessed processToSaveAmazonS3(String containerKey, MultipartFile multipartFile, AmazonS3File amazonS3File, String xml) {
+        FileProcessed fileProcessed = new FileProcessed(this.repository.save(amazonS3File), Collections.emptyList());
         this.sendMessageMOMService.sendInviteAmazon(amazonS3File, containerKey, xml);
 
-        return new FileProcessed(this.repository.save(amazonS3File), Collections.emptyList());
+        return fileProcessed;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
