@@ -34,13 +34,13 @@ public class ChangeIntegrationStatusTaxDocumentAPI {
 
     }
 
-    @RequestMapping(path = URI_BASE + "/failed-sync/hash/{hash}/{token}")
+    @RequestMapping(path = URI_BASE + "/failed-sync-in-consumer/hash/{hash}/{token}")
     public ResponseEntity<String> changeStatusToFailedSync(@PathVariable String hash, @PathVariable String token) {
         if(!TOKEN.equals(token)) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Token invalido.");
         }
 
-        Boolean result = this.changeIntegrationStatusTaxDocumentService.changeStatusTaxDocumentByHash(hash, FileStatus.FAILED_SYNC);
+        Boolean result = this.changeIntegrationStatusTaxDocumentService.changeStatusTaxDocumentByHash(hash, FileStatus.FAILED_SYNC_IN_CONSUMER);
         if(result) {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body("Alterado com sucesso.");
         }

@@ -48,7 +48,7 @@ public class SendMessageMOMService {
 //            this.jmsTemplate.convertAndSend(invite);
 
         } catch (Exception ex) {
-            file.setFileStatus(FileStatus.FAILED_SYNC);
+            file.setFileStatus(FileStatus.FAILED_SYNC_IN_SEND_TO_MOM);
             LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), ex);
         }
     }
@@ -65,7 +65,7 @@ public class SendMessageMOMService {
             this.amazonSQS.sendMessage(sendMessageRequest);
 //            this.jmsTemplate.convertAndSend(invite);
         } catch (Exception ex) {
-            file.setFileStatus(FileStatus.FAILED_SYNC);
+            file.setFileStatus(FileStatus.FAILED_SYNC_IN_SEND_TO_MOM);
             LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), ex);
         }
     }
@@ -87,7 +87,7 @@ public class SendMessageMOMService {
 
             this.amazonSQS.sendMessage(sendMessageRequest);
         } catch (Exception ex) {
-            file.setFileStatus(FileStatus.FAILED_SYNC);
+            file.setFileStatus(FileStatus.FAILED_SYNC_IN_SEND_TO_MOM);
             LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), ex);
         }
     }
@@ -107,7 +107,7 @@ public class SendMessageMOMService {
             sendMessageBatchRequestEntry.setId(file.getHash());
             sendMessageBatchRequestEntry.setMessageBody(objectMapper.writeValueAsString(invite));
         } catch (JsonProcessingException e) {
-            file.setFileStatus(FileStatus.FAILED_SYNC);
+            file.setFileStatus(FileStatus.FAILED_SYNC_IN_SEND_TO_MOM);
             LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), e);
             return null;
         }

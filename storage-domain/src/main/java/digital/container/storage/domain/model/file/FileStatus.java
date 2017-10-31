@@ -6,6 +6,8 @@ public enum FileStatus {
     NOT_SYNC,
     SYNCHRONIZED,
     PROCESSED,
-    FAILED_SYNC;
+    FAILED_SYNC,
+    FAILED_SYNC_IN_CONSUMER,
+    FAILED_SYNC_IN_SEND_TO_MOM;
 
 }
