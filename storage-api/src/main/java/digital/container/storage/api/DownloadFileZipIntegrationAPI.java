@@ -26,12 +26,16 @@ public class DownloadFileZipIntegrationAPI {
     @Transactional
     public ResponseEntity<Object> generateLinkToDownload(@RequestBody SearchScheduling searchScheduling,
                                                          @RequestParam(name = "integrationToken", defaultValue = "NO_TOKEN") String integrationToken){
-        if(StringUtils.isEmpty(searchScheduling.getOrganizationCode())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O organization token não está preenchido.");
-        }
         if(!TOKEN.equals(integrationToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Token está invalido.");
         }
+        if(StringUtils.isEmpty(searchScheduling.getOrganizationCode())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("O organization token não está preenchido.");
+        }
+        if(searchScheduling.getCnpjs() != null && searchScheduling.getCnpjs().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Você precisar me enviar algum cnpj");
+        }
+
         GumgaThreadScope.organizationCode.set(searchScheduling.getOrganizationCode());
 //        SearchScheduling searchScheduling = new SearchScheduling();
 //        searchScheduling.addCnpj("01632317000103");

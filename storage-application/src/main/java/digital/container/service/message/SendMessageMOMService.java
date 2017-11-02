@@ -8,6 +8,7 @@ import com.amazonaws.services.sqs.model.SendMessageBatchRequestEntry;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import digital.container.repository.file.FileRepository;
 import digital.container.storage.domain.model.file.AbstractFile;
 import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.amazon.AmazonS3File;
@@ -27,6 +28,8 @@ import java.util.Map;
 public class SendMessageMOMService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendMessageMOMService.class);
+    @Autowired
+    private FileRepository fileRepository;
 
 //    @Autowired
     private JmsTemplate jmsTemplate;
@@ -43,6 +46,7 @@ public class SendMessageMOMService {
             sendMessageRequest.setMessageBody(objectMapper.writeValueAsString(invite));
 //            MessageAttributeValue messageAttributeValue = new MessageAttributeValue();
 //            sendMessageRequest.setMessageAttributes(invite);
+            file.setFileStatus(FileStatus.WAS_SENT_TO_MOM);
             this.amazonSQS.sendMessage(sendMessageRequest);
 
 //            this.jmsTemplate.convertAndSend(invite);
@@ -50,6 +54,8 @@ public class SendMessageMOMService {
         } catch (Exception ex) {
             file.setFileStatus(FileStatus.FAILED_SYNC_IN_SEND_TO_MOM);
             LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), ex);
+        } finally {
+//            this.fileRepository.saveAndFlush(file);
         }
     }
 
@@ -62,11 +68,14 @@ public class SendMessageMOMService {
             ObjectMapper objectMapper = new ObjectMapper();
             sendMessageRequest.setMessageBody(objectMapper.writeValueAsString(invite));
 //            sendMessageRequest.setMessageAttributes(invite);
+            file.setFileStatus(FileStatus.WAS_SENT_TO_MOM);
             this.amazonSQS.sendMessage(sendMessageRequest);
 //            this.jmsTemplate.convertAndSend(invite);
         } catch (Exception ex) {
             file.setFileStatus(FileStatus.FAILED_SYNC_IN_SEND_TO_MOM);
             LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), ex);
+        } finally {
+//            this.fileRepository.saveAndFlush(file);
         }
     }
 
@@ -84,11 +93,13 @@ public class SendMessageMOMService {
             sendMessageRequest.setQueueUrl(System.getProperty("mom.queue"));
             ObjectMapper objectMapper = new ObjectMapper();
             sendMessageRequest.setMessageBody(objectMapper.writeValueAsString(invite));
-
+            file.setFileStatus(FileStatus.WAS_SENT_TO_MOM);
             this.amazonSQS.sendMessage(sendMessageRequest);
         } catch (Exception ex) {
             file.setFileStatus(FileStatus.FAILED_SYNC_IN_SEND_TO_MOM);
             LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), ex);
+        } finally {
+//            this.fileRepository.saveAndFlush(file);
         }
     }
 
@@ -104,6 +115,7 @@ public class SendMessageMOMService {
             invite.put("awss3", "YES");
             invite.put("relativePath", file.getRelativePath());
             invite.put("bucket", System.getProperty("amazon.s3.tax_document_bucket"));
+            file.setFileStatus(FileStatus.WAS_SENT_TO_MOM);
             sendMessageBatchRequestEntry.setId(file.getHash());
             sendMessageBatchRequestEntry.setMessageBody(objectMapper.writeValueAsString(invite));
         } catch (JsonProcessingException e) {

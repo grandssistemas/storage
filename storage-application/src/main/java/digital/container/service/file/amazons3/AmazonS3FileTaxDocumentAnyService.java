@@ -100,8 +100,8 @@ public class AmazonS3FileTaxDocumentAnyService extends GumgaService<AmazonS3File
 
         startTime = System.currentTimeMillis();
         if(!files.isEmpty()) {
-            this.fileRepository.save(files);
-    //        this.repository.flush();
+                this.fileRepository.save(files);
+                this.fileRepository.flush();
             new Thread(() -> {
                 sendteste(result);
             }).start();
