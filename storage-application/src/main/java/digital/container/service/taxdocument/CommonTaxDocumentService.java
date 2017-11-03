@@ -80,19 +80,31 @@ public class CommonTaxDocumentService {
     }
 
     public FileProcessed identifyTaxDocument(AbstractFile file, String containerKey, MultipartFile multipartFile, TokenResultProxy tokenResultProxy, String xml) {
+        Boolean letterCorrectionEvent =  Boolean.FALSE;
+        Boolean disableEvent = Boolean.FALSE;
+        Boolean cancellationEvent = this.commonTaxCocumentEventService.isCancellationEvent(xml);
 
-        FileProcessed fileProcessed = this.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+        if(!cancellationEvent) {
+            letterCorrectionEvent = this.commonTaxDocumentEventLetterCorrectionService.isLetterCorrectionEvent(xml);
+        }
 
-        if(!fileProcessed.getErrors().isEmpty()) {
-            Boolean cancellationEvent = this.commonTaxCocumentEventService.isCancellationEvent(xml);
+        if(!cancellationEvent && !letterCorrectionEvent) {
+            disableEvent  = this.commonTaxDocumentEventDisableService.isDisableEvent(xml);
+        }
+
+        FileProcessed fileProcessed = null;
+
+        if(!cancellationEvent && !letterCorrectionEvent && !disableEvent) {
+            fileProcessed = this.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+        } else {
             if(cancellationEvent) {
                 fileProcessed = this.commonTaxCocumentEventService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
             } else {
-                Boolean letterCorrectionEvent = this.commonTaxDocumentEventLetterCorrectionService.isLetterCorrectionEvent(xml);
+
                 if(letterCorrectionEvent) {
-                fileProcessed = this.commonTaxDocumentEventLetterCorrectionService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
+                    fileProcessed = this.commonTaxDocumentEventLetterCorrectionService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
                 } else {
-                    Boolean disableEvent = this.commonTaxDocumentEventDisableService.isDisableEvent(xml);
+
                     if(disableEvent) {
                         fileProcessed = this.commonTaxDocumentEventDisableService.getData(file, multipartFile, containerKey, tokenResultProxy, xml);
                     }
