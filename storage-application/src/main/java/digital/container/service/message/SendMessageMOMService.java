@@ -9,9 +9,14 @@ import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import digital.container.repository.file.FileRepository;
+import digital.container.service.file.databasefile.DatabaseFileService;
 import digital.container.storage.domain.model.file.AbstractFile;
 import digital.container.storage.domain.model.file.FileStatus;
+import digital.container.storage.domain.model.file.FileType;
 import digital.container.storage.domain.model.file.amazon.AmazonS3File;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
+import digital.container.storage.domain.model.util.LocalFileUtil;
+import digital.container.util.SaveLocalFile;
 import io.gumga.core.GumgaThreadScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +25,8 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,13 +35,12 @@ import java.util.Map;
 public class SendMessageMOMService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendMessageMOMService.class);
-    @Autowired
-    private FileRepository fileRepository;
 
-//    @Autowired
-    private JmsTemplate jmsTemplate;
     @Autowired
     private AmazonSQSAsync amazonSQS;
+    @Autowired
+    private DatabaseFileService databaseFileService;
+
 
     public void send(AbstractFile file, String containerKey) {
         try {
@@ -44,8 +50,8 @@ public class SendMessageMOMService {
             sendMessageRequest.setQueueUrl(System.getProperty("mom.queue"));
             ObjectMapper objectMapper = new ObjectMapper();
             sendMessageRequest.setMessageBody(objectMapper.writeValueAsString(invite));
-//            MessageAttributeValue messageAttributeValue = new MessageAttributeValue();
-//            sendMessageRequest.setMessageAttributes(invite);
+
+
             file.setFileStatus(FileStatus.WAS_SENT_TO_MOM);
             this.amazonSQS.sendMessage(sendMessageRequest);
 
@@ -67,10 +73,9 @@ public class SendMessageMOMService {
             sendMessageRequest.setQueueUrl(System.getProperty("mom.queue"));
             ObjectMapper objectMapper = new ObjectMapper();
             sendMessageRequest.setMessageBody(objectMapper.writeValueAsString(invite));
-//            sendMessageRequest.setMessageAttributes(invite);
+
             file.setFileStatus(FileStatus.WAS_SENT_TO_MOM);
             this.amazonSQS.sendMessage(sendMessageRequest);
-//            this.jmsTemplate.convertAndSend(invite);
         } catch (Exception ex) {
             file.setFileStatus(FileStatus.FAILED_SYNC_IN_SEND_TO_MOM);
             LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), ex);
@@ -86,23 +91,38 @@ public class SendMessageMOMService {
             invite.put("type", "XML");
             invite.put("xml", xml);
             invite.put("awss3", "YES");
-            invite.put("relativePath", file.getRelativePath());
             invite.put("bucket", System.getProperty("amazon.s3.tax_document_bucket"));
 
             SendMessageRequest sendMessageRequest = new SendMessageRequest();
             sendMessageRequest.setQueueUrl(System.getProperty("mom.queue"));
+
             ObjectMapper objectMapper = new ObjectMapper();
             sendMessageRequest.setMessageBody(objectMapper.writeValueAsString(invite));
             file.setFileStatus(FileStatus.WAS_SENT_TO_MOM);
             this.amazonSQS.sendMessage(sendMessageRequest);
         } catch (Exception ex) {
-            file.setFileStatus(FileStatus.FAILED_SYNC_IN_SEND_TO_MOM);
+            file.setFileStatus(FileStatus.FAILED_SYNC_IN_SEND_TO_MOM_BUT_WAS_SAVED_CONTINGENCY);
+            createFile(file, xml);
             LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), ex);
         } finally {
-//            this.fileRepository.saveAndFlush(file);
+
         }
     }
 
+    private void createFile(AbstractFile file, String xml) {
+        DatabaseFile databaseFile = new DatabaseFile();
+        databaseFile.setName(file.getName());
+        databaseFile.setHash(file.getHash());
+        databaseFile.setContentType(file.getContentType());
+        databaseFile.setFileType(FileType.TAX_DOCUMENT_IN_CONTINGENCY);
+        databaseFile.setSize(file.getSize());
+        databaseFileService.saveDatabaseFile(databaseFile, xml);
+
+//        File folder = new File(LocalFileUtil.DIRECTORY_PATH + '/' + file.getRelativePath().substring(0,file.getRelativePath().lastIndexOf('/')));
+//        folder.mkdirs();
+//        SaveLocalFile.saveFile(folder, file.getName(), new ByteArrayInputStream(xml.getBytes()));
+    }
+/*
     public SendMessageBatchRequestEntry createSendMessageBatchRequestEntry(AbstractFile file, String containerKey, String xml) {
         SendMessageBatchRequestEntry sendMessageBatchRequestEntry = new SendMessageBatchRequestEntry();
 
@@ -127,7 +147,6 @@ public class SendMessageMOMService {
         return sendMessageBatchRequestEntry;
     }
 
-//    @Async
     public void sendInviteAmazon(List<SendMessageBatchRequestEntry> sendMessageBatchRequestEntryList) {
         if(!sendMessageBatchRequestEntryList.isEmpty()) {
             SendMessageBatchRequest send_batch_request = new SendMessageBatchRequest()
@@ -138,7 +157,7 @@ public class SendMessageMOMService {
         LOGGER.info("Messages send AWS SQS --> " + sendMessageBatchRequestEntryList.size());
     }
 
-
+*/
     private Map createInvete(AbstractFile file, String containerKey, String oi) {
         Map invite = new HashMap();
         invite.put("container", containerKey);
@@ -150,6 +169,7 @@ public class SendMessageMOMService {
         invite.put("gumgaOrganizations", file.getGumgaOrganizations() == null ? "" : file.getGumgaOrganizations());
         invite.put("type", "NO_XML");
         invite.put("awss3", "NO");
+        invite.put("relativePath", file.getRelativePath());
         return invite;
     }
 

@@ -16,6 +16,7 @@ import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -80,6 +81,12 @@ public class DatabaseFileService extends GumgaService<DatabaseFile, String> {
         return new FileProcessed(this.databaseFileRepository.saveAndFlush(newDatabaseFile), Collections.emptyList());
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void saveDatabaseFile(DatabaseFile file, String xml) {
+        this.databaseFileRepository.save(file);
+        this.databaseFilePartService.saveFile(file, xml);
+        this.databaseFileRepository.save(file);
+    }
 
 
     @Transactional(readOnly = true)

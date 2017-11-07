@@ -44,7 +44,7 @@ public class SearchXMLUtil {
 
     public static String getIdeMod(String xml) {
         return Optional
-                .ofNullable(searchGroup1(xml, "<ide>.*<mod>(.*)<\\/mod>.*<\\/ide>"))
+                .ofNullable(searchGroup1(xml, "<ide>.*<mod>(55|65)<\\/mod>.*<\\/ide>"))
                 .orElse(EMPTY);
     }
 

@@ -7,6 +7,7 @@ import digital.container.service.file.amazons3.AmazonS3FileService;
 import digital.container.service.file.databasefile.DatabaseFileService;
 import digital.container.service.file.localfile.LocalFileService;
 import digital.container.storage.domain.model.file.AbstractFile;
+import digital.container.storage.domain.model.file.FileStatus;
 import digital.container.storage.domain.model.file.amazon.AmazonS3File;
 import digital.container.storage.domain.model.file.database.DatabaseFile;
 import digital.container.storage.domain.model.file.FileType;
@@ -219,4 +220,5 @@ public class SearchTaxDocumentService {
     public AbstractFile getFileByHashAndPublic(String hash) {
         return findOneAbstractFile(new GQuery(new Criteria("obj.hash", ComparisonOperator.EQUAL, hash)).and(new Criteria("obj.filePublic", ComparisonOperator.EQUAL, Boolean.TRUE)));
     }
+
 }

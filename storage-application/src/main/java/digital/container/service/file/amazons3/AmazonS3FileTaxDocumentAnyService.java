@@ -60,56 +60,44 @@ public class AmazonS3FileTaxDocumentAnyService extends GumgaService<AmazonS3File
         TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
         List<FileProcessed> result = new ArrayList<>();
         List<AbstractFile> files = new ArrayList<>();
-        List<SendMessageBatchRequestEntry> sendMessageBatchRequestEntryList = new ArrayList<>();
+//        List<SendMessageBatchRequestEntry> sendMessageBatchRequestEntryList = new ArrayList<>();
 
 
         String oi = GumgaThreadScope.organizationCode.get();
 
-        long startTime = System.currentTimeMillis();
+//        long startTime = System.currentTimeMillis();
         multipartFiles.stream().parallel()
-                .forEach( multipartFile -> {
+                .forEach(multipartFile -> {
                     GumgaThreadScope.organizationCode.set(oi);
                     FileProcessed fileProcessed = this.identifyTaxDocument(containerKey, multipartFile, tokenResultProxy);
                     result.add(fileProcessed);
 
-                    if(fileProcessed.getErrors().isEmpty()) {
+                    if (fileProcessed.getErrors().isEmpty()) {
                         files.add(fileProcessed.getFile());
-//                        SendMessageBatchRequestEntry sendMessageBatchRequestEntry = this.sendMessageMOMService.createSendMessageBatchRequestEntry(fileProcessed.getFile(), containerKey, fileProcessed.getXml());
-//                        if(sendMessageBatchRequestEntry != null) {
-//                            sendMessageBatchRequestEntryList.add(sendMessageBatchRequestEntry);
-//                        }
                     }
                 });
-            long endTime = System.currentTimeMillis();
+//        long endTime = System.currentTimeMillis();
 
-            System.out.println(containerKey+" Proccess files " + (endTime - startTime) + " milliseconds");
-
-//        for(MultipartFile multipartFile : multipartFiles) {
-//
-//            FileProcessed fileProcessed = this.identifyTaxDocument(containerKey, multipartFile, tokenResultProxy);
-//            result.add(fileProcessed);
-//
-//            if(fileProcessed.getErrors().isEmpty()) {
-//                files.add(fileProcessed.getFile());
-//                SendMessageBatchRequestEntry sendMessageBatchRequestEntry = this.sendMessageMOMService.createSendMessageBatchRequestEntry(fileProcessed.getFile(), containerKey, fileProcessed.getXml());
-//                if(sendMessageBatchRequestEntry != null) {
-//                    sendMessageBatchRequestEntryList.add(sendMessageBatchRequestEntry);
-//                }
-//            }
-//        }
-
-        startTime = System.currentTimeMillis();
-        if(!files.isEmpty()) {
-                this.fileRepository.save(files);
+//        System.out.println(containerKey + " Proccess files " + (endTime - startTime) + " milliseconds");
+//        startTime = System.currentTimeMillis();
+        if (!files.isEmpty()) {
+            int index = 0;
+            sendteste(result);
+            for (AbstractFile file : files) {
+                this.fileRepository.save(file);
+                if (index % 100 == 0) {
+                    index = 0;
+                    this.fileRepository.flush();
+                }
+                index++;
+            }
+            if (index <= 100) {
                 this.fileRepository.flush();
-            new Thread(() -> {
-                sendteste(result);
-            }).start();
+            }
 
-//            this.sendMessageMOMService.sendInviteAmazon(sendMessageBatchRequestEntryList);
         }
-        endTime = System.currentTimeMillis();
-        System.out.println(containerKey+" Save/SEnd files " + (endTime - startTime) + " milliseconds");
+//        endTime = System.currentTimeMillis();
+//        System.out.println(containerKey + " Save/SEnd files " + (endTime - startTime) + " milliseconds");
         return result;
     }
 
@@ -127,9 +115,9 @@ public class AmazonS3FileTaxDocumentAnyService extends GumgaService<AmazonS3File
         String xml = XMLUtil.getXml(multipartFile);
         FileProcessed fileProcessed = this.commonTaxDocumentService.identifyTaxDocument(amazonS3File, containerKey, multipartFile, tokenResultProxy, xml);
 
-        if((fileProcessed != null && fileProcessed.getErrors() != null && !fileProcessed.getErrors().isEmpty())) {
+        if ((fileProcessed != null && fileProcessed.getErrors() != null && !fileProcessed.getErrors().isEmpty())) {
 
-            return  fileProcessed;
+            return fileProcessed;
         }
 
         fileProcessed.setXml(xml);

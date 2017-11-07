@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,21 +29,36 @@ public class DatabaseFilePartService extends GumgaService<DatabaseFilePart, Stri
     public void saveFile(DatabaseFile databaseFile, MultipartFile multipartFile) {
         try(InputStream inputStream = multipartFile.getInputStream()) {
 
-            while (inputStream.available() > 0) {
-                DatabaseFilePart newDatabaseFilePart = new DatabaseFilePart();
-                newDatabaseFilePart.setDatabaseFile(databaseFile);
-
-                byte buffer[] = new byte[inputStream.available() > DatabaseFilePart.PART_SIZE ? DatabaseFilePart.PART_SIZE : inputStream.available()];
-                newDatabaseFilePart.setRawBytes(buffer);
-                inputStream.read(buffer);
-
-                DatabaseFilePart databaseFilePartSaved = this.databaseFilePartRepository.saveAndFlush(newDatabaseFilePart);
-
-                databaseFile.addDatabaseFilePart(databaseFilePartSaved);
-            }
+            process(databaseFile, inputStream);
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Transactional
+    public void saveFile(DatabaseFile databaseFile, String xml) {
+        try(InputStream inputStream = new ByteArrayInputStream(xml.getBytes())) {
+
+            process(databaseFile, inputStream);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void process(DatabaseFile databaseFile, InputStream inputStream) throws IOException {
+        while (inputStream.available() > 0) {
+            DatabaseFilePart newDatabaseFilePart = new DatabaseFilePart();
+            newDatabaseFilePart.setDatabaseFile(databaseFile);
+
+            byte buffer[] = new byte[inputStream.available() > DatabaseFilePart.PART_SIZE ? DatabaseFilePart.PART_SIZE : inputStream.available()];
+            newDatabaseFilePart.setRawBytes(buffer);
+            inputStream.read(buffer);
+
+            DatabaseFilePart databaseFilePartSaved = this.databaseFilePartRepository.saveAndFlush(newDatabaseFilePart);
+
+            databaseFile.addDatabaseFilePart(databaseFilePartSaved);
         }
     }
 }
