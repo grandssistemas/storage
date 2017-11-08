@@ -81,8 +81,8 @@ public class AmazonS3FileTaxDocumentAnyService extends GumgaService<AmazonS3File
 //        System.out.println(containerKey + " Proccess files " + (endTime - startTime) + " milliseconds");
 //        startTime = System.currentTimeMillis();
         if (!files.isEmpty()) {
+
             int index = 0;
-            sendteste(result);
             for (AbstractFile file : files) {
                 this.fileRepository.save(file);
                 if (index % 100 == 0) {
@@ -94,7 +94,7 @@ public class AmazonS3FileTaxDocumentAnyService extends GumgaService<AmazonS3File
             if (index <= 100) {
                 this.fileRepository.flush();
             }
-
+            sendteste(result);
         }
 //        endTime = System.currentTimeMillis();
 //        System.out.println(containerKey + " Save/SEnd files " + (endTime - startTime) + " milliseconds");
