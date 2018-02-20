@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.WebApplicationInitializer;
@@ -41,6 +43,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @Configuration
 @EnableWebMvc
+@EnableAsync
 @ComponentScan(basePackages = {"digital.container", "io.gumga"})
 @Import(Application.class)
 public class WebConfig extends WebMvcConfigurerAdapter implements WebApplicationInitializer {
@@ -111,6 +114,15 @@ public class WebConfig extends WebMvcConfigurerAdapter implements WebApplication
     public void addInterceptors(InterceptorRegistry registry) {
         //Para utilizar o Segurança você precisa descomentar a linha abaixo.
         registry.addInterceptor(gumgaRequestFilter());
+    }
+
+    @Bean
+    public ThreadPoolTaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
+        pool.setCorePoolSize(15);
+        pool.setMaxPoolSize(20);
+        pool.setWaitForTasksToCompleteOnShutdown(true);
+        return pool;
     }
 
 

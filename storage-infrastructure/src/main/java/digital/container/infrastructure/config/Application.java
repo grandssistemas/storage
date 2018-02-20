@@ -54,7 +54,6 @@ import com.zaxxer.hikari.HikariDataSource;
 @ComponentScan(basePackages = {"digital.container", "io.gumga"})
 @EnableJpaRepositories(repositoryFactoryBeanClass = GumgaRepositoryFactoryBean.class, basePackages = {"digital.container", "io.gumga"})
 @EnableTransactionManagement(proxyTargetClass = true)
-@EnableAsync
 public class Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
@@ -223,14 +222,7 @@ public class Application {
                 .build());
     }
 
-    @Bean
-    public ThreadPoolTaskExecutor taskExecutor() {
-        ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
-        pool.setCorePoolSize(15);
-        pool.setMaxPoolSize(20);
-        pool.setWaitForTasksToCompleteOnShutdown(true);
-        return pool;
-    }
+
 
 }
 

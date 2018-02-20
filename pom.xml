@@ -292,7 +292,7 @@
     <module>storage-application</module>
     <module>storage-gateway</module>
     <module>storage-api</module>
-    <module>storage-presentation</module>
+    <!--<module>storage-presentation</module>-->
     <!--<module>container-boot</module>-->
   </modules>
 </project>

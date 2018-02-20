@@ -8,6 +8,7 @@ import com.amazonaws.services.sqs.model.SendMessageBatchRequestEntry;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import digital.container.repository.file.AmazonS3FileRepository;
 import digital.container.repository.file.FileRepository;
 import digital.container.service.file.databasefile.DatabaseFileService;
 import digital.container.storage.domain.model.file.AbstractFile;
@@ -40,7 +41,8 @@ public class SendMessageMOMService {
     private AmazonSQSAsync amazonSQS;
     @Autowired
     private DatabaseFileService databaseFileService;
-
+//    @Autowired
+//    private AmazonS3FileRepository amazonS3FileRepository;
 
     public void send(AbstractFile file, String containerKey) {
         try {
@@ -99,8 +101,10 @@ public class SendMessageMOMService {
             ObjectMapper objectMapper = new ObjectMapper();
             sendMessageRequest.setMessageBody(objectMapper.writeValueAsString(invite));
             file.setFileStatus(FileStatus.WAS_SENT_TO_MOM);
+//            amazonS3FileRepository.changeStatusByID(file.getId(), FileStatus.WAS_SENT_TO_MOM);
             this.amazonSQS.sendMessage(sendMessageRequest);
         } catch (Exception ex) {
+//            amazonS3FileRepository.changeStatusByID(file.getId(), FileStatus.FAILED_SYNC_IN_SEND_TO_MOM_BUT_WAS_SAVED_CONTINGENCY);
             file.setFileStatus(FileStatus.FAILED_SYNC_IN_SEND_TO_MOM_BUT_WAS_SAVED_CONTINGENCY);
             createFile(file, xml);
             LOGGER.error("Erro ao enviar o arquivo:"+file.getHash(), ex);

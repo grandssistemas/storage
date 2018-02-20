@@ -60,48 +60,57 @@ public class AmazonS3FileTaxDocumentAnyService extends GumgaService<AmazonS3File
         TokenResultProxy tokenResultProxy = this.securityTokenService.searchOiSoftwareHouseAndAccountant(tokenSoftwareHouse, tokenAccountant);
         List<FileProcessed> result = new ArrayList<>();
         List<AbstractFile> files = new ArrayList<>();
-//        List<SendMessageBatchRequestEntry> sendMessageBatchRequestEntryList = new ArrayList<>();
 
+        if(multipartFiles.size() >= 100) {
+            String oi = GumgaThreadScope.organizationCode.get();
 
-        String oi = GumgaThreadScope.organizationCode.get();
+            multipartFiles.stream().parallel()
+                    .forEach(multipartFile -> {
+                        GumgaThreadScope.organizationCode.set(oi);
+                        FileProcessed fileProcessed = this.identifyTaxDocument(containerKey, multipartFile, tokenResultProxy);
+                        result.add(fileProcessed);
 
-//        long startTime = System.currentTimeMillis();
-        multipartFiles.stream().parallel()
-                .forEach(multipartFile -> {
-                    GumgaThreadScope.organizationCode.set(oi);
-                    FileProcessed fileProcessed = this.identifyTaxDocument(containerKey, multipartFile, tokenResultProxy);
-                    result.add(fileProcessed);
+                        if (fileProcessed.getErrors().isEmpty()) {
+                            files.add(fileProcessed.getFile());
+                        }
+                    });
+        } else {
+            for (MultipartFile multipartFile : multipartFiles) {
+                FileProcessed fileProcessed = this.identifyTaxDocument(containerKey, multipartFile, tokenResultProxy);
+                result.add(fileProcessed);
 
-                    if (fileProcessed.getErrors().isEmpty()) {
-                        files.add(fileProcessed.getFile());
-                    }
-                });
-//        long endTime = System.currentTimeMillis();
+                if (fileProcessed.getErrors().isEmpty()) {
+                    files.add(fileProcessed.getFile());
+                }
+            }
+        }
 
-//        System.out.println(containerKey + " Proccess files " + (endTime - startTime) + " milliseconds");
-//        startTime = System.currentTimeMillis();
         if (!files.isEmpty()) {
 
             int index = 0;
             for (AbstractFile file : files) {
                 this.fileRepository.save(file);
-                if (index % 100 == 0) {
+                if (index % 300 == 0) {
                     index = 0;
                     this.fileRepository.flush();
                 }
                 index++;
             }
-            if (index <= 100) {
+            if (index <= 300) {
                 this.fileRepository.flush();
             }
+
             sendteste(result);
+
+
+
         }
-//        endTime = System.currentTimeMillis();
-//        System.out.println(containerKey + " Save/SEnd files " + (endTime - startTime) + " milliseconds");
+
         return result;
     }
 
-    private void sendteste(List<FileProcessed> result) {
+
+    public void sendteste(List<FileProcessed> result) {
         result
                 .stream()
                 .filter(f -> f.getErrors() != null && f.getErrors().isEmpty() && f.getXml() != null)
