@@ -64,6 +64,8 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
 
     @Column(name = "id_file_backup")
     private String idFileBackup;
+    @Column(name = "migration")
+    private Boolean migration = Boolean.FALSE;
 
     public String getName() {
         return name;
@@ -322,4 +324,12 @@ public abstract class AbstractFile extends GumgaSharedModelUUID {
     }
 
     protected abstract String getHashFile();
+
+    public Boolean getMigration() {
+        return migration;
+    }
+
+    public void setMigration(Boolean migration) {
+        this.migration = migration;
+    }
 }

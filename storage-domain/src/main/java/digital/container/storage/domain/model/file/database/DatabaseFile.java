@@ -21,6 +21,7 @@ import java.util.List;
 @GumgaMultitenancy
 public class DatabaseFile extends AbstractFile {
 
+
     @JsonIgnore
     @OneToMany(mappedBy = "databaseFile", fetch = FetchType.LAZY)
     @OrderBy("id")
@@ -46,4 +47,6 @@ public class DatabaseFile extends AbstractFile {
     protected String getHashFile() {
         return GenerateHash.generateDatabaseFile();
     }
+
+
 }

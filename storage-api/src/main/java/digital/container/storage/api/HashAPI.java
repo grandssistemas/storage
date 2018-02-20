@@ -8,11 +8,15 @@ import digital.container.service.download.LinkDownloadService;
 import digital.container.service.taxdocument.SearchTaxDocumentService;
 import digital.container.storage.domain.model.download.LinkDownload;
 import digital.container.storage.domain.model.file.*;
+import digital.container.storage.domain.model.file.database.DatabaseFile;
+import digital.container.storage.domain.model.file.database.DatabaseFilePart;
 import digital.container.storage.domain.model.util.IntegrationTokenUtil;
 import digital.container.storage.util.SendDataFileHttpServlet;
 import digital.container.storage.util.SendDataLocalFileHttpServlet;
 import io.gumga.core.GumgaThreadScope;
 import io.gumga.presentation.exceptionhandler.GumgaRunTimeException;
+import okhttp3.*;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +27,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(path = "/api/file-hash")
@@ -31,6 +40,8 @@ public class HashAPI {
     private final SearchTaxDocumentService searchTaxDocumentService;
     private final LinkDownloadService linkDownloadService;
     private final SendDataFileHttpServlet sendDataFileHttpServlet;
+    @Autowired
+    private DatabaseFileRepository databaseFileRepository;
 
     @Autowired
     public HashAPI(LinkDownloadService linkDownloadService,
@@ -128,6 +139,52 @@ public class HashAPI {
         if(linkDownload != null) {
             SendDataLocalFileHttpServlet.send(linkDownload, httpServletResponse);
         }
+    }
+
+
+    OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(5, TimeUnit.MINUTES)
+            .writeTimeout(5, TimeUnit.MINUTES)
+            .readTimeout(5, TimeUnit.MINUTES)
+            .build();
+
+    @Transactional
+    @RequestMapping(path = "/public/migration")
+    public Boolean integrate() throws IOException {
+        GumgaThreadScope.ignoreCheckOwnership.set(Boolean.TRUE);
+        for (DatabaseFile databaseFile : databaseFileRepository.findAll()) {
+            if(FileType.ANYTHING.equals(databaseFile.getFileType()) && (databaseFile.getMigration() == null || !databaseFile.getMigration())) {
+                Hibernate.initialize(databaseFile.getParts());
+                MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+
+                File file = new File(databaseFile.getName());
+                FileOutputStream fos = new FileOutputStream(file);
+                for (DatabaseFilePart databaseFilePart : databaseFile.getParts()) {
+                    fos.write(databaseFilePart.getRawBytes());
+                }
+                fos.close();
+
+                RequestBody requestBody = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("file", databaseFile.getName(), RequestBody.create(okhttp3.MediaType.parse(MediaType.IMAGE_PNG_VALUE), file))
+                        .build();
+                Request build = new Request.Builder()
+                        .url(String.format("http://localhost:8085/storage-api/api/v2/file/public/upload/%s/migration/%s/%s/%s?shared=true&storageType=DATABASE", databaseFile.getContainerKey(), databaseFile.getId(), databaseFile.getOi(), databaseFile.getHash()))
+                        .post(requestBody)
+                        .addHeader("content-type", "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW")
+                        .build();
+
+                Response execute = client.newCall(build).execute();
+                execute.close();
+            }
+            databaseFile.setMigration(Boolean.TRUE);
+
+
+//            filesGroup.forEach(file -> builder.addFormDataPart("files", file.getName(), RequestBody.create(MediaType.parse(mediaType), file)));
+
+        }
+        GumgaThreadScope.ignoreCheckOwnership.set(Boolean.FALSE);
+        return Boolean.TRUE;
     }
 
 }

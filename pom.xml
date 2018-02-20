@@ -263,6 +263,11 @@
                 <artifactId>postgresql</artifactId>
                 <version>9.4-1202-jdbc42</version>
             </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>3.8.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
